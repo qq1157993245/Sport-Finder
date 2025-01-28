@@ -1,9 +1,9 @@
-import { Text, View, StyleSheet} from "react-native";
+import { Text, View,  StyleSheet } from 'react-native';
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Sportsfinder</Text>
+      <Text style={styles.text}>SportsFinder</Text>
     </View>
   );
 }
@@ -11,13 +11,11 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#25292e",
+    backgroundColor: '#25292e',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
   text: {
-      color: "white"
-  }
-
-})
+    color: '#fff',
+  },
+});
