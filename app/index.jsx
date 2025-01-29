@@ -6,7 +6,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Sports</Text>
+      <Text style={styles.text}>Sportssss!!!!</Text>
       <Button title="Go to Login" onPress={() => router.push('/account/login')} />
     </View>
   );
