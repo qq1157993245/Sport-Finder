@@ -1,9 +1,8 @@
 import { View, Text } from 'react-native'
 import React from 'react'
-import {getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, signInWithEmailAndPassword} from "firebase/auth";
 
-//Normal login function. Needs to pass *email* and *password* as parameters.
+//Normal login function. Needs to pass **email** and **password** as parameters.
 function loginAuth(email, password) {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, email, password)
