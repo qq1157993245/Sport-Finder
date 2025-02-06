@@ -4,7 +4,7 @@ import {
     updateProfile,
     sendPasswordResetEmail,
 } from 'firebase/auth'
-import {auth} from '../config/firebaseConfig.JS'
+import {auth} from '../(auth)/config/firebaseConfig'
 import { setDoc, doc } from "firebase/firestore";
 
 
