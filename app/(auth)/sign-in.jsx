@@ -1,20 +1,47 @@
 import { View, Text, ScrollView, Image } from 'react-native'
 import React, { useState } from 'react'
+
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { images } from '../../constants';
 import FormField from '../../components/formfield';
 import CustomButton from '../../components/custombutton';
-import { Link } from 'expo-router'
+import { Link, router } from 'expo-router'
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../(auth)/config/firebaseConfig'
 
 const SignIn = () => {
-  const [form, setForm] = useState({
-    email: '',
-    password: ''
-  })
-
+  // const [form, setForm] = useState({
+  //   email: '',
+  //   password: ''
+  // })
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const submit = () => {
+  // const submit = () => {
+
+  // }
+  const signIn = async () => {
+
+    if (email === "" || password === "") {
+      Alert.alert("Error", "Please fill in all fields");
+    }
+    setLoading(true)
+    try {
+      const response = await signInWithEmailAndPassword(auth, email, password)
+      console.log(response);
+      router.push('/home')
+     
+    }
+    catch (error) {
+      console.log(error)
+      alert('Sign in failed: ' + error.message)
+    }
+    finally {
+      setLoading(false)
+    }
 
   }
 
@@ -31,24 +58,24 @@ const SignIn = () => {
 
           <FormField
             title="Email"
-            value={form.email}
-            handleChangeText={(e) => setForm({ ...form, email: e })}
+            value={email}
+            handleChangeText={(text) => setEmail(text)}
             otherStyles="mt-7"
             keyboardType="email-address"
           />
 
           <FormField
             title="Password"
-            value={form.password}
-            handleChangeText={(e) => setForm({ ...form, password: e })}
+            value={password}
+            handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
           />
-
+          
           <CustomButton
             title="Sign In"
-            handlePress={submit}
+            handlePress={signIn}
             containerStyles="mt-7"
-            isLoading={isSubmitting}
+            isLoading={loading}
           />
 
           <View className="justify-center pt-5 flex-row gap-2 items-center">
