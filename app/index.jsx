@@ -22,7 +22,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   // const [isSubmitting, setIsSubmitting] = useState(false)
 
   const signUp= async () => {
@@ -65,7 +65,7 @@ const SignUp = () => {
             value={form.username}
             handleChangeText={(e) => setForm({ ...form, username: e })}
             otherStyles="mt-10"
-          /> */} 
+          /> */}
 
           <FormField
             title="Email"
@@ -87,7 +87,7 @@ const SignUp = () => {
             handlePress={signUp}
             containerStyles="mt-7"
             isLoading={loading}
-          />  
+          />
 
           <CustomButton
             title="Already have an account? Sign in!"

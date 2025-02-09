@@ -11,7 +11,7 @@ const TabIcon = ({ icon, color, name, focused }) => {
         style={{ tintColor: color, width: 24, height: 24, marginTop: 22 }}
       />
       <View style={{ width: 70, alignItems: 'center' }}>
-        <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs`} style={{ color: color}}>
+        <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs`} style={{ color: color }}>
           {name}
         </Text>
       </View>
@@ -24,42 +24,32 @@ const TabsLayout = () => {
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#007AFF', // Active tab color (clicked tab)
-        tabBarInactiveTintColor: 'gray', // Inactive tabs color
+        tabBarActiveTintColor: '#D3D3D3', // Light gray when active
+        tabBarInactiveTintColor: 'gray', // Dark gray when inactive
         tabBarInactiveBackgroundColor: 'black',
         tabBarStyle: {
           backgroundColor: 'black', // Overall background color
           borderTopWidth: 1,
           borderTopColor: '#232533',
           height: 84,
-        }
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+        tabBarItemStyle: {
+          flex: 1, // Ensures tabs are evenly spaced
+        },
       }}
     >
       <Tabs.Screen
-        name="home"
+        name="map"
         options={{
-          title: 'Home',
+          title: 'Map',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.home}
+              icon={icons.map}
               color={color}
-              name="Home"
-              focused={focused}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="bookmark"
-        options={{
-          title: 'Bookmark',
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <TabIcon
-              icon={icons.bookmark}
-              color={color}
-              name="Bookmark"
+              name="Map"
               focused={focused}
             />
           ),
