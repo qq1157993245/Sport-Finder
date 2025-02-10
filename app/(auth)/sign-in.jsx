@@ -32,7 +32,7 @@ const SignIn = () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password)
       console.log(response);
-      router.push('/home')
+      router.push('/map')
      
     }
     catch (error) {
