@@ -91,6 +91,13 @@ const SignIn = () => {
               Sign up!
             </Link>
           </View>
+
+          <View className="items-center mt-3">
+            <Link href="/forgotPassword" className="text-blue-400 text-sm font-psemibold">
+              Forgot Password?
+            </Link>
+          </View>
+          
         </View>
       </ScrollView>
     </SafeAreaView>
