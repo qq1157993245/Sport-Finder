@@ -8,9 +8,9 @@ import FormField from '../../components/formfield';
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
 
-  const [username, setUsername] = useState("Enter Your Username");
-  const [age, setAge] = useState("Enter your age");
-  const [favoriteSport, setFavoriteSport] = useState("Enter your Favorite Sport");
+  const [username, setUsername] = useState("");
+  const [age, setAge] = useState("");
+  const [favoriteSport, setFavoriteSport] = useState("");
 
   const handleUpdatePassword = () => {
     console.log("Update Password Clicked");
@@ -59,17 +59,18 @@ const Profile = () => {
         <CustomButton
           title="Update Password"
           handlePress={handleUpdatePassword}
-          containerStyles="bg-gray-700 text-white mb-4"
+          containerStyles="bg-gray-500 text-white mb-4"
+        />
+        
+        <CustomButton
+          title="Logout"
+          handlePress={handleLogout}
+          containerStyles="bg-gray-500 text-white mb-4"
         />
         <CustomButton
           title="Delete Account"
           handlePress={handleDeleteAccount}
           containerStyles="bg-red-600 text-white mb-4"
-        />
-        <CustomButton
-          title="Logout"
-          handlePress={handleLogout}
-          containerStyles="bg-gray-500 text-white"
         />
       </View>
     </SafeAreaView>

@@ -30,19 +30,23 @@ const SignUp = () => {
     if (email === "" || password === "") {
       Alert.alert("Error", "Please fill in all fields");
     }
-    setLoading(true)
-    try {
-      const response = await createUserWithEmailAndPassword(auth, email, password)
-      console.log(response);
-      router.push('/map')
+    
+    else{
+      setLoading(true)
+      try {
+        const response = await createUserWithEmailAndPassword(auth, email, password)
+        console.log(response);
+        router.push('/map')
+      }
+      catch (error) {
+        console.log(error)
+        alert('Sign Up failed: ' + error.message)
+      }
+      finally {
+        setLoading(false)
+      }
     }
-    catch (error) {
-      console.log(error)
-      alert('Sign Up failed: ' + error.message)
-    }
-    finally {
-      setLoading(false)
-    }
+    
 
   }
   return (
