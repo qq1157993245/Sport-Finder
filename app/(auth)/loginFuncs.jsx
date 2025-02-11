@@ -1,37 +1,28 @@
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider,
-    signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup} from "firebase/auth";
+import { auth } from './config/firebaseConfig';
 
-// Normal login function using email and password
-export function loginAuth(email, password) {
-  const auth = getAuth();
-  return signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log('User logged in: ', user);
-      return user;
-    })
-    .catch((error) => {
-      console.error('Error during login: ', error);
-      throw error;
-    });
+//Normal login function. Needs to pass **email** and **password** as parameters.
+export async function loginAuth(email, password) {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    console.log("Successfully logged in with password!");
+
+    return { success: 1, message: "Successfully logged in with password!" };
+  } catch (error) {
+    console.error("Password log in error: ", error);
+    return { success: 0, message: error.message };
+  }
 }
 
-// Google login function
-export function googleAuth() {
-  const provider = new GoogleAuthProvider();
-  const auth = getAuth();
-
-  return signInWithRedirect(auth, provider)
-    .then(() => getRedirectResult(auth))
-    .then((result) => {
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      const token = credential.accessToken;
-      const user = result.user;
-      console.log('Google login successful: ', user);
-      return user;
-    })
-    .catch((error) => {
-      console.error('Google login error: ', error);
-      throw error;
-    });
+//Google login function.
+export async function googleAuth() {
+  try{
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+    console.log("Successfully logged in with google!");
+    return {success: 1, message: "Successfully logged in with google!"}
+  }catch(error){
+    console.error("Google log in error: ", error);
+    return {success: 0, message: error.message}
+  }
 }
