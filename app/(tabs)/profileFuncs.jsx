@@ -1,18 +1,19 @@
 import { auth, db } from "../(auth)/config/firebaseConfig";
 import { updateDoc,deleteDoc, doc } from "firebase/firestore"; 
 import { deleteUser, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider  } from "firebase/auth";
+import { setOptions } from "expo-splash-screen";
 
-//Update user's username, favoritesports,etc
+//Update user's username, favoriteSport,etc
 export async function updateData(user) {
   try {
     const currentUser = auth.currentUser;
     const userRef = doc(db, "users", currentUser.uid);
 
     await updateDoc(userRef, {
-      username: user.userName,
-      userAge: user.age,
-      favoriteSports: user.favoriteSports,
-    });
+      username: user.username,
+      age: user.age,
+      favoriteSport: user.favoriteSport,
+    }, setOptions);
     console.log("Document updated successfully!");
     return {success: 1, message: "Document updated successfully!"};
   } catch (error) {

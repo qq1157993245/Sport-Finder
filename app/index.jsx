@@ -2,13 +2,6 @@ import { useState } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
-import {auth} from '../app/(auth)/config/firebaseConfig'
-import {
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  updateProfile,
-  sendPasswordResetEmail,
-} from 'firebase/auth'
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
@@ -16,34 +9,19 @@ import {signUp} from './(auth)/signUpFuncs';
 
 const SignUp = () => {
 
-  function handleConfirmPassword(text) {
-    setConfirmPassword(text);
-    if (text !== password) {
-      setError('Passwords do not match');
-    } else {
-      setError('');
-    }
-  }
-
-  function handleSignUp() {
-    let success = 0;
-    if(!error) {
-      success = signUp(email, password, confirmPassword);
-      if (success) {
+  async function handleSignUp() {
+      const response = await signUp(email, password, confirmPassword);
+      if (response.success) {
         router.push('/map');
+      }else{
+        setError(response.message);
       }
-    } 
   }
 
-  const [form, setForm] = useState({
-    email:'',
-    password:''
-  })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   // const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -82,21 +60,21 @@ const SignUp = () => {
             value={password}
             handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
+            secureTextEntry
           />
 
           <FormField
             title="Confirm Password"
             value={confirmPassword}
-            handleChangeText={(text) => handleConfirmPassword(text)}
+            handleChangeText={(text) => setConfirmPassword(text)}
             otherStyles="mt-7"
+            secureTextEntry
           />
           {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 
           <CustomButton
             title="Sign Up"
-            handlePress={()=>{
-              handleSignUp();
-            }}
+            handlePress={()=>handleSignUp()}
             containerStyles="mt-7"
             // isLoading={loading}
           />

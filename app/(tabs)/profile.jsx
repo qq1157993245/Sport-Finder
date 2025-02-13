@@ -1,9 +1,10 @@
-import { View, Text } from 'react-native';
+import { View, Text, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import FormField from '../../components/formfield';
+import { changePassword, deleteAccount, logOut, updateData } from './profileFuncs';
 
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
@@ -13,15 +14,16 @@ const Profile = () => {
   const [favoriteSport, setFavoriteSport] = useState("");
 
   const handleUpdatePassword = () => {
-    console.log("Update Password Clicked");
+    router.replace('/forgotPassword'); // Redirect to forgot password page
   };
 
   const handleDeleteAccount = () => {
-    console.log("Delete Account Clicked");
+    deleteAccount();
+    router.replace("/");// Redirect to sign up page
   };
 
   const handleLogout = () => {
-    console.log("Logging out...");
+    logOut();
     router.replace("/sign-in"); // Redirect to sign-in and prevent going back
   };
 
@@ -35,21 +37,30 @@ const Profile = () => {
           title="Username"
           value={username}
           placeholder="Enter username"
-          handleChangeText={setUsername}
+          handleChangeText={(text)=>{
+            setUsername(text);
+            updateData({username: text, age, favoriteSport});
+          }}
           otherStyles="mt-2"
         />
         <FormField
           title="Age"
           value={age}
           placeholder="Enter your age"
-          handleChangeText={setAge}
+          handleChangeText={(text)=>{
+            setAge(text);
+            updateData({username, age: text, favoriteSport});
+          }}
           otherStyles="mt-2"
         />
         <FormField
           title="Favorite Sport"
           value={favoriteSport}
           placeholder="Enter your favorite sport"
-          handleChangeText={setFavoriteSport}
+          handleChangeText={(text)=>{
+            setFavoriteSport(text);
+            updateData({username, age, favoriteSport: text});
+          }}
           otherStyles="mt-2"
         />
       </View>

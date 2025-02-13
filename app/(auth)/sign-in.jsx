@@ -6,47 +6,22 @@ import { images } from '../../constants';
 import FormField from '../../components/formfield';
 import CustomButton from '../../components/custombutton';
 import { Link, router } from 'expo-router'
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import {auth} from '../(auth)/config/firebaseConfig'
+import { loginAuth } from './loginFuncs';
 
 const SignIn = () => {
-  // const [form, setForm] = useState({
-  //   email: '',
-  //   password: ''
-  // })
+
+  async function handleSignIn() {
+    const response = await loginAuth(email, password);
+    if (response.success) {
+      router.push('/map');
+    } else {
+      setError(response.message);
+    }
+  }
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  // const submit = () => {
-
-  // }
-  const signIn = async () => {
-
-    if (email === "" || password === "") {
-      Alert.alert("Error", "Please fill in all fields");
-    }
-    else{
-      setLoading(true)
-      try {
-        const response = await signInWithEmailAndPassword(auth, email, password)
-        console.log(response);
-        router.push('/map')
-        
-      }
-      catch (error) {
-        console.log(error)
-        alert('Sign in failed: ' + error.message)
-      }
-      finally {
-        setLoading(false)
-      }
-    }
-    
-
-  }
+  const [error, setError] = useState('');
 
   return (
     <SafeAreaView className="bg-black h-full">
@@ -76,10 +51,11 @@ const SignIn = () => {
           
           <CustomButton
             title="Sign In"
-            handlePress={signIn}
+            handlePress={()=>handleSignIn()}
             containerStyles="mt-7"
-            isLoading={loading}
           />
+
+          {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 
           <View className="justify-center pt-5 flex-row gap-2 items-center">
             <Text className="text-lg text-gray-100 font-pregular">
