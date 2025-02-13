@@ -11,9 +11,29 @@ import {
 } from 'firebase/auth'
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
+import {signUp} from './(auth)/signUpFuncs';
 
 
 const SignUp = () => {
+
+  function handleConfirmPassword(text) {
+    setConfirmPassword(text);
+    if (text !== password) {
+      setError('Passwords do not match');
+    } else {
+      setError('');
+    }
+  }
+
+  function handleSignUp() {
+    let success = 0;
+    if(!error) {
+      success = signUp(email, password, confirmPassword);
+      if (success) {
+        router.push('/map');
+      }
+    } 
+  }
 
   const [form, setForm] = useState({
     email:'',
@@ -21,34 +41,12 @@ const SignUp = () => {
   })
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   // const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const signUp= async () => {
-
-    if (email === "" || password === "") {
-      Alert.alert("Error", "Please fill in all fields");
-    }
-    
-    else{
-      setLoading(true)
-      try {
-        const response = await createUserWithEmailAndPassword(auth, email, password)
-        console.log(response);
-        router.push('/map')
-      }
-      catch (error) {
-        console.log(error)
-        alert('Sign Up failed: ' + error.message)
-      }
-      finally {
-        setLoading(false)
-      }
-    }
-    
-
-  }
   return (
     <SafeAreaView className="bg-black h-full">
       <ScrollView>
@@ -86,11 +84,21 @@ const SignUp = () => {
             otherStyles="mt-7"
           />
 
+          <FormField
+            title="Confirm Password"
+            value={confirmPassword}
+            handleChangeText={(text) => handleConfirmPassword(text)}
+            otherStyles="mt-7"
+          />
+          {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
+
           <CustomButton
             title="Sign Up"
-            handlePress={signUp}
+            handlePress={()=>{
+              handleSignUp();
+            }}
             containerStyles="mt-7"
-            isLoading={loading}
+            // isLoading={loading}
           />
 
           <CustomButton

@@ -8,44 +8,38 @@ import {auth} from '../(auth)/config/firebaseConfig'
 import { setDoc, doc } from "firebase/firestore";
 
 
-export const signUp = async (email, password, conFirmPassword, username) => {
+export const signUp = async (email, password, confirmPassword) => {
    try{
         //ensure both passwords match
         if (password != confirmPassword){
             throw Error('Passwords do not match');
         }
 
-        const userRef = doc(db, 'users', username.toLowerCase());
-
-        //See if username is taken already
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()){
-            throw Error(`Username ${username} already exists`);
-        }
-
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        // change display name to username
-        await updateProfile(userCredential.user, {displayName: username})
-
-        //todo add more fields
-        const userProfile = {
-            email,
-            username,
-            uid: userCredential.user.uid,
-            first,
-            last,
-            pfp,
-        }
-        await setDoc(userRef, userProfile);
 
         await sendEmailVerification(userCredential.user);
 
-        return userCredential;
+        // change display name to username
+        // await updateProfile(userCredential.user, {displayName: username})
+
+        //todo add more fields
+        const userProfile = {
+            email:email,
+            userName: '',
+            age:'',
+            favoriteSport:''
+        }
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        console.log(auth.currentUser.uid);
+
+        await setDoc(userRef, userProfile);
+
+        console.log("Successfully sign up!");
+        return {success : 1, message: "Successfully sign up!"};
 
    } catch (error) {
-    console.error('Sign Up Failed ' + error.message);
-    throw error;
+    console.log("Fail to sign up");
+    return {success : 0, message: "Fail to sign up"};
    }
 }
 
