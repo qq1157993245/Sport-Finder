@@ -7,6 +7,7 @@ import FormField from '../../components/formfield';
 import CustomButton from '../../components/custombutton';
 import { Link, router } from 'expo-router'
 import { loginAuth } from './loginFuncs';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const SignIn = () => {
 
@@ -25,7 +26,7 @@ const SignIn = () => {
 
   return (
     <SafeAreaView className="bg-black h-full">
-      <ScrollView>
+      <KeyboardAwareScrollView>
         <View className="w-full justify-center min-h-[70vh] px-4 my-6">
           <Image source={images.sflogo2}
             resizeMode='contain' className="w-[115px] h-[35px]"
@@ -75,7 +76,7 @@ const SignIn = () => {
           </View>
           
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   )
 }

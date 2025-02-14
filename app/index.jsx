@@ -5,6 +5,7 @@ import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 
 const SignUp = () => {
@@ -27,7 +28,7 @@ const SignUp = () => {
 
   return (
     <SafeAreaView className="bg-black h-full">
-      <ScrollView>
+      <KeyboardAwareScrollView>
 
         <View
           className="w-full flex justify-center h-full px-4 my-6"
@@ -85,7 +86,7 @@ const SignUp = () => {
             containerStyles="mt-7"
           />
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
