@@ -17,7 +17,7 @@ const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // const submit = () => {
@@ -34,7 +34,7 @@ const SignIn = () => {
         const response = await signInWithEmailAndPassword(auth, email, password)
         console.log(response);
         router.push('/map')
-        
+
       }
       catch (error) {
         console.log(error)
@@ -44,7 +44,7 @@ const SignIn = () => {
         setLoading(false)
       }
     }
-    
+
 
   }
 
@@ -56,7 +56,7 @@ const SignIn = () => {
             resizeMode='contain' className="w-[115px] h-[35px]"
           />
           <Text className="text-3xl text-white text-semibold mt-10 ml-1 font-psemibold" >
-          Login
+          Sign In
           </Text>
 
           <FormField
@@ -73,7 +73,13 @@ const SignIn = () => {
             handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
           />
-          
+
+          <View className="mt-2 self-end">
+            <Link href="/forgotPassword" className="text-blue-400 text-sm font-psemibold">
+              Forgot Password?
+            </Link>
+          </View>
+
           <CustomButton
             title="Sign In"
             handlePress={signIn}
@@ -92,12 +98,6 @@ const SignIn = () => {
             </Link>
           </View>
 
-          <View className="items-center mt-3">
-            <Link href="/forgotPassword" className="text-blue-400 text-sm font-psemibold">
-              Forgot Password?
-            </Link>
-          </View>
-          
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -24,11 +24,11 @@ const TabsLayout = () => {
     <Tabs
       screenOptions={{
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#D3D3D3', // Light gray when active
-        tabBarInactiveTintColor: 'gray', // Dark gray when inactive
+        tabBarActiveTintColor: '#D3D3D3',
+        tabBarInactiveTintColor: 'gray',
         tabBarInactiveBackgroundColor: 'black',
         tabBarStyle: {
-          backgroundColor: 'black', // Overall background color
+          backgroundColor: 'black',
           borderTopWidth: 1,
           borderTopColor: '#232533',
           height: 84,
@@ -36,7 +36,7 @@ const TabsLayout = () => {
           alignItems: 'center',
         },
         tabBarItemStyle: {
-          flex: 1, // Ensures tabs are evenly spaced
+          flex: 1,
         },
       }}
     >
@@ -71,15 +71,15 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="settings"
         options={{
-          title: 'Profile',
+          title: 'settings',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.profile}
+              icon={icons.settings}
               color={color}
-              name="Profile"
+              name="Settings"
               focused={focused}
             />
           ),

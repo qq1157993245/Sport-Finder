@@ -30,7 +30,7 @@ const SignUp = () => {
     if (email === "" || password === "") {
       Alert.alert("Error", "Please fill in all fields");
     }
-    
+
     else{
       setLoading(true)
       try {
@@ -46,7 +46,6 @@ const SignUp = () => {
         setLoading(false)
       }
     }
-    
 
   }
   return (
@@ -57,11 +56,11 @@ const SignUp = () => {
           className="w-full flex justify-center h-full px-4 my-6"
         >
 
-          <Text className="text-center text-3xl justify-center font-semibold text-white mt-10 font-psemibold">
+          <Text className="text-center text-4xl justify-center font-semibold text-white mt-10 font-pextrabold">
             SportsFinder
           </Text>
-          <Text className="text-center text-lg justify-center font-semibold text-white mt-10 font-psemibold">
-            Sign Up to SportsFinder
+          <Text className="text-left text-3xl justify-center font-semibold fontsize-10 text-white mt-10 font-psemibold">
+            Sign Up
           </Text>
 
           {/* <FormField
@@ -93,11 +92,17 @@ const SignUp = () => {
             isLoading={loading}
           />
 
-          <CustomButton
-            title="Already have an account? Sign in!"
-            handlePress={() => router.push('/sign-in')}
-            containerStyles="mt-7"
-          />
+          <View className="justify-center pt-5 flex-row gap-2 items-center">
+            <Text className="text-lg text-gray-100 font-pregular">
+              Already have an account?
+            </Text>
+            <Link
+              href="/sign-in"
+              className='text-white font-psemibold mt-50'>
+              Sign in!
+            </Link>
+          </View>
+
         </View>
       </ScrollView>
     </SafeAreaView>

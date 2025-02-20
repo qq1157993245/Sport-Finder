@@ -5,31 +5,18 @@ import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import FormField from '../../components/formfield';
 
-const Profile = () => {
-  const router = useRouter(); // Initialize router for navigation
+const profile = () => {
+  const router = useRouter();
 
   const [username, setUsername] = useState("");
   const [age, setAge] = useState("");
   const [favoriteSport, setFavoriteSport] = useState("");
 
-  const handleUpdatePassword = () => {
-    console.log("Update Password Clicked");
-  };
-
-  const handleDeleteAccount = () => {
-    console.log("Delete Account Clicked");
-  };
-
-  const handleLogout = () => {
-    console.log("Logging out...");
-    router.replace("/sign-in"); // Redirect to sign-in and prevent going back
-  };
-
   return (
     <SafeAreaView className="bg-black h-full px-6">
-      <Text className="text-white text-3xl font-psemibold mt-6">Profile</Text>
+      <Text className="text-white text-2xl font-psemibold text-center">Profile</Text>
 
-      {/* Profile Fields using FormField Component */}
+      {/* profile Fields using FormField Component */}
       <View className="mt-10 space-y-6">
         <FormField
           title="Username"
@@ -52,29 +39,14 @@ const Profile = () => {
           handleChangeText={setFavoriteSport}
           otherStyles="mt-2"
         />
+        <CustomButton
+          title="Save"
+          containerStyles="bg-gray-500 text-white mt-10"
+        />
       </View>
 
-      {/* Action Buttons */}
-      <View className="mt-12">
-        <CustomButton
-          title="Update Password"
-          handlePress={handleUpdatePassword}
-          containerStyles="bg-gray-500 text-white mb-4"
-        />
-        
-        <CustomButton
-          title="Logout"
-          handlePress={handleLogout}
-          containerStyles="bg-gray-500 text-white mb-4"
-        />
-        <CustomButton
-          title="Delete Account"
-          handlePress={handleDeleteAccount}
-          containerStyles="bg-red-600 text-white mb-4"
-        />
-      </View>
     </SafeAreaView>
   );
 };
 
-export default Profile;
+export default profile;
