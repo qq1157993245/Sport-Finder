@@ -13,7 +13,7 @@ const SignUp = () => {
   async function handleSignUp() {
       const response = await signUp(email, password, confirmPassword);
       if (response.success) {
-        router.push('/map');
+        router.push('/preferences');
       }else{
         setError(response.message);
       }
