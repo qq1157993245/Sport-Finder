@@ -2,7 +2,12 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged, initializeAuth, getReactNativePersistence } from "firebase/auth";
+import React, { useEffect, useState } from "react"
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -21,9 +26,37 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
+const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
+
+const AuthContext = React.createContext();
+
+const AuthProvider = ({ children }) => {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [pending, setPending] = useState(true);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user)
+      setPending(false)
+    });
+  }, []);
+
+  if(pending){
+    return <>Loading...</>
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 //Intialize database
 const db = getFirestore(app);
 
-export { auth, db }
+export { auth, db , AuthContext, AuthProvider }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
@@ -6,13 +6,28 @@ import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { AuthContext } from "./(auth)/config/firebaseConfig";
+import { Redirect } from 'expo-router';
 
 
 const SignUp = () => {
 
+  const { currentUser, pending } = useContext(AuthContext);
+  const [isLoggedIn , setisLoggedIn] = useState(false)
+
+  useEffect(() => {
+    console.log('CHECKING USER ' + currentUser);
+    if (!pending && currentUser) {
+      // Redirect to map if already logged in
+      setisLoggedIn(true);
+      console.log('PUSHING MAP');
+    }
+  }, [pending, currentUser]);
+
   async function handleSignUp() {
       const response = await signUp(email, password, confirmPassword);
       if (response.success) {
+        console.log('CHECKING USER ' + currentUser);
         router.push('/map');
       }else{
         setError(response.message);
@@ -25,7 +40,9 @@ const SignUp = () => {
   const [error, setError] = useState('');
 
   // const [isSubmitting, setIsSubmitting] = useState(false)
-
+  if (isLoggedIn){
+    return <Redirect href="/map" />;
+  }
   return (
     <SafeAreaView className="bg-black h-full">
       <KeyboardAwareScrollView>
