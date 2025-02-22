@@ -1,13 +1,19 @@
 import { StyleSheet, View } from 'react-native';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { onAuthStateChanged, getAuth, User } from 'firebase/auth';
 
 SplashScreen.preventAutoHideAsync();
 
+const auth = getAuth();
+
 const RootLayout = () => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -19,6 +25,18 @@ const RootLayout = () => {
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
   });
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+      setLoading(false);
+    };
+  
+    loadUser();
+  }, []);
 
   useEffect(() => {
     if (error) throw error;

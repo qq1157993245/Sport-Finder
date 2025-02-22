@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
@@ -6,11 +6,22 @@ import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./(auth)/config/firebaseConfig"; 
 
 const SignUp = () => {
 
   async function handleSignUp() {
+
+      useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (user) {
+            router.replace("/map");
+          }
+        });
+        return () => unsubscribe();
+      })
+
       const response = await signUp(email, password, confirmPassword);
       if (response.success) {
         router.push('/map');

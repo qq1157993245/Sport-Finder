@@ -2,6 +2,8 @@ import { auth, db } from "../(auth)/config/firebaseConfig";
 import { updateDoc,deleteDoc, doc } from "firebase/firestore"; 
 import { deleteUser, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider  } from "firebase/auth";
 import { setOptions } from "expo-splash-screen";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 //Update user's username, favoriteSport,etc
 export async function updateData(user) {
@@ -42,6 +44,8 @@ export async function deleteAccount(){
 export async function logOut(){
   try {
     await signOut(auth);
+    await AsyncStorage.removeItem('user');
+    setUser(null);
     console.log('Successfully log out!');
     return {success: 1, message: 'Successfully log out!'};
   } catch (error) {
