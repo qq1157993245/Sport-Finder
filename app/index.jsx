@@ -61,7 +61,6 @@ const SignUp = () => {
             value={password}
             handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
-            secureTextEntry
           />
 
           <FormField
@@ -69,7 +68,6 @@ const SignUp = () => {
             value={confirmPassword}
             handleChangeText={(text) => setConfirmPassword(text)}
             otherStyles="mt-7"
-            secureTextEntry
           />
           {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 

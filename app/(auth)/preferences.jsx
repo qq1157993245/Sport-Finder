@@ -45,6 +45,7 @@ const Preferences = () => {
                 setAge(text);
               }}
               otherStyles="mt-2"
+              keyboardType = "numeric"
             />
             <FormField
               title="Favorite Sport"

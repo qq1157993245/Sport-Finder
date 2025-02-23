@@ -29,6 +29,12 @@ const AuthLayout = () => {
             headerShown: false
           }}
         />
+        <Stack.Screen
+          name="editProfile"
+          options={{
+            headerShown: false
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor ='#161622'
