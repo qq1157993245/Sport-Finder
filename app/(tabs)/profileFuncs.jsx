@@ -1,7 +1,25 @@
 import { auth, db } from "../(auth)/config/firebaseConfig";
-import { updateDoc,deleteDoc, doc } from "firebase/firestore"; 
+import { updateDoc,deleteDoc, getDoc, doc } from "firebase/firestore"; 
 import { deleteUser, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider  } from "firebase/auth";
 import { setOptions } from "expo-splash-screen";
+
+export async function getData() {
+  try {
+    const currentUser = auth.currentUser;
+    const userRef = doc(db, "users", currentUser.uid);
+    const response = await getDoc(userRef);
+
+    if (!response.exists()) {
+      return { success: 0, message: "User data not found!" };
+    }
+    
+    console.log("Fetching data successfully!");
+    return {success: 1, data: response.data(), message: "Fetching data successfully!"};
+  } catch (error) {
+    console.error("Error fetching data: ", error);
+    return {success: 0, message: error.message};
+  }
+}
 
 //Update user's username, favoriteSport,etc
 export async function updateData(user) {

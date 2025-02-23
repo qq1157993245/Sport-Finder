@@ -1,18 +1,18 @@
-import { View, Text, Alert } from 'react-native';
-import React, { useState } from 'react';
+import { View, Text, Alert, Image } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import FormField from '../../components/formfield';
-import { changePassword, deleteAccount, logOut, updateData } from './profileFuncs';
+import { changePassword, deleteAccount, logOut, updateData, getData } from './profileFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { UserContext } from '../context/userContext';
+import image from '../../constants/images';
 
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
 
-  const [username, setUsername] = useState("");
-  const [age, setAge] = useState("");
-  const [favoriteSport, setFavoriteSport] = useState("");
+  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport} = useContext(UserContext);
 
   const handleUpdatePassword = () => {
     router.replace('/forgotPassword'); // Redirect to forgot password page
@@ -28,64 +28,63 @@ const Profile = () => {
     router.replace("/sign-in"); // Redirect to sign-in and prevent going back
   };
 
+  const handleEditProfile = () =>{
+    router.push('/editProfile');
+  }
+
+  useEffect(()=>{
+    const fetchData = async ()=>{
+      const response = await getData();
+
+      if (response.success) {
+        setUsername(response.data.username);
+        setAge(response.data.age);
+        setFavoriteSport(response.data.favoriteSport);
+      } else {
+        Alert.alert('Error', response.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <SafeAreaView className="bg-black h-full px-6">
-      <Text className="text-white text-3xl font-psemibold mt-6">Profile</Text>
-        <KeyboardAwareScrollView showsVerticalScrollIndicator = {false}>
-      {/* Profile Fields using FormField Component */}
-          <View className="mt-10 space-y-6">
-            <FormField
-              title="Username"
-              value={username}
-              placeholder="Enter username"
-              handleChangeText={(text)=>{
-                setUsername(text);
-                updateData({username: text, age, favoriteSport});
-              }}
-              otherStyles="mt-2"
-            />
-            <FormField
-              title="Age"
-              value={age}
-              placeholder="Enter your age"
-              handleChangeText={(text)=>{
-                setAge(text);
-                updateData({username, age: text, favoriteSport});
-              }}
-              otherStyles="mt-2"
-            />
-            <FormField
-              title="Favorite Sport"
-              value={favoriteSport}
-              placeholder="Enter your favorite sport"
-              handleChangeText={(text)=>{
-                setFavoriteSport(text);
-                updateData({username, age, favoriteSport: text});
-              }}
-              otherStyles="mt-2"
-            />
-          </View>
+      <Text className="text-white text-3xl font-psemibold mt-6 text-center">Profile</Text>
+      <KeyboardAwareScrollView showsVerticalScrollIndicator = {false}>
+    {/* Profile Fields using FormField Component */}
+        <View className="mt-10 space-y-6">
+          {username && <Text className="text-white text-3xl font-psemibold mt-6 text-center">{username}</Text>}
+          {age && <Text className="text-white text-2xl font-psemibold mt-6 text-center">{age}</Text>}
+          {favoriteSport && <Text className="text-white text-3xl font-psemibold mt-6 text-center">{`Favorite Sport: ${favoriteSport}`}</Text>}
+        </View>
 
-          {/* Action Buttons */}
-          <View className="mt-12">
-            <CustomButton
-              title="Update Password"
-              handlePress={handleUpdatePassword}
-              containerStyles="bg-gray-500 text-white mb-4"
-            />
-            
-            <CustomButton
-              title="Logout"
-              handlePress={handleLogout}
-              containerStyles="bg-gray-500 text-white mb-4"
-            />
-            <CustomButton
-              title="Delete Account"
-              handlePress={handleDeleteAccount}
-              containerStyles="bg-red-600 text-white mb-4"
-            />
-          </View>
-        </KeyboardAwareScrollView>
+        {/* Action Buttons */}
+        <View className="mt-12">
+          <CustomButton
+            title="Edit Profile"
+            handlePress={handleEditProfile}
+            containerStyles="bg-blue-500 text-white mb-4"
+          />
+          
+          <CustomButton
+            title="Update Password"
+            handlePress={handleUpdatePassword}
+            containerStyles="bg-gray-500 text-white mb-4"
+          />
+          
+          <CustomButton
+            title="Logout"
+            handlePress={handleLogout}
+            containerStyles="bg-gray-500 text-white mb-4"
+          />
+          <CustomButton
+            title="Delete Account"
+            handlePress={handleDeleteAccount}
+            containerStyles="bg-red-600 text-white mb-4"
+          />
+        </View>
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

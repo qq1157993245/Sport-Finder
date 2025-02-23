@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './(auth)/config/firebaseConfig';
+import UserProvider from './context/userContext';
+
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
@@ -35,7 +37,8 @@ const RootLayout = () => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
-        <SafeAreaProvider>
+        <UserProvider>
+          <SafeAreaProvider>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
@@ -43,6 +46,7 @@ const RootLayout = () => {
             <Stack.Screen name="/search/[query]" options={{ headerShown: false }} />
           </Stack>
         </SafeAreaProvider>
+       </UserProvider>
       </AuthProvider>
     </GestureHandlerRootView>
   );

@@ -27,8 +27,7 @@ const SignUp = () => {
   async function handleSignUp() {
       const response = await signUp(email, password, confirmPassword);
       if (response.success) {
-        console.log('CHECKING USER ' + currentUser);
-        router.push('/map');
+        router.push('/preferences');
       }else{
         setError(response.message);
       }
@@ -78,7 +77,6 @@ const SignUp = () => {
             value={password}
             handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
-            secureTextEntry
           />
 
           <FormField
@@ -86,7 +84,6 @@ const SignUp = () => {
             value={confirmPassword}
             handleChangeText={(text) => setConfirmPassword(text)}
             otherStyles="mt-7"
-            secureTextEntry
           />
           {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
 
