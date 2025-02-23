@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AuthProvider } from './(auth)/config/firebaseConfig';
+// import { AuthProvider } from './(auth)/config/firebaseConfig';
 import UserProvider from './context/userContext';
 
 SplashScreen.preventAutoHideAsync();
@@ -36,7 +36,6 @@ const RootLayout = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
         <UserProvider>
           <SafeAreaProvider>
           <Stack>
@@ -47,7 +46,6 @@ const RootLayout = () => {
           </Stack>
         </SafeAreaProvider>
        </UserProvider>
-      </AuthProvider>
     </GestureHandlerRootView>
   );
 };

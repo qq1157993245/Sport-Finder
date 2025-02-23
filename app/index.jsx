@@ -6,13 +6,14 @@ import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { AuthContext } from "./(auth)/config/firebaseConfig";
+// import { AuthContext } from "./(auth)/config/firebaseConfig";
 import { Redirect } from 'expo-router';
+import { UserContext } from "./context/userContext";
 
 
 const SignUp = () => {
 
-  const { currentUser, pending } = useContext(AuthContext);
+  const { currentUser, pending } = useContext(UserContext);
   const [isLoggedIn , setisLoggedIn] = useState(false)
 
   useEffect(() => {

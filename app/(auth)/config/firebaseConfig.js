@@ -28,35 +28,35 @@ const app = initializeApp(firebaseConfig);
 
 const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
 
-const AuthContext = React.createContext();
+// const AuthContext = React.createContext();
 
-const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [pending, setPending] = useState(true);
+// const AuthProvider = ({ children }) => {
+//   const [currentUser, setCurrentUser] = useState(null);
+//   const [pending, setPending] = useState(true);
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user)
-      setPending(false)
-    });
-  }, []);
+//   useEffect(() => {
+//     onAuthStateChanged(auth, (user) => {
+//       setCurrentUser(user)
+//       setPending(false)
+//     });
+//   }, []);
 
-  if(pending){
-    return <>Loading...</>
-  }
+//   if(pending){
+//     return <>Loading...</>
+//   }
 
-  return (
-    <AuthContext.Provider
-      value={{
-        currentUser
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
-};
+//   return (
+//     <AuthContext.Provider
+//       value={{
+//         currentUser
+//       }}
+//     >
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
 
 //Intialize database
 const db = getFirestore(app);
 
-export { auth, db , AuthContext, AuthProvider }
+export { auth, db}
