@@ -18,13 +18,13 @@ const Profile = () => {
     router.replace('/forgotPassword'); // Redirect to forgot password page
   };
 
-  const handleDeleteAccount = () => {
-    deleteAccount();
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
     router.replace("/");// Redirect to sign up page
   };
 
-  const handleLogout = () => {
-    logOut();
+  const handleLogout = async () => {
+    await logOut();
     router.replace("/sign-in"); // Redirect to sign-in and prevent going back
   };
 
