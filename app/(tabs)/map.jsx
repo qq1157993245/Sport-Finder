@@ -3,7 +3,7 @@ import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-
+import coordinates from './coordinates.json';
 
 const MapScreen = () => {
   const router = useRouter();
@@ -35,14 +35,18 @@ const MapScreen = () => {
         style={styles.map}
         initialRegion={region}
         onRegionChangeComplete={handleRegionChangeComplete}
+        showsUserLocation={true}
+        showsUsersLocationButton={true}
       >
-        {/* Existing game markers */}
-        {gameMarkers.map((marker) => (
+        {coordinates.map((coordinate, index) => (
           <Marker
-            key={marker.id}
-            coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-            title={marker.sportType}
-            description={`Players: ${marker.numPlayers}, Skill: ${marker.skillLevel}`}
+            key={index} // Important: Use a unique key for each marker
+            coordinate={{
+              latitude: coordinate.latitude,
+              longitude: coordinate.longitude,
+            }}
+            title={coordinate.title}
+            description={coordinate.description}
           />
         ))}
       </MapView>

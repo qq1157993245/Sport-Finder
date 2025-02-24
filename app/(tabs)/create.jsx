@@ -4,27 +4,54 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../../components/custombutton';
 import FormField from '../../components/formfield';
+import {db} from '../(auth)/config/firebaseConfig';
+import { Link, router } from "expo-router";
+import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+
 
 const Create = () => {
-  const router = useRouter();
+  
   const { latitude, longitude } = useLocalSearchParams(); // Get coordinates from MapScreen
-
+  const [latitudeType, setLatitudeType] = useState('');
+  const [longitudeType, setLongitudeType] = useState('');
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
 
-  const handleCreateGame = () => {
-    const newGame = {
-      id: Date.now(),
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      numPlayers,
-      skillLevel,
-      sportType,
-    };
+  const handleCreateGame = async (latitude, longitude) => {
+    try {
+      const coordCollection= collection(db, 'coordinates')
+      const coordinateRef = doc(coordCollection, "user-yag")
+      const latitudeNumber = typeof latitude === 'number' ? latitude : Number(latitude); // Convert if needed.  Handle potential NaN.
+      const longitudeNumber = typeof longitude === 'number' ? longitude : Number(longitude); // Convert if needed. Handle potential NaN.
+      await setDoc(coordinateRef, {
+        latitude: latitudeNumber,
+        longitude: longitudeNumber,
+      });
+      router.push('/map')
+    }
+    catch (error) {
+      console.error('Game creation failed' + error.message)
+      throw error; 
+      router.push('/map')
+    }
+    
 
-    // Store the game in a global state or backend (for now, pass it back)
-    router.replace({ pathname: "/(tabs)/map", params: { newGame: JSON.stringify(newGame) } });
+
+   
+
+
+    // const newGame = {
+    //   id: Date.now(),
+    //   latitude: parseFloat(latitude),
+    //   longitude: parseFloat(longitude),
+    //   numPlayers,
+    //   skillLevel,
+    //   sportType,
+    // };
+
+    // // Store the game in a global state or backend (for now, pass it back)
+    // router.replace({ pathname: "/(tabs)/map", params: { newGame: JSON.stringify(newGame) } });
   };
 
   return (
