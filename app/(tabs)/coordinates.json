@@ -1,0 +1,22 @@
+
+[
+    {
+      "latitude": 37.7749,
+      "longitude": -122.4194,
+      "title": "San Francisco",
+      "description": "A vibrant city"
+    },
+    {
+      "latitude": 34.0522,
+      "longitude": -118.2437,
+      "title": "Los Angeles",
+      "description": "City of Angels"
+    },
+    {
+      "latitude": 40.7128,
+      "longitude": -74.0060,
+      "title": "New York City",
+      "description": "The Big Apple"
+    }
+      
+  ]
