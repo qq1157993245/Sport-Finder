@@ -21,7 +21,7 @@ const Create = () => {
   const handleCreateGame = async (latitude, longitude) => {
     try {
       const coordCollection= collection(db, 'coordinates')
-      const coordinateRef = doc(coordCollection, "user-2")
+      const coordinateRef = doc(coordCollection, "user-4")
       console.log(typeof latitude)
       console.log(typeof longitude)
       await setDoc(coordinateRef, {
