@@ -4,7 +4,8 @@ import { StyleSheet, View, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
-
+import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
+import {db} from '../(auth)/config/firebaseConfig';
 const MapScreen = () => {
   const router = useRouter();
   const [region, setRegion] = useState({
@@ -14,7 +15,23 @@ const MapScreen = () => {
     longitudeDelta: 0.02,
   });
 
-  const [gameMarkers, setGameMarkers] = useState([]);
+  const [markers, setMarkers] = useState([]);
+
+  useEffect(() => {
+      // Fetch markers from Firestore and set up a listener for real-time updates
+      const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
+  
+      const unsubscribe = onSnapshot(coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
+        const fetchedCoords = [];
+        querySnapshot.forEach((doc) => {
+          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude}); // Include the document ID
+        });
+        console.log("coords: ", fetchedCoords.join(", "));
+        setMarkers(fetchedCoords);
+      });
+  
+      // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
+    }, []);
 
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
@@ -38,7 +55,7 @@ const MapScreen = () => {
         showsUserLocation={true}
         showsUsersLocationButton={true}
       >
-        {coordinates.map((coordinate, index) => (
+        {/* {coordinates.map((coordinate, index) => (
           <Marker
             key={index} // Important: Use a unique key for each marker
             coordinate={{
@@ -48,6 +65,18 @@ const MapScreen = () => {
             title={coordinate.title}
             description={coordinate.description}
           />
+        ))} */}
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id} // Use the document ID as the key
+            coordinate={{
+              latitude: marker.latitude,
+              longitude: marker.longitude, 
+            }}
+            title={marker.title}
+            description={marker.description}
+          >
+          </Marker>
         ))}
       </MapView>
 

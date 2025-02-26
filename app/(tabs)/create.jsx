@@ -21,12 +21,12 @@ const Create = () => {
   const handleCreateGame = async (latitude, longitude) => {
     try {
       const coordCollection= collection(db, 'coordinates')
-      const coordinateRef = doc(coordCollection, "user-yag")
-      const latitudeNumber = typeof latitude === 'number' ? latitude : Number(latitude); // Convert if needed.  Handle potential NaN.
-      const longitudeNumber = typeof longitude === 'number' ? longitude : Number(longitude); // Convert if needed. Handle potential NaN.
+      const coordinateRef = doc(coordCollection, "user-4")
+      console.log(typeof latitude)
+      console.log(typeof longitude)
       await setDoc(coordinateRef, {
-        latitude: latitudeNumber,
-        longitude: longitudeNumber,
+        latitude,
+        longitude,
       });
       router.push('/map')
     }
@@ -70,7 +70,7 @@ const Create = () => {
       </View>
 
       <View className="mt-10">
-        <CustomButton title="Create" handlePress={handleCreateGame} containerStyles="bg-gray-500 text-white" />
+        <CustomButton title="Create" handlePress={() => handleCreateGame(longitude, latitude)} containerStyles="bg-gray-500 text-white" />
       </View>
     </SafeAreaView>
   );
