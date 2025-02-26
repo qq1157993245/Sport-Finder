@@ -20,7 +20,7 @@ const Profile = () => {
 
   const handleDeleteAccount = async () => {
     await deleteAccount();
-    router.replace("/");// Redirect to sign up page
+    router.push("/");// Redirect to sign up page
   };
 
   const handleLogout = async () => {

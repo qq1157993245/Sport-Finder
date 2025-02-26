@@ -4,7 +4,8 @@ import { StyleSheet, View, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
-
+import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
+import {db} from '../(auth)/config/firebaseConfig';
 const MapScreen = () => {
   const router = useRouter();
   const [region, setRegion] = useState({
@@ -14,7 +15,22 @@ const MapScreen = () => {
     longitudeDelta: 0.02,
   });
 
-  const [gameMarkers, setGameMarkers] = useState([]);
+  const [markers, setMarkers] = useState([]);
+
+  // useEffect(() => {
+  //     // Fetch markers from Firestore and set up a listener for real-time updates
+  //     const markersCollection = collection(db, 'markers'); // 'markers' is your collection name
+  
+  //     const unsubscribe = onSnapshot(markersCollection, (querySnapshot) => { // Use onSnapshot for updates
+  //       const fetchedMarkers = [];
+  //       querySnapshot.forEach((doc) => {
+  //         fetchedMarkers.push({ id: doc.id, ...doc.data() }); // Include the document ID
+  //       });
+  //       setMarkers(fetchedMarkers);
+  //     });
+  
+  //     return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
+  //   }, []);
 
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
