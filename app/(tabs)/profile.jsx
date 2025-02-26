@@ -12,15 +12,29 @@ import image from '../../constants/images';
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
 
-  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport} = useContext(UserContext);
+  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport, userPassword} = useContext(UserContext);
+  const [deleteAccount, setDeleteAccount] = useState(false);
 
   const handleUpdatePassword = () => {
     router.replace('/forgotPassword'); // Redirect to forgot password page
   };
 
-  const handleDeleteAccount = async () => {
-    await deleteAccount();
-    router.replace("/");// Redirect to sign up page
+  const handleDeleteAccount = async (userPassword) => {
+    Alert.alert(
+      'Delete account',
+      'Are you sure to delete your account?',
+      [
+        {text: 'Yes', onPress: async ()=>{
+          setDeleteAccount(true);
+          await deleteAccount(userPassword);
+          setDeleteAccount(false);
+          router.replace("/");// Redirect to sign up page
+        }},
+        {text: 'Cancel', onPress: async ()=>{
+          setDeleteAccount(false)
+        }},
+      ]
+    );
   };
 
   const handleLogout = async () => {
@@ -50,22 +64,24 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="bg-black h-full px-6">
-      <Text className="text-white text-3xl font-psemibold mt-6 text-center">Profile</Text>
-      <KeyboardAwareScrollView showsVerticalScrollIndicator = {false}>
-    {/* Profile Fields using FormField Component */}
-        <View className="mt-10 space-y-6">
-          {username && <Text className="text-white text-3xl font-psemibold mt-6 text-center">{username}</Text>}
-          {age && <Text className="text-white text-2xl font-psemibold mt-6 text-center">{age}</Text>}
-          {favoriteSport && <Text className="text-white text-3xl font-psemibold mt-6 text-center">{`Favorite Sport: ${favoriteSport}`}</Text>}
+      <KeyboardAwareScrollView showsVerticalScrollIndicator = {false} >
+        <View className="items-center">
+          <Image source={image.empty} className='w-20 h-20 bg-purple-600 rounded-full'/>
+        </View>
+      {/* Profile Fields using FormField Component */}
+        <View className="mt-6 space-y-6 bg-gray-900">
+          {username && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{username}</Text>}
+          {age && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{`${age} years old`}</Text>}
+          {favoriteSport && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{`I like ${favoriteSport}`}</Text>}
+          <CustomButton
+            title="Edit Profile"
+            handlePress={handleEditProfile}
+            containerStyles="bg-blue-500 text-white mt-5 min-h-[50px] "
+          />
         </View>
 
         {/* Action Buttons */}
         <View className="mt-12">
-          <CustomButton
-            title="Edit Profile"
-            handlePress={handleEditProfile}
-            containerStyles="bg-blue-500 text-white mb-4"
-          />
           
           <CustomButton
             title="Update Password"
@@ -80,7 +96,7 @@ const Profile = () => {
           />
           <CustomButton
             title="Delete Account"
-            handlePress={handleDeleteAccount}
+            handlePress={()=>handleDeleteAccount(userPassword)}
             containerStyles="bg-red-600 text-white mb-4"
           />
         </View>

@@ -1,10 +1,11 @@
-import { View, Text, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, Keyboard } from 'react-native';
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import FormField from '../../components/formfield';
 import { updateData } from '../(tabs)/profileFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Dropdownmenu from '../../components/dropdownmenu';
 
 const Preferences = () => {
     async function handleSaveInfo() {
@@ -18,14 +19,22 @@ const Preferences = () => {
 
   const router = useRouter(); // Initialize router for navigation
 
-  const [username, setUsername] = useState("");
-  const [age, setAge] = useState("");
-  const [favoriteSport, setFavoriteSport] = useState("");
+  const [username, setUsername] = useState('');
+  const [age, setAge] = useState('');
+  const [favoriteSport, setFavoriteSport] = useState('');
+
+  const ages = Array.from({ length: 101 }, (_, i) => ({ label: `${i}`, value: i }))
+  const sports = [
+    {label: 'Basketball', value: 'basketball'},
+    {label: 'Volleyball', value: 'volleyball'},
+    {label: 'Football', value: 'football'},
+    {label: 'Baseball', value: 'baseball'},
+    {label: 'Handball', value: 'handball'},
+  ];
 
   return (
-    <SafeAreaView className="bg-black h-full px-6">
+    <SafeAreaView className="bg-black h-full px-6" onTouchStart={Keyboard.dismiss}>
       <Text className="text-white text-3xl font-psemibold mt-6 text-center">Preferences</Text>
-        <KeyboardAwareScrollView showsVerticalScrollIndicator = {false}>
       {/* Profile Fields using FormField Component */}
           <View className="mt-10 space-y-6">
             <FormField
@@ -37,24 +46,21 @@ const Preferences = () => {
               }}
               otherStyles="mt-2"
             />
-            <FormField
-              title="Age"
+            <Dropdownmenu
+              title={'Age'}
+              items={ages}
               value={age}
-              placeholder="Enter your age"
-              handleChangeText={(text)=>{
-                setAge(text);
-              }}
-              otherStyles="mt-2"
-              keyboardType = "numeric"
+              setValue={setAge}
+              placeholder='Select an age'
+              zIndex={2000}
             />
-            <FormField
-              title="Favorite Sport"
+            <Dropdownmenu
+              title={'Favorite Sport'}
+              items={sports}
               value={favoriteSport}
-              placeholder="Enter your favorite sport"
-              handleChangeText={(text)=>{
-                setFavoriteSport(text);
-              }}
-              otherStyles="mt-2"
+              setValue={setFavoriteSport}
+              placeholder='Select a sport'
+              zIndex={1000}
             />
           </View>
 
@@ -65,16 +71,15 @@ const Preferences = () => {
                 activeOpacity={0.7}
                 className={'rounded-xl min-h-[62px] flex flex-row ' +
                    'justify-center items-center bg-red-600 text-white mb-4 ' + 
-                   ((username && age) ? 'opacity-100' : 'opacity-50')
+                   ((username && age && favoriteSport) ? 'opacity-100' : 'opacity-50')
                     }
-                disabled={(username && age) ? false : true}
+                disabled={(username && age && favoriteSport) ? false : true}
                 >
                 <Text className={`text-primary font-psemibold text-lg`}>
                     Save
                 </Text>
             </TouchableOpacity>
           </View>
-        </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
