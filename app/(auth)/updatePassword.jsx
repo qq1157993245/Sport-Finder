@@ -1,20 +1,21 @@
-import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '../../components/formfield'
 import CustomButton from '../../components/custombutton'
 import { Link, router } from 'expo-router'
 import { resetPassword } from './signUpFuncs'
+import { Ionicons } from '@expo/vector-icons'
 
-const ForgotPassword = () => {
+const UpdatePassword = () => {
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('');
 
   const handleResetPassword = async () => {
     if (!email) {
-      setError('Please enter your email');
-      return;
+        setError('Please enter your email');
+        return;
     }
 
     try {
@@ -36,9 +37,13 @@ const ForgotPassword = () => {
   return (
     <SafeAreaView className="bg-black h-full">
       <ScrollView>
+        <TouchableOpacity onPress={()=>router.back()}>
+            <Ionicons name="close" size={30} color="white" />
+        </TouchableOpacity>
         <View className="w-full justify-center min-h-[70vh] px-4 my-6">
+
           <Text className="text-3xl text-white text-semibold mt-10 font-psemibold text-center">
-            Forgot Password
+            Update Password
           </Text>
 
           <Text className="text-gray-300 text-md text-center mt-2">
@@ -63,7 +68,7 @@ const ForgotPassword = () => {
           />
 
           <View className="items-center mt-5">
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.replace('/sign-in')}>
                 <Text className="text-blue-400 text-sm font-psemibold">Back to Sign In</Text>
             </TouchableOpacity>
           </View>
@@ -73,4 +78,4 @@ const ForgotPassword = () => {
   )
 }
 
-export default ForgotPassword
+export default UpdatePassword

@@ -16,7 +16,7 @@ const Profile = () => {
   const [deleteAccount, setDeleteAccount] = useState(false);
 
   const handleUpdatePassword = () => {
-    router.replace('/forgotPassword'); // Redirect to forgot password page
+    router.push('/updatePassword'); // Redirect to forgot password page
   };
 
   const handleDeleteAccount = async (userPassword) => {

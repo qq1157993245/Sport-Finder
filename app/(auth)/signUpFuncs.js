@@ -33,16 +33,51 @@ export const signUp = async (email, password, confirmPassword) => {
         return {success : 1, message: "Successfully sign up!"};
 
    } catch (error) {
-    return {success : 0, message: error.message};
+    let errorMessage;
+
+    switch (error.code) {
+        case "auth/email-already-in-use":
+            errorMessage = "This email is already registered.";
+            break;
+        case "auth/invalid-email":
+            errorMessage = "Invalid email format.";
+            break;
+        case "auth/weak-password":
+            errorMessage = "Password is too weak. Try a stronger password.";
+            break;
+        case "auth/operation-not-allowed":
+            errorMessage = "Sign-up is currently disabled.";
+            break;
+        default:
+            errorMessage = "Something went wrong. Please try again.";
+            break;
+    }
+    return {success : 0, message: errorMessage};
    }
 }
 
 export const resetPassword = async(email) => {
     try {
-        return await sendPasswordResetEmail(auth, email);
+        await sendPasswordResetEmail(auth, email);
+        return {success: 1, message: 'Successfully reset password!'};
     } catch (error) {
-        console.error('Password Reset Failed:' + error.message);
-        throw error;
+        let errorMessage;
+
+        switch (error.code) {
+            case "auth/user-not-found":
+                errorMessage = "No account found with this email.";
+                break;
+            case "auth/invalid-email":
+                errorMessage = "Invalid email format.";
+                break;
+            case "auth/too-many-requests":
+                errorMessage = "Too many requests. Please try again later.";
+                break;
+            default:
+                errorMessage = "Something went wrong. Please try again.";
+                break;
+        }
+        return {success: 0, message: errorMessage};
     }
 }
 
