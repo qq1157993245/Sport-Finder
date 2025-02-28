@@ -13,7 +13,7 @@ import { UserContext } from "./context/userContext";
 
 const SignUp = () => {
 
-  const { currentUser, pending, setUserPassword} = useContext(UserContext);
+  const { currentUser, pending} = useContext(UserContext);
   const [isLoggedIn , setisLoggedIn] = useState(false)
 
   useEffect(() => {
@@ -28,7 +28,6 @@ const SignUp = () => {
   async function handleSignUp() {
       const response = await signUp(email, password, confirmPassword);
       if (response.success) {
-        setUserPassword(password);
         router.push('/preferences');
       }else{
         setError(response.message);

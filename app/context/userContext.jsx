@@ -6,7 +6,6 @@ import {Text} from "react-native";
 export const UserContext = createContext();
 
 export default function UserProvider({ children }) {
-    const [userPassword, setUserPassword] = useState('');
 
     const [username, setUsername] = useState("");
     const [age, setAge] = useState("");
@@ -28,7 +27,7 @@ export default function UserProvider({ children }) {
   
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge,
-     favoriteSport, setFavoriteSport, currentUser, userPassword, setUserPassword}}>
+     favoriteSport, setFavoriteSport, currentUser}}>
       {children}
     </UserContext.Provider>
   );

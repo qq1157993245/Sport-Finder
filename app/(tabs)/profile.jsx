@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-import FormField from '../../components/formfield';
 import { changePassword, deleteAccount, logOut, updateData, getData } from './profileFuncs';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { UserContext } from '../context/userContext';
@@ -11,29 +10,33 @@ import image from '../../constants/images';
 
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
-
-  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport, userPassword} = useContext(UserContext);
-  const [deleteAccount, setDeleteAccount] = useState(false);
+  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport} = useContext(UserContext);
 
   const handleUpdatePassword = () => {
     router.push('/updatePassword'); // Redirect to forgot password page
   };
 
-  const handleDeleteAccount = async (userPassword) => {
-    Alert.alert(
-      'Delete account',
-      'Are you sure to delete your account?',
+  // IOS only!
+  const handleDeleteAccount = async () => {
+    Alert.prompt(
+      'Delete Account', 
+      'Enter your password to confirm account deletion',
       [
-        {text: 'Yes', onPress: async ()=>{
-          setDeleteAccount(true);
-          await deleteAccount(userPassword);
-          setDeleteAccount(false);
-          router.replace("/");// Redirect to sign up page
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Delete', onPress: async (password) => {
+          if (password.trim()) { 
+            const response = await deleteAccount(password);
+            if (response.success) {
+              router.replace("/"); // Redirect to sign up page after deletion
+            } else {
+              Alert.alert('Error', response.message);
+            }
+          } else {
+            Alert.alert("Error", "Password is required.");
+          }
         }},
-        {text: 'Cancel', onPress: async ()=>{
-          setDeleteAccount(false)
-        }},
-      ]
+      ],
+      'secure-text'
     );
   };
 
@@ -96,7 +99,7 @@ const Profile = () => {
           />
           <CustomButton
             title="Delete Account"
-            handlePress={()=>handleDeleteAccount(userPassword)}
+            handlePress={handleDeleteAccount}
             containerStyles="bg-red-600 text-white mb-4"
           />
         </View>

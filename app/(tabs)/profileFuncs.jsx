@@ -57,8 +57,20 @@ export async function deleteAccount(userPassword){
     console.log("User account deleted successfully!");
     return {success: 1, message: "User account deleted successfully!"};
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return {success: 0, message: error.message};
+    let errorMessage;
+    
+    switch(error.code){
+      case 'auth/invalid-credential':
+        errorMessage = 'Incorrect password. Please try again.';
+        break;
+      case 'permission-denied':
+        errorMessage = 'You do not have permission to delete this account.';
+        break;
+      default:
+        errorMessage = 'Something went wrong. Please try again.';
+        break;
+    }
+    return {success: 0, message: errorMessage};
   }
 }
 
