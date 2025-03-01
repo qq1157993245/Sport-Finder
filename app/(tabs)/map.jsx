@@ -3,10 +3,10 @@ import MapView, { Marker } from 'react-native-maps';
 import { StyleSheet, View, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-import coordinates from './coordinates.json';
-import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
-import {db} from '../(auth)/config/firebaseConfig';
-const MapScreen = () => {
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from '../(auth)/config/firebaseConfig';
+
+const Map = () => {
   const router = useRouter();
   const [region, setRegion] = useState({
     latitude: 37.7749, // Default to San Francisco
@@ -20,16 +20,22 @@ const MapScreen = () => {
   useEffect(() => {
       // Fetch markers from Firestore and set up a listener for real-time updates
       const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
-  
+
       const unsubscribe = onSnapshot(coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
         const fetchedCoords = [];
         querySnapshot.forEach((doc) => {
-          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude}); // Include the document ID
+          const data = doc.data();
+          fetchedCoords.push({
+            id: doc.id, // Firebase document ID as the unique key
+            latitude: data.latitude,
+            longitude: data.longitude,
+            title: data.title,
+            description: data.description,
+          });
         });
-        console.log("coords: ", fetchedCoords.join(", "));
         setMarkers(fetchedCoords);
       });
-  
+
       // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
     }, []);
 
@@ -41,8 +47,8 @@ const MapScreen = () => {
   // Function to navigate to Create screen with the coordinates
   const goToCreateScreen = () => {
     router.push({
-      pathname: "/(tabs)/create",
-      params: { latitude: region.latitude, longitude: region.longitude },
+      pathname: "/create",
+      query: { latitude: region.latitude, longitude: region.longitude }, // Corrected to query
     });
   };
 
@@ -55,38 +61,36 @@ const MapScreen = () => {
         showsUserLocation={true}
         showsUsersLocationButton={true}
       >
-        {/* {coordinates.map((coordinate, index) => (
-          <Marker
-            key={index} // Important: Use a unique key for each marker
-            coordinate={{
-              latitude: coordinate.latitude,
-              longitude: coordinate.longitude,
-            }}
-            title={coordinate.title}
-            description={coordinate.description}
-          />
-        ))} */}
         {markers.map((marker) => (
           <Marker
             key={marker.id} // Use the document ID as the key
             coordinate={{
               latitude: marker.latitude,
-              longitude: marker.longitude, 
+              longitude: marker.longitude,
             }}
             title={marker.title}
             description={marker.description}
-          >
-          </Marker>
+          />
         ))}
       </MapView>
 
-      {/* Fixed Hitmarker */}
+      {/* hitmarker to choose location */}
       <View style={styles.hitmarker} />
 
-      {/* Button to Create a Game */}
+      {/*create game button which redirects to create page */}
       <View style={styles.createButtonContainer}>
-        <CustomButton title="Create Game Here" handlePress={goToCreateScreen} />
+        <CustomButton
+          title="+"
+          handlePress={goToCreateScreen}
+          containerStyles="text-3xl w-16 h-16 bg-white-500 text-white rounded-full flex items-center justify-center"
+        />
       </View>
+
+      {/* refresh button */}
+      <CustomButton
+        title="↻"
+        handlePress={() => {/* add refresh function here */}}
+        containerStyles="text-2xl mb-8 w-10 h-6 bg-white-500 text-white rounded-full flex items-center justify-center absolute bottom-5 right-5"      />
     </View>
   );
 };
@@ -96,13 +100,13 @@ const styles = StyleSheet.create({
   map: { flex: 1 },
   hitmarker: {
     position: 'absolute',
-    top: Dimensions.get('window').height / 2 - 15,
-    left: Dimensions.get('window').width / 2 - 15,
-    width: 30,
-    height: 30,
-    backgroundColor: 'red',
-    borderRadius: 15,
-    borderWidth: 2,
+    top: Dimensions.get('window').height / 2 - 5,
+    left: Dimensions.get('window').width / 2 - 5,
+    width: 10,
+    height: 10,
+    backgroundColor: 'black',
+    borderRadius: 5,
+    borderWidth: 1,
     borderColor: 'white',
   },
   createButtonContainer: {
@@ -112,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MapScreen;
+export default Map;

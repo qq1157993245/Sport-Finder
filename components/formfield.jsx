@@ -18,16 +18,16 @@ const FormField = ({ title, value, placeholder, handleChangeText, otherStyles, .
             placeholderTextColor="#7b7b8b"
             onChangeText={handleChangeText}
             secureTextEntry={(title === 'Password' || title === 'Confirm Password') && !showPassword}
-            {...props} 
+            {...props}
           />
-  
+
           {/* Password Visibility Toggle */}
           {(title === "Password" || title === "Confirm Password") && (
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Image 
+              <Image
                 source={showPassword ? icons.eye : icons.eyeHide}
-                className="w-6 h-6" 
-                resizeMode="contain" 
+                className="w-6 h-6"
+                resizeMode="contain"
               />
             </TouchableOpacity>
           )}
