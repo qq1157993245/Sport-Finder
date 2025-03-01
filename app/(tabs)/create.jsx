@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../../components/custombutton';
 import FormField from '../../components/formfield';
-import {db} from '../(auth)/config/firebaseConfig';
+import {db,auth} from '../(auth)/config/firebaseConfig';
 import { Link, router } from "expo-router";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 
@@ -20,13 +20,18 @@ const Create = () => {
 
   const handleCreateGame = async (latitude, longitude) => {
     try {
-      const coordCollection= collection(db, 'coordinates')
-      const coordinateRef = doc(coordCollection, "user-yag")
-      const latitudeNumber = typeof latitude === 'number' ? latitude : Number(latitude); // Convert if needed.  Handle potential NaN.
-      const longitudeNumber = typeof longitude === 'number' ? longitude : Number(longitude); // Convert if needed. Handle potential NaN.
+      const currentUser = auth.currentUser;
+      const coordCollection= collection(db, 'coordinates');
+      const coordinateRef = doc(coordCollection, currentUser.uid);
+      console.log(typeof latitude);
+      console.log(typeof longitude);
       await setDoc(coordinateRef, {
-        latitude: latitudeNumber,
-        longitude: longitudeNumber,
+        latitude,
+        longitude,
+        numPlayers,
+        skillLevel,
+        sportType,
+        timeCreated: new Date(),
       });
       router.push('/map')
     }
@@ -70,7 +75,7 @@ const Create = () => {
       </View>
 
       <View className="mt-10">
-        <CustomButton title="Create" handlePress={handleCreateGame} containerStyles="bg-gray-500 text-white" />
+        <CustomButton title="Create" handlePress={() => handleCreateGame(longitude, latitude)} containerStyles="bg-gray-500 text-white" />
       </View>
     </SafeAreaView>
   );
