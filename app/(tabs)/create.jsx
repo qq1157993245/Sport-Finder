@@ -56,8 +56,8 @@ const Create = () => {
       <Text className="text-white text-3xl font-semibold mt-20">Create a Game!</Text>
 
       <View className="mt-10 space-y-6">
-        <Text className="text-white">Location: {latitude}, {longitude}</Text>
-
+        <Text className="text-white">latitude: {latitude}</Text>
+        <Text className="text-white">longitude: {longitude}</Text>
         <FormField
           title="Number of Players"
           value={numPlayers}
@@ -86,7 +86,7 @@ const Create = () => {
       <View className="mt-10">
         <CustomButton
           title="Create"
-          handlePress={() => handleCreateGame(longitude, latitude)}
+          handlePress={() => handleCreateGame(latitude,longitude )}
           containerStyles="bg-gray-500 text-white"
         />
       </View>

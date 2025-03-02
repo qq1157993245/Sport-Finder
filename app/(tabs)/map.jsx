@@ -9,7 +9,7 @@ import {db} from '../(auth)/config/firebaseConfig';
 import icons from '../../constants/icons.js'
 import * as Location from 'expo-location';
 
-const Map = () => {
+const MapScreen = () => {
   const router = useRouter();
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
@@ -22,7 +22,7 @@ const Map = () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission to access location was denied');
-          return;
+          
         }
     
         let location = await Location.getCurrentPositionAsync({});
@@ -48,6 +48,7 @@ const Map = () => {
             description: data.description,
           });
         });
+        console.log(fetchedCoords)
         setMarkers(fetchedCoords);
       });
 
@@ -63,7 +64,7 @@ const Map = () => {
   const goToCreateScreen = () => {
     router.push({
       pathname: "/create",
-      query: { latitude: region.latitude, longitude: region.longitude }, // Corrected to query
+      params: { latitude: region.latitude, longitude: region.longitude }, // Corrected to query
     });
   };
 
@@ -82,9 +83,9 @@ const Map = () => {
         showsUsersLocationButton={true}
       >
       
-        {markers.map((marker, index) => (
+        {markers.map((marker) => (
           <Marker
-            key={marker.id || index} // Use the document ID as the key
+            key={marker.id} // Use the document ID as the key
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude,
@@ -93,10 +94,15 @@ const Map = () => {
             description={marker.description}
           />
         ))}
+       
       </MapView>
 
       {/* hitmarker to choose location */}
       <View style={styles.hitmarker} />
+        
+      <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
+        <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>
+      </TouchableOpacity>
 
       {/*create game button which redirects to create page */}
       <View style={styles.createButtonContainer}>
@@ -148,4 +154,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default Map;
+export default MapScreen;
