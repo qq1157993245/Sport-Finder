@@ -23,7 +23,7 @@ const Profile = () => {
     // For ios
     if (Platform.OS === 'ios') {
       Alert.prompt(
-        'Delete Account', 
+        'Delete Account',
         'Enter your password to confirm account deletion',
         [
           {text: 'Cancel', style: 'cancel'},
@@ -43,7 +43,7 @@ const Profile = () => {
     }
 
     setDialogVisible(false);
-    setPassword(''); 
+    setPassword('');
 
     const response = await deleteAccount(inputPassword);
     if (response.success) {
@@ -98,13 +98,13 @@ const Profile = () => {
 
         {/* Action Buttons */}
         <View className="mt-12">
-          
+
           <CustomButton
             title="Update Password"
             handlePress={handleUpdatePassword}
             containerStyles="bg-gray-500 text-white mb-4"
           />
-          
+
           <CustomButton
             title="Logout"
             handlePress={handleLogout}
@@ -122,13 +122,13 @@ const Profile = () => {
             <Dialog.Description>
               Enter your password to confirm account deletion.
             </Dialog.Description>
-            <Dialog.Input 
+            <Dialog.Input
               placeholder="Password"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
             />
-            <Dialog.Button 
+            <Dialog.Button
               label="Cancel"
               onPress={() => {
                 setDialogVisible(false);
