@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import { StyleSheet, View, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
 import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
 import {db} from '../(auth)/config/firebaseConfig';
+import icons from '../../constants/icons.js'
+import * as Location from 'expo-location';
+
 const MapScreen = () => {
   const router = useRouter();
-  const [region, setRegion] = useState({
-    latitude: 37.7749, // Default to San Francisco
-    longitude: -122.4194,
-    latitudeDelta: 0.02,
-    longitudeDelta: 0.02,
-  });
+  const [initialRegion, setInitialRegion] = useState(null);
+  const [region, setRegion] = useState(null);
 
   const [markers, setMarkers] = useState([]);
 
   useEffect(() => {
+      // Get the user's current location
+      (async () => {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission to access location was denied');
+          return;
+        }
+    
+        let location = await Location.getCurrentPositionAsync({});
+        setInitialRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        });
+      })();
       // Fetch markers from Firestore and set up a listener for real-time updates
       const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
   
@@ -46,11 +61,16 @@ const MapScreen = () => {
     });
   };
 
+  const handleGetCurrentLocation = () =>{
+    setRegion(initialRegion);
+  }
+
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
-        initialRegion={region}
+        initialRegion={initialRegion}
+        region={region}
         onRegionChangeComplete={handleRegionChangeComplete}
         showsUserLocation={true}
         showsUsersLocationButton={true}
@@ -66,9 +86,9 @@ const MapScreen = () => {
             description={coordinate.description}
           />
         ))} */}
-        {markers.map((marker) => (
+        {markers.map((marker, index) => (
           <Marker
-            key={marker.id} // Use the document ID as the key
+            key={marker.id || index} // Use the document ID as the key
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude, 
@@ -83,6 +103,10 @@ const MapScreen = () => {
       {/* Fixed Hitmarker */}
       <View style={styles.hitmarker} />
 
+      <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
+        <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>
+      </TouchableOpacity>
+
       {/* Button to Create a Game */}
       <View style={styles.createButtonContainer}>
         <CustomButton title="Create Game Here" handlePress={goToCreateScreen} />
@@ -92,7 +116,7 @@ const MapScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {flex: 1},
   map: { flex: 1 },
   hitmarker: {
     position: 'absolute',
@@ -110,6 +134,17 @@ const styles = StyleSheet.create({
     bottom: 50,
     alignSelf: 'center',
   },
+  currentLocationButton: {
+    position: 'absolute',
+    top: Dimensions.get('window').height * 0.12,
+    right: Dimensions.get('window').width * 0.01,
+  },
+  currentLocationIcon: {
+    width: Dimensions.get('window').height * 0.06,
+    height: Dimensions.get('window').width * 0.12,
+    backgroundColor: '#F3F1F1',
+    borderRadius: '50%',
+  }
 });
 
 export default MapScreen;
