@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,16 +7,17 @@ import FormField from '../../components/formfield';
 import {db,auth} from '../(auth)/config/firebaseConfig';
 import { Link, router } from "expo-router";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
-
+import { Ionicons } from '@expo/vector-icons';
 
 const Create = () => {
-  
   const { latitude, longitude } = useLocalSearchParams(); // Get coordinates from MapScreen
   const [latitudeType, setLatitudeType] = useState('');
   const [longitudeType, setLongitudeType] = useState('');
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
+
+  const router = useRouter();  // Using router to navigate
 
   const handleCreateGame = async (latitude, longitude) => {
     try {
@@ -33,17 +34,25 @@ const Create = () => {
         sportType,
         timeCreated: new Date(),
       });
-      router.push('/map')
+
+      // After creating the game, navigate back to map screen with updated state
+      router.push('/map'); // You may pass the event state here if needed.
+    } catch (error) {
+      console.error('Game creation failed: ' + error.message);
+      throw error;
     }
-    catch (error) {
-      console.error('Game creation failed' + error.message)
-      throw error; 
-    }
-    
+  };
+
+  const handleClose = () => {
+    router.push('/map'); // Navigate to the map page when the close button is pressed
   };
 
   return (
+
     <SafeAreaView className="bg-black h-full px-6">
+      <TouchableOpacity onPress={handleClose}>
+        <Ionicons name="close" size={30} color="white" />
+      </TouchableOpacity>
       <Text className="text-white text-3xl font-semibold mt-20">Create a Game!</Text>
 
       <View className="mt-10 space-y-6">
@@ -75,7 +84,11 @@ const Create = () => {
       </View>
 
       <View className="mt-10">
-        <CustomButton title="Create" handlePress={() => handleCreateGame(longitude, latitude)} containerStyles="bg-gray-500 text-white" />
+        <CustomButton
+          title="Create"
+          handlePress={() => handleCreateGame(longitude, latitude)}
+          containerStyles="bg-gray-500 text-white"
+        />
       </View>
     </SafeAreaView>
   );
