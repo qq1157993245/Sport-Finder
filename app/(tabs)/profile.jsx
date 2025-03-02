@@ -116,6 +116,7 @@ const Profile = () => {
             containerStyles="bg-red-600 text-white mb-4"
           />
 
+          {/* This dialog is only for android */}
           <Dialog.Container visible={dialogVisible}>
             <Dialog.Title>Delete Account</Dialog.Title>
             <Dialog.Description>
