@@ -17,6 +17,8 @@ const Create = () => {
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
+  const [hour, setHour] = useState(''); 
+  const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
 
   const router = useRouter();  // Using router to navigate
 
@@ -47,6 +49,7 @@ const Create = () => {
         skillLevel,
         sportType,
         timeCreated: new Date(),
+        hour
       });
 
       // After creating the game, navigate back to map screen with updated state
@@ -70,8 +73,8 @@ const Create = () => {
       <Text className="text-white text-3xl font-semibold mt-20">Create a Game!</Text>
 
       <View className="mt-10 space-y-6">
-        <Text className="text-white">latitude: {latitude}</Text>
-        <Text className="text-white">longitude: {longitude}</Text>
+        {/* <Text className="text-white">latitude: {latitude}</Text>
+        <Text className="text-white">longitude: {longitude}</Text> */}
         <FormField
           title="Number of Players"
           value={numPlayers}
@@ -85,7 +88,7 @@ const Create = () => {
             value={skillLevel}
             setValue={setSkillLevel}
             placeholder="Select skill level"
-            zIndex={2000}
+            zIndex={3000}
         />
         <Dropdownmenu
             title="Sport Type"
@@ -93,11 +96,20 @@ const Create = () => {
             value={sportType}
             setValue={setSportType}
             placeholder="Select sport type"
-            zIndex={1000}
+            zIndex={2000}
         />
+        <Dropdownmenu
+            title={'Hour'}
+            items={hours}
+            value={hour}
+            setValue={setHour}
+            placeholder='Select an estimated time for game'
+            zIndex={1000}
+          />
       </View>
 
       <View className="mt-10">
+        
         <CustomButton
           title="Create"
           handlePress={() => handleCreateGame(latitude,longitude )}
