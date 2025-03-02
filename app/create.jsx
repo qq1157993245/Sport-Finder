@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
+import Dropdownmenu from '../components/dropdownmenu';
 import {db,auth} from './(auth)/config/firebaseConfig';
 import { Link, router } from "expo-router";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
@@ -18,6 +19,19 @@ const Create = () => {
   const [sportType, setSportType] = useState('');
 
   const router = useRouter();  // Using router to navigate
+
+  const skillLevels = [
+    { label: 'Beginner', value: 'beginner' },
+    { label: 'Intermediate', value: 'intermediate' },
+    { label: 'Advanced', value: 'advanced' }
+  ];
+
+  const sportTypes = [
+    { label: 'Basketball', value: 'basketball' },
+    { label: 'Soccer', value: 'soccer' },
+    { label: 'Tennis', value: 'tennis' },
+    { label: 'Volleyball', value: 'volleyball' }
+  ];
 
   const handleCreateGame = async (latitude, longitude) => {
     try {
@@ -65,21 +79,21 @@ const Create = () => {
           handleChangeText={setNumPlayers}
           otherStyles="mt-2"
         />
-
-        <FormField
-          title="Skill Level"
-          value={skillLevel}
-          placeholder="Enter skill level"
-          handleChangeText={setSkillLevel}
-          otherStyles="mt-2"
+        <Dropdownmenu
+            title="Skill Level"
+            items={skillLevels}
+            value={skillLevel}
+            setValue={setSkillLevel}
+            placeholder="Select skill level"
+            zIndex={2000}
         />
-
-        <FormField
-          title="Sport Type"
-          value={sportType}
-          placeholder="Enter sport type"
-          handleChangeText={setSportType}
-          otherStyles="mt-2"
+        <Dropdownmenu
+            title="Sport Type"
+            items={sportTypes}
+            value={sportType}
+            setValue={setSportType}
+            placeholder="Select sport type"
+            zIndex={1000}
         />
       </View>
 

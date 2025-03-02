@@ -1,13 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import FormField from '../../components/formfield'; // Assuming you have this component
-import CustomButton from '../../components/custombutton'; // Assuming you have this component
+import FormField from '../../components/formfield';
+import CustomButton from '../../components/custombutton';
+import Dropdownmenu from '../../components/dropdownmenu'; // Import Dropdownmenu
+
 
 const Event = () => {
     const [numPlayers, setNumPlayers] = useState('');
     const [skillLevel, setSkillLevel] = useState('');
     const [sportType, setSportType] = useState('');
+
+    const skillLevels = [
+      { label: 'Beginner', value: 'beginner' },
+      { label: 'Intermediate', value: 'intermediate' },
+      { label: 'Advanced', value: 'advanced' }
+    ];
+
+    const sportTypes = [
+      { label: 'Basketball', value: 'basketball' },
+      { label: 'Soccer', value: 'soccer' },
+      { label: 'Tennis', value: 'tennis' },
+      { label: 'Volleyball', value: 'volleyball' }
+    ];
 
     const handleSave = () => {
       // Implement save functionality
@@ -41,19 +56,21 @@ const Event = () => {
             handleChangeText={setNumPlayers}
             otherStyles="mt-2"
           />
-          <FormField
-            title="Skill Level"
-            value={skillLevel}
-            placeholder="Enter skill level"
-            handleChangeText={setSkillLevel}
-            otherStyles="mt-2"
+          <Dropdownmenu
+              title="Skill Level"
+              items={skillLevels}
+              value={skillLevel}
+              setValue={setSkillLevel}
+              placeholder="Select skill level"
+              zIndex={2000}
           />
-          <FormField
-            title="Sport Type"
-            value={sportType}
-            placeholder="Enter sport type"
-            handleChangeText={setSportType}
-            otherStyles="mt-2"
+          <Dropdownmenu
+              title="Sport Type"
+              items={sportTypes}
+              value={sportType}
+              setValue={setSportType}
+              placeholder="Select sport type"
+              zIndex={1000}
           />
         </View>
 

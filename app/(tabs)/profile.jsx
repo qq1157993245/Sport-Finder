@@ -81,9 +81,9 @@ const Profile = () => {
   return (
     <SafeAreaView className="bg-black h-full px-6">
       <KeyboardAwareScrollView showsVerticalScrollIndicator = {false} >
-        <View className="items-center">
-          <Image source={image.empty} className='w-20 h-20 bg-purple-600 rounded-full'/>
-        </View>
+      <Text className="text-white text-3xl font-semibold text-center mt-8">Profile</Text>
+
+
       {/* Profile Fields using FormField Component */}
         <View className="mt-6 space-y-6 bg-gray-900">
           {username && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{username}</Text>}

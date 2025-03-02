@@ -22,9 +22,9 @@ const MapScreen = () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission to access location was denied');
-          
+
         }
-    
+
         let location = await Location.getCurrentPositionAsync({});
         setInitialRegion({
           latitude: location.coords.latitude,
@@ -32,6 +32,8 @@ const MapScreen = () => {
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         });
+        setInitialRegion(currentRegion);
+        setRegion(currentRegion);
       })();
       // Fetch markers from Firestore and set up a listener for real-time updates
       const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
@@ -82,7 +84,7 @@ const MapScreen = () => {
         showsUserLocation={true}
         showsUsersLocationButton={true}
       >
-      
+
         {markers.map((marker) => (
           <Marker
             key={marker.id} // Use the document ID as the key
@@ -94,12 +96,12 @@ const MapScreen = () => {
             description={marker.description}
           />
         ))}
-       
+
       </MapView>
 
       {/* hitmarker to choose location */}
       <View style={styles.hitmarker} />
-        
+
       <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
         <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>
       </TouchableOpacity>
@@ -127,7 +129,7 @@ const styles = StyleSheet.create({
   map: { flex: 1 },
   hitmarker: {
     position: 'absolute',
-    top: Dimensions.get('window').height / 2 - 5,
+    top: Dimensions.get('window').height / 2 - 23,
     left: Dimensions.get('window').width / 2 - 5,
     width: 10,
     height: 10,
