@@ -2,6 +2,7 @@ import { auth, db } from "../(auth)/config/firebaseConfig";
 import { updateDoc,deleteDoc, getDoc, doc } from "firebase/firestore"; 
 import { deleteUser, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider  } from "firebase/auth";
 import { setOptions } from "expo-splash-screen";
+import { router } from "expo-router";
 
 export async function getData() {
   try {
@@ -41,19 +42,35 @@ export async function updateData(user) {
 }
 
 //Delete account with user data
-export async function deleteAccount(){
+export async function deleteAccount(userPassword){
   try {
     const user = auth.currentUser;
+
+    const credential = EmailAuthProvider.credential(user.email, userPassword);
+    await reauthenticateWithCredential(user, credential);
+
     const userRef = doc(db, "users", user.uid);
 
     await deleteDoc(userRef);
-
     await deleteUser(user);
+  
     console.log("User account deleted successfully!");
     return {success: 1, message: "User account deleted successfully!"};
   } catch (error) {
-    console.error("Error deleting user:", error);
-    return {success: 0, message: error.message};
+    let errorMessage;
+    
+    switch(error.code){
+      case 'auth/invalid-credential':
+        errorMessage = 'Incorrect password. Please try again.';
+        break;
+      case 'permission-denied':
+        errorMessage = 'You do not have permission to delete this account.';
+        break;
+      default:
+        errorMessage = 'Something went wrong. Please try again.';
+        break;
+    }
+    return {success: 0, message: errorMessage};
   }
 }
 

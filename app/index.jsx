@@ -13,7 +13,7 @@ import { UserContext } from "./context/userContext";
 
 const SignUp = () => {
 
-  const { currentUser, pending } = useContext(UserContext);
+  const { currentUser, pending} = useContext(UserContext);
   const [isLoggedIn , setisLoggedIn] = useState(false)
 
   useEffect(() => {

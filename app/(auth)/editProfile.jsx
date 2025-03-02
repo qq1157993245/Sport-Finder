@@ -1,4 +1,4 @@
-import { View, Text, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Alert, TouchableOpacity, Keyboard } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,7 @@ import { changePassword, deleteAccount, logOut, updateData, getData } from '../(
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { UserContext } from '../context/userContext';
 import { Ionicons } from '@expo/vector-icons';
+import Dropdownmenu from '../../components/dropdownmenu';
 
 const EditProfile = () => {
   const router = useRouter(); // Initialize router for navigation
@@ -15,45 +16,53 @@ const EditProfile = () => {
   const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport} = useContext(UserContext);
 
   const [inputUserName, setInputUserName] = useState('');
-  const [inputAge, setInputAge] = useState('');
-  const [inputFavoriteSport, setInputFavoriteSport] = useState('');
+  const [selectAge, setSelectAge] = useState('');
+  const [selectFavoriteSport, setSelectFavoriteSport] = useState('');
+
+  const ages = Array.from({ length: 101 }, (_, i) => ({ label: `${i}`, value: i }))
+  const sports = [
+    {label: 'Basketball', value: 'basketball'},
+    {label: 'Volleyball', value: 'volleyball'},
+    {label: 'Football', value: 'football'},
+    {label: 'Baseball', value: 'baseball'},
+    {label: 'Handball', value: 'handball'},
+  ];
 
   const handleSaveData = () => {
     if(inputUserName){
       updateData({'username': inputUserName, age, favoriteSport});
       setUsername(inputUserName);
     }
-    if(inputAge) {
-      updateData({username, 'age': inputAge, favoriteSport});
-      setAge(inputAge);
+    if(selectAge) {
+      updateData({username, 'age': selectAge, favoriteSport});
+      setAge(selectAge);
     }
-    if(inputFavoriteSport){
-      updateData({username, age, 'favoriteSport': inputFavoriteSport});
-      setFavoriteSport(inputFavoriteSport);
+    if(selectFavoriteSport){
+      updateData({username, age, 'favoriteSport': selectFavoriteSport});
+      setFavoriteSport(selectFavoriteSport);
     }
 
     setInputUserName('');
-    setInputAge('');
-    setInputFavoriteSport('');
+    setSelectAge('');
+    setSelectFavoriteSport('');
 
     router.back(); // Redirect to profile page
   };
 
   function handleClose() {
     setInputUserName('');
-    setInputAge('');
-    setInputFavoriteSport('');
+    setSelectAge('');
+    setSelectFavoriteSport('');
 
     router.back();
   }
 
   return (
-    <SafeAreaView className="bg-black h-full px-6">
+    <SafeAreaView className="bg-black h-full px-6" onTouchStart={Keyboard.dismiss}>
       <TouchableOpacity onPress={handleClose}>
         <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text className="text-white text-3xl font-psemibold mt-6 text-center">Edit</Text>
-      <KeyboardAwareScrollView showsVerticalScrollIndicator = {false}>
     {/* Profile Fields using FormField Component */}
         <View className="mt-10 space-y-6">
           <FormField
@@ -64,22 +73,21 @@ const EditProfile = () => {
             }}
             otherStyles="mt-2"
           />
-          <FormField
-            title="Age"
-            placeholder="Enter your age"
-            handleChangeText={(text)=>{
-              setInputAge(text);
-            }}
-            otherStyles="mt-2"
-            keyboardType = "numeric"
+          <Dropdownmenu
+            title={'Age'}
+            items={ages}
+            value={selectAge}
+            setValue={setSelectAge}
+            placeholder='Select an age'
+            zIndex={2000}
           />
-          <FormField
-            title="Favorite Sport"
-            placeholder="Enter your favorite sport"
-            handleChangeText={(text)=>{
-              setInputFavoriteSport(text);
-            }}
-            otherStyles="mt-2"
+          <Dropdownmenu
+            title={'Favorite Sport'}
+            items={sports}
+            value={selectFavoriteSport}
+            setValue={setSelectFavoriteSport}
+            placeholder='Select a sport'
+            zIndex={1000}
           />
         </View>
 
@@ -90,9 +98,9 @@ const EditProfile = () => {
             activeOpacity={0.7}
             className={'rounded-xl min-h-[62px] flex flex-row ' +
               'justify-center items-center bg-purple-600 text-white mb-4 ' + 
-              ((inputUserName || inputAge || inputFavoriteSport) ? 'opacity-100' : 'opacity-50')
+              ((inputUserName || selectAge || selectFavoriteSport) ? 'opacity-100' : 'opacity-50')
                 }
-            disabled={(inputUserName || inputAge || inputFavoriteSport) ? false : true}
+            disabled={(inputUserName || selectAge || selectFavoriteSport) ? false : true}
           >
             <Text className={`text-primary font-psemibold text-lg`}>
                 Save
@@ -100,7 +108,6 @@ const EditProfile = () => {
           </TouchableOpacity>
 
         </View>
-      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };

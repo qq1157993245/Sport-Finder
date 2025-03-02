@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Image, Alert } from 'react-native'
+import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -70,9 +70,9 @@ const SignIn = () => {
           </View>
 
           <View className="items-center mt-3">
-            <Link href="/forgotPassword" className="text-blue-400 text-sm font-psemibold">
-              Forgot Password?
-            </Link>
+            <TouchableOpacity onPress={() => router.push('/forgotPassword')}>
+                <Text className="text-blue-400 text-sm font-psemibold">Forgot Password?</Text>
+            </TouchableOpacity>
           </View>
           
         </View>
@@ -80,5 +80,4 @@ const SignIn = () => {
     </SafeAreaView>
   )
 }
-
 export default SignIn
