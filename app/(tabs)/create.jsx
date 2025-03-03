@@ -12,8 +12,6 @@ import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 const Create = () => {
   
   const { latitude, longitude } = useLocalSearchParams(); // Get coordinates from MapScreen
-  const [latitudeType, setLatitudeType] = useState('');
-  const [longitudeType, setLongitudeType] = useState('');
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
@@ -27,6 +25,9 @@ const Create = () => {
       await setDoc(coordinateRef, {
         latitude,
         longitude,
+        sport: sportType,
+        playersCount: numPlayers,
+        gameDuration: 0,
       });
       router.push('/map')
     }

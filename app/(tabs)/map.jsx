@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import MapView, { Marker } from 'react-native-maps';
-import { StyleSheet, View, Dimensions } from 'react-native';
+import MapView, { Marker, Callout } from 'react-native-maps';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
@@ -24,7 +24,7 @@ const MapScreen = () => {
       const unsubscribe = onSnapshot(coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
         const fetchedCoords = [];
         querySnapshot.forEach((doc) => {
-          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude}); // Include the document ID
+          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude, sport: doc.data.sport, playersCount: doc.data.playersCount, gameDuration: doc.data.gameDuration})
         });
         console.log("coords: ", fetchedCoords.join(", "));
         setMarkers(fetchedCoords);
@@ -53,29 +53,26 @@ const MapScreen = () => {
         initialRegion={region}
         onRegionChangeComplete={handleRegionChangeComplete}
         showsUserLocation={true}
-        showsUsersLocationButton={true}
+        showsMyLocationButton={true}
       >
-        {/* {coordinates.map((coordinate, index) => (
-          <Marker
-            key={index} // Important: Use a unique key for each marker
-            coordinate={{
-              latitude: coordinate.latitude,
-              longitude: coordinate.longitude,
-            }}
-            title={coordinate.title}
-            description={coordinate.description}
-          />
-        ))} */}
         {markers.map((marker) => (
           <Marker
-            key={marker.id} // Use the document ID as the key
+            key={marker.id}
             coordinate={{
               latitude: marker.latitude,
-              longitude: marker.longitude, 
+              longitude: marker.longitude,
             }}
-            title={marker.title}
-            description={marker.description}
           >
+            {/* Popup when clicking marker */}
+            <Callout>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
+                <Text style={styles.calloutDescription}>Players: {marker.playersCount}</Text>
+                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} minutes</Text>
+                <Text style={styles.calloutDescription}>Latitude: {marker.latitude}</Text>
+                <Text style={styles.calloutDescription}>Longitude: {marker.longitude}</Text>
+              </View>
+            </Callout>
           </Marker>
         ))}
       </MapView>
@@ -109,6 +106,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 50,
     alignSelf: 'center',
+  },
+  callout: {
+    width: 200,
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  calloutDescription: {
+    fontSize: 14,
+    marginTop: 5,
   },
 });
 
