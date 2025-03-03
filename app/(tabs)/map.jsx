@@ -22,7 +22,6 @@ const MapScreen = () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
           Alert.alert('Permission to access location was denied');
-
         }
 
         let location = await Location.getCurrentPositionAsync({});
@@ -32,8 +31,12 @@ const MapScreen = () => {
           latitudeDelta: 0.02,
           longitudeDelta: 0.02,
         });
-        setInitialRegion(currentRegion);
-        setRegion(currentRegion);
+        setRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        });
       })();
       // Fetch markers from Firestore and set up a listener for real-time updates
       const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
@@ -64,6 +67,10 @@ const MapScreen = () => {
 
   // Function to navigate to Create screen with the coordinates
   const goToCreateScreen = () => {
+    if (!region) {
+      Alert.alert("Location not available", "Please wait for your location to be set.");
+      return;
+    }
     router.push({
       pathname: "/create",
       params: { latitude: region.latitude, longitude: region.longitude }, // Corrected to query
