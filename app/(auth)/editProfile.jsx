@@ -93,11 +93,11 @@ const EditProfile = () => {
 
         {/* Action Buttons */}
         <View className="mt-12">
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={handleSaveData}
             activeOpacity={0.7}
             className={'rounded-xl min-h-[62px] flex flex-row ' +
-              'justify-center items-center bg-purple-600 text-white mb-4 ' + 
+              'justify-center items-center bg-gray-500 text-white mb-4 ' +
               ((inputUserName || selectAge || selectFavoriteSport) ? 'opacity-100' : 'opacity-50')
                 }
             disabled={(inputUserName || selectAge || selectFavoriteSport) ? false : true}

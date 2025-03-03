@@ -153,11 +153,11 @@ const styles = StyleSheet.create({
   currentLocationButton: {
     position: 'absolute',
     top: Dimensions.get('window').height * 0.12,
-    right: Dimensions.get('window').width * 0.01,
+    right: Dimensions.get('window').width * 0.015,
   },
   currentLocationIcon: {
-    width: Dimensions.get('window').height * 0.06,
-    height: Dimensions.get('window').width * 0.12,
+    width: 43,
+    height: 43,
     backgroundColor: '#F3F1F1',
     borderRadius: '50%',
   }

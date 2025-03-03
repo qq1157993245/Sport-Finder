@@ -21,7 +21,8 @@ const Event = () => {
       { label: 'Basketball', value: 'basketball' },
       { label: 'Soccer', value: 'soccer' },
       { label: 'Tennis', value: 'tennis' },
-      { label: 'Volleyball', value: 'volleyball' }
+      { label: 'Volleyball', value: 'volleyball' },
+      { label: 'Handball', value: 'handball' }
     ];
 
     const handleSave = () => {

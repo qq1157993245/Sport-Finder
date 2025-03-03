@@ -46,16 +46,12 @@ const SignUp = () => {
   return (
     <SafeAreaView className="bg-black h-full">
       <KeyboardAwareScrollView>
-
-        <View
-          className="w-full flex justify-center h-full px-4 my-6"
-        >
-
-          <Text className="text-center text-3xl justify-center font-semibold text-white mt-10 font-psemibold">
+        <View className="w-full flex justify-center h-full px-4 my-6">
+          <Text className="text-center text-4xl justify-center font-semibold text-white mt-10 font-psemibold">
             SportsFinder
           </Text>
-          <Text className="text-center text-lg justify-center font-semibold text-white mt-10 font-psemibold">
-            Sign Up to SportsFinder
+          <Text className="text-left text-2xl justify-center font-semibold text-white mt-10 font-psemibold">
+            Sign Up
           </Text>
 
           {/* <FormField
@@ -95,11 +91,16 @@ const SignUp = () => {
             // isLoading={loading}
           />
 
-          <CustomButton
-            title="Already have an account? Sign in!"
-            handlePress={() => router.push('/sign-in')}
-            containerStyles="mt-7"
-          />
+          <View className="justify-center pt-5 flex-row gap-2 items-center">
+            <Text className="text-lg text-gray-100 font-pregular">
+              Already have an account?
+            </Text>
+            <Link
+              href="/sign-in"
+              className='text-white font-psemibold mt-50'>
+              Sign In!
+            </Link>
+          </View>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

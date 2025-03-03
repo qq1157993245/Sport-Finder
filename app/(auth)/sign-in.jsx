@@ -28,11 +28,13 @@ const SignIn = () => {
     <SafeAreaView className="bg-black h-full">
       <KeyboardAwareScrollView>
         <View className="w-full justify-center min-h-[70vh] px-4 my-6">
-          <Image source={images.sflogo2}
-            resizeMode='contain' className="w-[115px] h-[35px]"
-          />
-          <Text className="text-3xl text-white text-semibold mt-10 ml-1 font-psemibold" >
-          Login
+
+          <Text className="text-4xl text-white font-bold text-center mt-5">
+            SportsFinder
+          </Text>
+
+          <Text className="text-2xl text-white font-semibold mt-10 ml-1 font-psemibold">
+            Login
           </Text>
 
           <FormField
@@ -49,7 +51,14 @@ const SignIn = () => {
             handleChangeText={(text) => setPassword(text)}
             otherStyles="mt-7"
           />
-          
+
+          {/* Forgot Password Link (Aligned to Right) */}
+          <View className="flex-row justify-end mt-2">
+            <TouchableOpacity onPress={() => router.push('/forgotPassword')}>
+              <Text className="text-blue-400 text-sm font-psemibold">Forgot Password?</Text>
+            </TouchableOpacity>
+          </View>
+
           <CustomButton
             title="Sign In"
             handlePress={()=>handleSignIn()}
@@ -65,16 +74,10 @@ const SignIn = () => {
             <Link
               href="/"
               className='text-white font-psemibold mt-50'>
-              Sign up!
+              Sign Up!
             </Link>
           </View>
 
-          <View className="items-center mt-3">
-            <TouchableOpacity onPress={() => router.push('/forgotPassword')}>
-                <Text className="text-blue-400 text-sm font-psemibold">Forgot Password?</Text>
-            </TouchableOpacity>
-          </View>
-          
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

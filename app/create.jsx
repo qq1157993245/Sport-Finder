@@ -17,7 +17,7 @@ const Create = () => {
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
-  const [hour, setHour] = useState(''); 
+  const [hour, setHour] = useState('');
   const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
 
   const router = useRouter();  // Using router to navigate
@@ -32,7 +32,8 @@ const Create = () => {
     { label: 'Basketball', value: 'basketball' },
     { label: 'Soccer', value: 'soccer' },
     { label: 'Tennis', value: 'tennis' },
-    { label: 'Volleyball', value: 'volleyball' }
+    { label: 'Volleyball', value: 'volleyball' },
+    { label: 'Handball', value: 'handball' }
   ];
 
   const handleCreateGame = async (latitude, longitude) => {
@@ -109,7 +110,7 @@ const Create = () => {
       </View>
 
       <View className="mt-10">
-        
+
         <CustomButton
           title="Create"
           handlePress={() => handleCreateGame(latitude,longitude )}
