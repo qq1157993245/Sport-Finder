@@ -28,6 +28,7 @@ const Create = () => {
         sport: sportType,
         playersCount: numPlayers,
         gameDuration: 0,
+        skillLevel: skillLevel
       });
       router.push('/map')
     }

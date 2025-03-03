@@ -24,7 +24,7 @@ const MapScreen = () => {
       const unsubscribe = onSnapshot(coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
         const fetchedCoords = [];
         querySnapshot.forEach((doc) => {
-          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude, sport: doc.data.sport, playersCount: doc.data.playersCount, gameDuration: doc.data.gameDuration})
+          fetchedCoords.push({latitude: doc.data().longitude, longitude: doc.data().latitude, sport: doc.data().sport, playersCount: doc.data().playersCount, gameDuration: doc.data().gameDuration, skillLevel: doc.data().skillLevel})
         });
         console.log("coords: ", fetchedCoords.join(", "));
         setMarkers(fetchedCoords);
@@ -69,8 +69,7 @@ const MapScreen = () => {
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
                 <Text style={styles.calloutDescription}>Players: {marker.playersCount}</Text>
                 <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} minutes</Text>
-                <Text style={styles.calloutDescription}>Latitude: {marker.latitude}</Text>
-                <Text style={styles.calloutDescription}>Longitude: {marker.longitude}</Text>
+                <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
               </View>
             </Callout>
           </Marker>
