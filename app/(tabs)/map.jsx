@@ -54,7 +54,7 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sport, playersCount: doc.data().playersCount, gameDuration: doc.data().gameDuration, skillLevel: doc.data().skillLevel})
+          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel})
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -110,8 +110,8 @@ const MapScreen = () => {
             <Callout>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
-                <Text style={styles.calloutDescription}>Players: {marker.playersCount}</Text>
-                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} minutes</Text>
+                <Text style={styles.calloutDescription}>Players: {marker.playersCount}/{marker.playersCount}</Text>
+                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
               </View>
             </Callout>

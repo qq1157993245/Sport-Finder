@@ -21,17 +21,17 @@ const Create = () => {
   const router = useRouter();
 
   const skillLevels = [
-    { label: 'Beginner', value: 'beginner' },
-    { label: 'Intermediate', value: 'intermediate' },
-    { label: 'Advanced', value: 'advanced' }
+    { label: 'Beginner', value: 'Beginner' },
+    { label: 'Intermediate', value: 'Intermediate' },
+    { label: 'Advanced', value: 'Advanced' }
   ];
 
   const sportTypes = [
-    { label: 'Basketball', value: 'basketball' },
-    { label: 'Soccer', value: 'soccer' },
-    { label: 'Tennis', value: 'tennis' },
-    { label: 'Volleyball', value: 'volleyball' },
-    { label: 'Handball', value: 'handball' }
+    { label: 'Basketball', value: 'Basketball' },
+    { label: 'Soccer', value: 'Soccer' },
+    { label: 'Tennis', value: 'Tennis' },
+    { label: 'Volleyball', value: 'Volleyball' },
+    { label: 'Handball', value: 'Handball' }
   ];
 
   // const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
