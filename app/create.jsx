@@ -5,22 +5,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import Dropdownmenu from '../components/dropdownmenu';
-import {db,auth} from './(auth)/config/firebaseConfig';
-import { Link, router } from "expo-router";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+import { db, auth } from './(auth)/config/firebaseConfig';
+import { collection, setDoc, doc } from "firebase/firestore";
 import { Ionicons } from '@expo/vector-icons';
 
 const Create = () => {
-  const { latitude, longitude } = useLocalSearchParams(); // Get coordinates from MapScreen
-  const [latitudeType, setLatitudeType] = useState('');
-  const [longitudeType, setLongitudeType] = useState('');
+  const { latitude, longitude } = useLocalSearchParams();
   const [numPlayers, setNumPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
   const [hour, setHour] = useState('');
   const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const router = useRouter();  // Using router to navigate
+  const router = useRouter();
 
   const skillLevels = [
     { label: 'Beginner', value: 'beginner' },
@@ -36,13 +34,19 @@ const Create = () => {
     { label: 'Handball', value: 'handball' }
   ];
 
-  const handleCreateGame = async (latitude, longitude) => {
+  // const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
+
+  const handleCreateGame = async () => {
+    if (!numPlayers || !skillLevel || !sportType || !hour) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
+
     try {
       const currentUser = auth.currentUser;
-      const coordCollection= collection(db, 'coordinates');
+      const coordCollection = collection(db, 'coordinates');
       const coordinateRef = doc(coordCollection, currentUser.uid);
-      console.log(typeof latitude);
-      console.log(typeof longitude);
+
       await setDoc(coordinateRef, {
         latitude,
         longitude,
@@ -53,29 +57,29 @@ const Create = () => {
         hour
       });
 
-      // After creating the game, navigate back to map screen with updated state
-      router.push('/map'); // You may pass the event state here if needed.
+      router.push('/map');
     } catch (error) {
-      console.error('Game creation failed: ' + error.message);
-      throw error;
+      console.error('Game creation failed:', error.message);
+      setErrorMessage("Failed to create game. Please try again.");
     }
   };
 
   const handleClose = () => {
-    router.push('/map'); // Navigate to the map page when the close button is pressed
+    router.push('/map');
   };
 
   return (
-
     <SafeAreaView className="bg-black h-full px-6">
       <TouchableOpacity onPress={handleClose}>
         <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text className="text-white text-3xl font-semibold mt-20">Create a Game!</Text>
 
+      {errorMessage ? (
+        <Text className="text-red-500 mt-4">{errorMessage}</Text>
+      ) : null}
+
       <View className="mt-10 space-y-6">
-        {/* <Text className="text-white">latitude: {latitude}</Text>
-        <Text className="text-white">longitude: {longitude}</Text> */}
         <FormField
           title="Number of Players"
           value={numPlayers}
@@ -84,36 +88,36 @@ const Create = () => {
           otherStyles="mt-2"
         />
         <Dropdownmenu
-            title="Skill Level"
-            items={skillLevels}
-            value={skillLevel}
-            setValue={setSkillLevel}
-            placeholder="Select skill level"
-            zIndex={3000}
+          title="Skill Level"
+          items={skillLevels}
+          value={skillLevel}
+          setValue={setSkillLevel}
+          placeholder="Select skill level"
+          zIndex={3000}
         />
         <Dropdownmenu
-            title="Sport Type"
-            items={sportTypes}
-            value={sportType}
-            setValue={setSportType}
-            placeholder="Select sport type"
-            zIndex={2000}
+          title="Sport Type"
+          items={sportTypes}
+          value={sportType}
+          setValue={setSportType}
+          placeholder="Select sport type"
+          zIndex={2000}
         />
         <Dropdownmenu
-            title={'Hour'}
-            items={hours}
-            value={hour}
-            setValue={setHour}
-            placeholder='Select an estimated time for game'
-            zIndex={1000}
-          />
+          title="Hour"
+          items={hours}
+          value={hour}
+          setValue={setHour}
+          placeholder="Select an estimated time for game"
+          zIndex={1000}
+        />
       </View>
 
       <View className="mt-10">
 
         <CustomButton
           title="Create"
-          handlePress={() => handleCreateGame(latitude,longitude )}
+          handlePress={handleCreateGame}
           containerStyles="bg-gray-500 text-white"
         />
       </View>
