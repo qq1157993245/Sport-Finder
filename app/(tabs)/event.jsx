@@ -4,12 +4,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import FormField from '../../components/formfield';
 import CustomButton from '../../components/custombutton';
 import Dropdownmenu from '../../components/dropdownmenu'; // Import Dropdownmenu
+import { collection, setDoc, doc, getDoc , deleteDoc, updateDoc} from "firebase/firestore";
+import { db, auth } from '../(auth)/config/firebaseConfig';
+import { Alert } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 
 const Event = () => {
-    const [numPlayers, setNumPlayers] = useState('');
-    const [skillLevel, setSkillLevel] = useState('');
-    const [sportType, setSportType] = useState('');
+    const [Players, setNumPlayers] = useState('');
+    const [sLevel, setSkillLevel] = useState('');
+    const [sType, setSportType] = useState('');
 
     const skillLevels = [
       { label: 'Beginner', value: 'beginner' },
@@ -25,20 +29,88 @@ const Event = () => {
       { label: 'Handball', value: 'handball' }
     ];
 
-    const handleSave = () => {
-      // Implement save functionality
+    const router = useRouter();
+
+    // manually delete a marker
+    const currentUser = auth.currentUser; 
+
+    const handleEndGame = async () => {
+      try {
+         const coordCollection = collection(db, 'coordinates');
+         const coordinateRef = doc(coordCollection, currentUser.uid);
+         const coordSnap = await getDoc(coordinateRef);
+         
+         if(coordSnap.exists()) {
+           await deleteDoc(coordinateRef);
+           console.log("Marker deleted")
+           Alert.alert("Success", "You deleted your current event. "); 
+          
+           router.push('/map');
+         }
+         else {
+            // throw new Error("You have not created an event")
+            Alert.alert("You have not created an event. Please create one first.");
+            router.push('/map');
+         }
+
+      }
+      catch (error) {
+        console.error("Error deleting document:", error);
+        throw error; // Re-throw the error so the calling function can handle it.
+      }
+    }
+    const handleSave = async () => {
+      try {
+        const coordCollection = collection(db, 'coordinates');
+        const coordinateRef = doc(coordCollection, currentUser.uid);
+        const coordSnap = await getDoc(coordinateRef);
+        
+        if(coordSnap.exists()) {
+          
+          
+          if (Players !== ''){
+            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+              numPlayers: Players,
+            });
+            setNumPlayers('');
+          }
+          if (sLevel !== ''){
+            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+              skillLevel: sLevel,
+            });
+            setSkillLevel("");
+          }
+          if (sType !== ''){
+            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+              sportType: sType
+            });
+            setSportType("");
+          }
+          
+          router.push('/map');
+        }
+        else {
+           // throw new Error("You have not created an event")
+           Alert.alert("You have not created an event. Please create one first.");
+           router.push('/map');
+        }
+        Alert.alert('Success', 'Edited current event!');
+     }
+     catch (error) {
+       console.error("Error editing with changing current event", error);
+       throw error; // Re-throw the error so the calling function can handle it.
+     }
+      
       console.log('Event saved');
     };
-
+    
     const handleAddTime = () => {
-      // Implement add time functionality
+      // Implement add time functionality'
+      router.push('/time');
       console.log('Time added');
     };
 
-    const handleEndGame = () => {
-      // Implement end game functionality
-      console.log('Game ended');
-    };
+    
 
     return (
       <SafeAreaView className="bg-black h-full px-6 py-10">
@@ -52,7 +124,7 @@ const Event = () => {
           {/* Form fields for number of players, skill level, and sport type */}
           <FormField
             title="Number of Players"
-            value={numPlayers}
+            value={Players}
             placeholder="Enter number of players"
             handleChangeText={setNumPlayers}
             otherStyles="mt-2"
@@ -60,7 +132,7 @@ const Event = () => {
           <Dropdownmenu
               title="Skill Level"
               items={skillLevels}
-              value={skillLevel}
+              value={sLevel}
               setValue={setSkillLevel}
               placeholder="Select skill level"
               zIndex={2000}
@@ -68,7 +140,7 @@ const Event = () => {
           <Dropdownmenu
               title="Sport Type"
               items={sportTypes}
-              value={sportType}
+              value={sType}
               setValue={setSportType}
               placeholder="Select sport type"
               zIndex={1000}
