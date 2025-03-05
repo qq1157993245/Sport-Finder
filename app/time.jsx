@@ -58,11 +58,7 @@ const addTime = () => {
       router.push('/map');
 
     };
-    
-    const handleAddTime = () => {
-      // Implement add time functionality
-      console.log('Time added');
-    };
+   
 
     
 
