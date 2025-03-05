@@ -32,19 +32,19 @@ const Event = () => {
     const router = useRouter();
 
     // manually delete a marker
-    const currentUser = auth.currentUser; 
+    const currentUser = auth.currentUser;
 
     const handleEndGame = async () => {
       try {
          const coordCollection = collection(db, 'coordinates');
          const coordinateRef = doc(coordCollection, currentUser.uid);
          const coordSnap = await getDoc(coordinateRef);
-         
+
          if(coordSnap.exists()) {
            await deleteDoc(coordinateRef);
            console.log("Marker deleted")
-           Alert.alert("Success", "You deleted your current event. "); 
-          
+           Alert.alert("Success", "You deleted your current event. ");
+
            router.push('/map');
          }
          else {
@@ -64,53 +64,53 @@ const Event = () => {
         const coordCollection = collection(db, 'coordinates');
         const coordinateRef = doc(coordCollection, currentUser.uid);
         const coordSnap = await getDoc(coordinateRef);
-        
-        if(coordSnap.exists()) {
-          
-          
-          if (Players !== ''){
-            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+
+        if (coordSnap.exists()) {
+          let updated = false;
+
+          if (Players !== '') {
+            await updateDoc(doc(db, "coordinates", currentUser.uid), {
               numPlayers: Players,
             });
             setNumPlayers('');
+            updated = true;
           }
-          if (sLevel !== ''){
-            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+          if (sLevel !== '') {
+            await updateDoc(doc(db, "coordinates", currentUser.uid), {
               skillLevel: sLevel,
             });
             setSkillLevel("");
+            updated = true;
           }
-          if (sType !== ''){
-            await updateDoc(doc(db, "coordinates", currentUser.uid),{
+          if (sType !== '') {
+            await updateDoc(doc(db, "coordinates", currentUser.uid), {
               sportType: sType
             });
             setSportType("");
+            updated = true;
           }
-          
+
+          if (updated) {
+            Alert.alert('Success', 'Edited current event!');
+          }
+
+          router.push('/map');
+        } else {
+          Alert.alert("You have not created an event. Please create one first.");
           router.push('/map');
         }
-        else {
-           // throw new Error("You have not created an event")
-           Alert.alert("You have not created an event. Please create one first.");
-           router.push('/map');
-        }
-        Alert.alert('Success', 'Edited current event!');
-     }
-     catch (error) {
-       console.error("Error editing with changing current event", error);
-       throw error; // Re-throw the error so the calling function can handle it.
-     }
-      
-      console.log('Event saved');
+      } catch (error) {
+        console.error("Error editing current event", error);
+      }
     };
-    
+
     const handleAddTime = () => {
       // Implement add time functionality'
       router.push('/time');
       console.log('Time added');
     };
 
-    
+
 
     return (
       <SafeAreaView className="bg-black h-full px-6 py-10">
@@ -118,7 +118,7 @@ const Event = () => {
         <Text className="text-white text-3xl font-semibold text-center">My Event</Text>
 
         {/* Event Info Section */}
-        <View className="mt-8 space-y-6">
+        <View className="mt-10 space-y-6">
           <Text className="text-white text-xl font-semibold">Event Info</Text>
 
           {/* Form fields for number of players, skill level, and sport type */}

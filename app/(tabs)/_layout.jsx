@@ -62,7 +62,7 @@ const TabsLayout = () => {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.plus}
+              icon={icons.sport}
               color={color}
               name="Event"
               focused={focused}
