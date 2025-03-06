@@ -57,11 +57,9 @@ const Create = () => {
         sportType,
         timeCreated: new Date(),
         hour,
-        currentPlayers: 1
+        currentPlayers: 1,
+        isInGame: true
       });
-
-      // Update user status to indicate they are in a game
-      await setDoc(userRef, { isInGame: true }, { merge: true });
 
       router.push('/map');
     } catch (error) {

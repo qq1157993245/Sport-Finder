@@ -68,7 +68,7 @@ const MapScreen = () => {
       try {
         const currentUser = auth.currentUser;
         const userId = currentUser.uid;
-        const userRef = doc(db, "users", userId);
+        const userRef = doc(db, "coordinates", userId);
     
         if (!joinedGames.includes(marker.id)) {
           setJoinedGames([...joinedGames, marker.id]);
@@ -157,7 +157,7 @@ const MapScreen = () => {
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
                 <TouchableOpacity
                   style={[styles.joinButton, joinedMarkerIds.has(marker.id) && styles.disabledButton]}
-                  onPress={() => Alert.alert("Joined Game", "You have successfully joined the game!")}
+                  onPress={() => handleJoinGame(marker)}
                 >
                   <Text style={styles.joinButtonText}>Join Game</Text>
                 </TouchableOpacity>
