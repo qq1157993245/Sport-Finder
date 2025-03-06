@@ -47,6 +47,7 @@ const MapScreen = () => {
         const fetchedCoords = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
+         
           // fetchedCoords.push({
           //   id: doc.id, // Firebase document ID as the unique key
           //   latitude: data.latitude,
@@ -54,7 +55,7 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel})
+          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, expires: doc.data().expiresAt})
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -68,6 +69,27 @@ const MapScreen = () => {
     setRegion(newRegion);
   };
 
+
+  const extractTime = (date) => {
+    if (!(date instanceof Date) || isNaN(date)) {
+      Alert.alert("Not an date object", "Please input a date");
+    }
+    const options = {
+      hour: 'numeric',
+      hour12: true, // Use 12-hour format
+    };
+    const timeString = date.toLocaleTimeString('en-US', options);
+    
+    const ampm = timeString.slice(-2);
+    
+    const hours = date.getHours().toString().padStart(2);
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+
+  
+    return `${hours}:${minutes} ${ampm}`;
+  };
+
+  
   // Function to navigate to Create screen with the coordinates
   const goToCreateScreen = () => {
     if (!region) {
@@ -115,6 +137,9 @@ const MapScreen = () => {
                   Game Duration: {marker.gameDuration} {marker.gameDuration === 1 ? "hour" : "hours"}
                 </Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
+                <Text style={styles.calloutDescription}>
+                  Games Ends At: {extractTime(marker.expires.toDate())}
+                </Text>
               </View>
             </Callout>
           </Marker>

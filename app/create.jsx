@@ -49,15 +49,19 @@ const Create = () => {
       const currentUser = auth.currentUser;
       const coordCollection = collection(db, 'coordinates');
       const coordinateRef = doc(coordCollection, currentUser.uid);
-
+       
+      const tCreated = new Date();
+      const expires = new Date();
+      expires.setHours(expires.getHours() + Number(hour));
       await setDoc(coordinateRef, {
         latitude,
         longitude,
         numPlayers,
         skillLevel,
         sportType,
-        timeCreated: new Date(),
-        hour
+        timeCreated: tCreated,
+        hour,
+        expiresAt: expires
       });
 
       router.push('/map');
