@@ -19,13 +19,16 @@ const EditProfile = () => {
   const [selectAge, setSelectAge] = useState('');
   const [selectFavoriteSport, setSelectFavoriteSport] = useState('');
 
-  const ages = Array.from({ length: 101 }, (_, i) => ({ label: `${i}`, value: i }))
+  const ages = Array.from({ length: 87 }, (_, i) => ({ label: `${i + 13}`, value: i + 13 }))
   const sports = [
-    {label: 'Basketball', value: 'basketball'},
-    {label: 'Volleyball', value: 'volleyball'},
-    {label: 'Football', value: 'football'},
-    {label: 'Baseball', value: 'baseball'},
-    {label: 'Handball', value: 'handball'},
+    { label: 'Basketball', value: 'basketball' },
+    { label: 'Soccer', value: 'soccer' },
+    { label: 'Tennis', value: 'tennis' },
+    { label: 'Volleyball', value: 'volleyball' },
+    { label: 'Handball', value: 'handball' },
+    { label: 'Baseball', value: 'Baseball' },
+    { label: 'Football', value: 'Football' },
+    { label: 'Pickleball', value: 'Pickleball' }
   ];
 
   const handleSaveData = () => {
@@ -93,20 +96,16 @@ const EditProfile = () => {
 
         {/* Action Buttons */}
         <View className="mt-12">
-          <TouchableOpacity
-            onPress={handleSaveData}
-            activeOpacity={0.7}
-            className={'rounded-xl min-h-[62px] flex flex-row ' +
-              'justify-center items-center bg-gray-500 text-white mb-4 ' +
-              ((inputUserName || selectAge || selectFavoriteSport) ? 'opacity-100' : 'opacity-50')
-                }
-            disabled={(inputUserName || selectAge || selectFavoriteSport) ? false : true}
-          >
-            <Text className={`text-primary font-psemibold text-lg`}>
-                Save
-            </Text>
-          </TouchableOpacity>
-
+          <CustomButton
+            title="Save"
+            handlePress={handleSaveData}
+            containerStyles={`bg-gray-500 text-white mb-4 ${
+              (inputUserName || selectAge || selectFavoriteSport) ? 'opacity-100' : 'opacity-50'
+            }`}
+            textStyles="text-lg"
+            isLoading={false}
+            disabled={!(inputUserName || selectAge || selectFavoriteSport)}
+          />
         </View>
     </SafeAreaView>
   );

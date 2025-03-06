@@ -16,9 +16,9 @@ const Event = () => {
     const [sType, setSportType] = useState('');
 
     const skillLevels = [
-      { label: 'Beginner', value: 'beginner' },
-      { label: 'Intermediate', value: 'intermediate' },
-      { label: 'Advanced', value: 'advanced' }
+      { label: 'Beginner', value: 'Beginner' },
+      { label: 'Intermediate', value: 'Intermediate' },
+      { label: 'Advanced', value: 'Advanced' }
     ];
 
     const sportTypes = [
@@ -26,7 +26,10 @@ const Event = () => {
       { label: 'Soccer', value: 'soccer' },
       { label: 'Tennis', value: 'tennis' },
       { label: 'Volleyball', value: 'volleyball' },
-      { label: 'Handball', value: 'handball' }
+      { label: 'Handball', value: 'handball' },
+      { label: 'Baseball', value: 'Baseball' },
+      { label: 'Football', value: 'Football' },
+      { label: 'Pickleball', value: 'Pickleball' }
     ];
 
     const router = useRouter();
@@ -122,12 +125,12 @@ const Event = () => {
           <Text className="text-white text-xl font-semibold">Event Info</Text>
 
           {/* Form fields for number of players, skill level, and sport type */}
-          <FormField
+          <Dropdownmenu
             title="Number of Players"
+            items={Array.from({ length: 20 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
             value={Players}
-            placeholder="Enter number of players"
-            handleChangeText={setNumPlayers}
-            otherStyles="mt-2"
+            setValue={setNumPlayers}
+            placeholder="Select number of players"
           />
           <Dropdownmenu
               title="Skill Level"

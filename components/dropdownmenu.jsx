@@ -7,7 +7,7 @@ const Dropdownmenu = ({items, value, setValue, placeholder, title, ...props}) =>
 
   return (
     <View className='mt-8'>
-      <Text className="text-base text-gray-100 font-pmedium">{title}</Text>
+      <Text className="text-base text-gray-100 font-pmedium mb-1">{title}</Text>
       <DropDownPicker
         {...props}
         items={items}

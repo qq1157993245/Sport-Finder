@@ -38,7 +38,12 @@ const UpdatePassword = () => {
     <SafeAreaView className="bg-black h-full">
       <ScrollView>
         <TouchableOpacity onPress={()=>router.back()}>
-            <Ionicons name="close" size={30} color="white" />
+          <Ionicons
+            name="close"
+            size={30}
+            color="white"
+            style={{ marginLeft: 10, marginTop: 5 }}
+          />
         </TouchableOpacity>
         <View className="w-full justify-center min-h-[70vh] px-4 my-6">
 

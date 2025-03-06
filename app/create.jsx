@@ -31,7 +31,10 @@ const Create = () => {
     { label: 'Soccer', value: 'Soccer' },
     { label: 'Tennis', value: 'Tennis' },
     { label: 'Volleyball', value: 'Volleyball' },
-    { label: 'Handball', value: 'Handball' }
+    { label: 'Handball', value: 'Handball' },
+    { label: 'Baseball', value: 'Baseball' },
+    { label: 'Football', value: 'Football' },
+    { label: 'Pickleball', value: 'Pickleball' }
   ];
 
   // const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
@@ -80,13 +83,13 @@ const Create = () => {
       ) : null}
 
       <View className="mt-10 space-y-6">
-        <FormField
-          title="Number of Players"
-          value={numPlayers}
-          placeholder="Enter number of players"
-          handleChangeText={setNumPlayers}
-          otherStyles="mt-2"
-        />
+      <Dropdownmenu
+        title="Number of Players"
+        items={Array.from({ length: 20 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
+        value={numPlayers}
+        setValue={setNumPlayers}
+        placeholder="Select number of players"
+      />
         <Dropdownmenu
           title="Skill Level"
           items={skillLevels}

@@ -23,13 +23,16 @@ const Preferences = () => {
   const [age, setAge] = useState('');
   const [favoriteSport, setFavoriteSport] = useState('');
 
-  const ages = Array.from({ length: 101 }, (_, i) => ({ label: `${i}`, value: i }))
+  const ages = Array.from({ length: 87 }, (_, i) => ({ label: `${i + 13}`, value: i + 13 }))
   const sports = [
-    {label: 'Basketball', value: 'basketball'},
-    {label: 'Volleyball', value: 'volleyball'},
-    {label: 'Football', value: 'football'},
-    {label: 'Baseball', value: 'baseball'},
-    {label: 'Handball', value: 'handball'},
+    { label: 'Basketball', value: 'basketball' },
+    { label: 'Soccer', value: 'soccer' },
+    { label: 'Tennis', value: 'tennis' },
+    { label: 'Volleyball', value: 'volleyball' },
+    { label: 'Handball', value: 'handball' },
+    { label: 'Baseball', value: 'Baseball' },
+    { label: 'Football', value: 'Football' },
+    { label: 'Pickleball', value: 'Pickleball' }
   ];
 
   return (
@@ -70,7 +73,7 @@ const Preferences = () => {
                 onPress={handleSaveInfo}
                 activeOpacity={0.7}
                 className={'rounded-xl min-h-[62px] flex flex-row ' +
-                   'justify-center items-center bg-red-600 text-white mb-4 ' + 
+                   'justify-center items-center bg-red-600 text-white mb-4 ' +
                    ((username && age && favoriteSport) ? 'opacity-100' : 'opacity-50')
                     }
                 disabled={(username && age && favoriteSport) ? false : true}

@@ -104,14 +104,16 @@ const MapScreen = () => {
             }}
             title={marker.title}
             description={marker.description}
-          
+
           >
             {/* Popup when clicking marker */}
             <Callout>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
                 <Text style={styles.calloutDescription}>Players: {marker.playersCount}/{marker.playersCount}</Text>
-                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} hours</Text>
+                <Text style={styles.calloutDescription}>
+                  Game Duration: {marker.gameDuration} {marker.gameDuration === 1 ? "hour" : "hours"}
+                </Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
               </View>
             </Callout>
@@ -121,7 +123,7 @@ const MapScreen = () => {
       </MapView>
 
       {/* hitmarker to choose location */}
-      <View style={styles.hitmarker} />
+      <View style={styles.hitmarker}/>
 
       <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
         <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>
@@ -137,10 +139,6 @@ const MapScreen = () => {
       </View>
 
       {/* refresh button */}
-      <CustomButton
-        title="↻"
-        handlePress={() => {/* add refresh function here */}}
-        containerStyles="text-2xl mb-8 w-10 h-6 bg-white-500 text-white rounded-full flex items-center justify-center absolute bottom-5 right-5"      />
     </View>
   );
 };
