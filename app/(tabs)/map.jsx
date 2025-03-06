@@ -15,8 +15,9 @@ const MapScreen = () => {
   const router = useRouter();
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
-
+  const [joinedGames, setJoinedGames] = useState([]);
   const [markers, setMarkers] = useState([]);
+  const [joinedMarkerIds, setJoinedMarkerIds] = useState(new Set());  // Track joined marker IDs
 
   useEffect(() => {
       // Get the user's current location
@@ -54,7 +55,7 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel})
+          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers})
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -62,6 +63,47 @@ const MapScreen = () => {
 
       // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
     }, []);
+
+    const handleJoinGame = async (marker) => {
+      try {
+        const currentUser = auth.currentUser;
+        const userId = currentUser.uid;
+        const userRef = doc(db, "users", userId);
+    
+        if (!joinedGames.includes(marker.id)) {
+          setJoinedGames([...joinedGames, marker.id]);
+    
+          // Update Firestore: Mark user as in the game
+          await setDoc(userRef, { isInGame: true, gameId: marker.id }, { merge: true });
+    
+          Alert.alert("Joined Game", "You have successfully joined the game!");
+        }
+      } catch (error) {
+        console.error("Error joining game:", error);
+        Alert.alert("Error", "Failed to join game. Please try again.");
+      }
+    };
+    
+    
+    const handleQuitGame = async (marker) => {
+      try {
+        const currentUser = auth.currentUser;
+        const userId = currentUser.uid;
+        const userRef = doc(db, "users", userId);
+    
+        if (joinedGames.includes(marker.id)) {
+          setJoinedGames(joinedGames.filter(id => id !== marker.id));
+    
+          // Update Firestore: Remove user from the game
+          await updateDoc(userRef, { isInGame: false, gameId: null });
+    
+          Alert.alert("Quit Game", "You have left the game.");
+        }
+      } catch (error) {
+        console.error("Error quitting game:", error);
+        Alert.alert("Error", "Failed to leave game. Please try again.");
+      }
+    };
 
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
@@ -110,9 +152,26 @@ const MapScreen = () => {
             <Callout>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
-                <Text style={styles.calloutDescription}>Players: {marker.playersCount}/{marker.playersCount}</Text>
-                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} hours</Text>
+                <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>
+                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
+                <TouchableOpacity
+                  style={[styles.joinButton, joinedMarkerIds.has(marker.id) && styles.disabledButton]}
+                  onPress={() => Alert.alert("Joined Game", "You have successfully joined the game!")}
+                >
+                  <Text style={styles.joinButtonText}>Join Game</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                  styles.quitButton,
+                  !joinedGames.includes(marker.id) && styles.disabledButton // Disable styling
+                  ]}
+                  onPress={() => handleQuitGame(marker)}
+                  disabled={!joinedGames.includes(marker.id)}
+                >
+                  <Text style={styles.quitButtonText}>Quit Game</Text>
+                </TouchableOpacity>
               </View>
             </Callout>
           </Marker>
@@ -190,6 +249,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
   },
+  joinButton: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: '#2196F3',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  joinButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  quitButton: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  
+  quitButtonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  
+  disabledButton: {
+    backgroundColor: 'gray',
+    opacity: 0.5,
+  }
 });
 
 export default MapScreen;

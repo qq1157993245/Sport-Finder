@@ -6,7 +6,7 @@ import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import Dropdownmenu from '../components/dropdownmenu';
 import { db, auth } from './(auth)/config/firebaseConfig';
-import { collection, setDoc, doc } from "firebase/firestore";
+import { collection, setDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { Ionicons } from '@expo/vector-icons';
 
 const Create = () => {
@@ -15,7 +15,6 @@ const Create = () => {
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
   const [hour, setHour] = useState('');
-  const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
   const [errorMessage, setErrorMessage] = useState('');
 
   const router = useRouter();
@@ -30,12 +29,12 @@ const Create = () => {
     { label: 'Basketball', value: 'Basketball' },
     { label: 'Soccer', value: 'Soccer' },
     { label: 'Tennis', value: 'Tennis' },
-    { label: 'Volleyball', value: 'Volleyball' },
-    { label: 'Handball', value: 'Handball' }
+    { label: 'Volleyball', value: 'Volleyball' }
   ];
 
-  // const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
+  const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
 
+  // Function to create game and set isInGame to true
   const handleCreateGame = async () => {
     if (!numPlayers || !skillLevel || !sportType || !hour) {
       setErrorMessage("All fields are required.");
@@ -44,9 +43,12 @@ const Create = () => {
 
     try {
       const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
       const coordCollection = collection(db, 'coordinates');
-      const coordinateRef = doc(coordCollection, currentUser.uid);
+      const coordinateRef = doc(coordCollection, userId);
+      const userRef = doc(db, "users", userId);
 
+      // Create game data
       await setDoc(coordinateRef, {
         latitude,
         longitude,
@@ -54,8 +56,12 @@ const Create = () => {
         skillLevel,
         sportType,
         timeCreated: new Date(),
-        hour
+        hour,
+        currentPlayers: 1
       });
+
+      // Update user status to indicate they are in a game
+      await setDoc(userRef, { isInGame: true }, { merge: true });
 
       router.push('/map');
     } catch (error) {
@@ -64,13 +70,30 @@ const Create = () => {
     }
   };
 
-  const handleClose = () => {
-    router.push('/map');
+  // Function to leave game and set isInGame to false
+  const handleLeaveGame = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      const userId = currentUser.uid;
+      const coordinateRef = doc(db, 'coordinates', userId);
+      const userRef = doc(db, "users", userId);
+
+      // Remove game from database
+      await deleteDoc(coordinateRef);
+
+      // Update user status to indicate they are no longer in a game
+      await updateDoc(userRef, { isInGame: false });
+
+      router.push('/map');
+    } catch (error) {
+      console.error('Failed to leave game:', error.message);
+      setErrorMessage("Failed to leave game. Please try again.");
+    }
   };
 
   return (
     <SafeAreaView className="bg-black h-full px-6">
-      <TouchableOpacity onPress={handleClose}>
+      <TouchableOpacity onPress={handleLeaveGame}>
         <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text className="text-white text-3xl font-semibold mt-20">Create a Game!</Text>
@@ -114,11 +137,15 @@ const Create = () => {
       </View>
 
       <View className="mt-10">
-
         <CustomButton
           title="Create"
           handlePress={handleCreateGame}
           containerStyles="bg-gray-500 text-white"
+        />
+        <CustomButton
+          title="Leave Game"
+          handlePress={handleLeaveGame}
+          containerStyles="bg-red-500 text-white mt-4"
         />
       </View>
     </SafeAreaView>
