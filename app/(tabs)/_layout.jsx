@@ -45,6 +45,7 @@ const TabsLayout = () => {
         options={{
           title: 'Map',
           headerShown: false,
+          gestureEnabled: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               icon={icons.map}
@@ -60,6 +61,7 @@ const TabsLayout = () => {
         options={{
           title: 'Event',
           headerShown: false,
+          gestureEnabled: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               icon={icons.sport}
@@ -75,6 +77,7 @@ const TabsLayout = () => {
         options={{
           title: 'Profile',
           headerShown: false,
+          gestureEnabled: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               icon={icons.profile}
