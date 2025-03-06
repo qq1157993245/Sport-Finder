@@ -75,6 +75,9 @@ const MapScreen = () => {
     
           // Update Firestore: Mark user as in the game
           await setDoc(userRef, { isInGame: true, gameId: marker.id }, { merge: true });
+          await updateDoc(userRef, {
+            currentPlayers : currentPlayers + 1
+          });
     
           Alert.alert("Joined Game", "You have successfully joined the game!");
         }
