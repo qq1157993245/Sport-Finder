@@ -31,19 +31,26 @@ const EditProfile = () => {
     { label: 'Pickleball', value: 'Pickleball' }
   ];
 
-  const handleSaveData = () => {
+  const handleSaveData = async () => {
+    const updatedUser = {
+      username: username,
+      age: age,
+      favoriteSport: favoriteSport
+    };
     if(inputUserName){
-      updateData({'username': inputUserName, age, favoriteSport});
+      updatedUser.username = inputUserName;
       setUsername(inputUserName);
     }
     if(selectAge) {
-      updateData({username, 'age': selectAge, favoriteSport});
+      updatedUser.age = selectAge;
       setAge(selectAge);
     }
     if(selectFavoriteSport){
-      updateData({username, age, 'favoriteSport': selectFavoriteSport});
+      updatedUser.favoriteSport = selectFavoriteSport;
       setFavoriteSport(selectFavoriteSport);
     }
+
+    await updateData(updatedUser);
 
     setInputUserName('');
     setSelectAge('');

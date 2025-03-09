@@ -5,7 +5,7 @@ const CustomButton = ({
   handlePress,
   containerStyles,
   textStyles,
-  isLoading,
+  isLoading
 }) => {
   return (
     <TouchableOpacity
