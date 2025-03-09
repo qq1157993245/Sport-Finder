@@ -74,18 +74,14 @@ const MapScreen = () => {
     if (!(date instanceof Date) || isNaN(date)) {
       Alert.alert("Not an date object", "Please input a date");
     }
-    const options = {
-      hour: 'numeric',
-      hour12: true, // Use 12-hour format
-    };
-    const timeString = date.toLocaleTimeString('en-US', options);
     
-    const ampm = timeString.slice(-2);
-    
-    const hours = date.getHours().toString().padStart(2);
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-
   
+    let hours = date.getHours();
+    
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
   };
 

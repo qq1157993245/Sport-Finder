@@ -15,7 +15,18 @@ const addTime = () => {
    
 
     const [Hour, setHour] = useState('');
-    const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
+    const hours = [
+      { label: '1 hour', value: 1 },
+      { label: '1 hour 30 minutes', value: 1.5 },
+      { label: '2 hour', value: 2 },
+      { label: '2 hour 30 minutes', value: 2.5 },
+      { label: '3 hour', value: 3 },
+      { label: '3 hour 30 minutes', value: 3.5},
+      { label: '4 hour', value: 4 },
+      { label: '4 hour 30 minutes', value: 4.5},
+      { label: '5 hour', value: 5},
+      
+    ];
 
     const router = useRouter();
 
@@ -23,20 +34,32 @@ const addTime = () => {
     const currentUser = auth.currentUser; 
 
     
+    function isFloat(number) {
+      return Number(number) === number && number % 1 !== 0;
+    }
     const handleSave = async () => {
       try {
         const docRef = doc(db, 'coordinates', currentUser.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const endTime = docSnap.data().expiresAt.toDate();
+          const currHour = docSnap.data().hour;
+          if (isFloat(Hour)) {
+            const num =  Math.floor(Hour);
+            endTime.setHours(endTime.getHours() + num);
+            endTime.setMinutes(endTime.getMinutes() + 30);
+         }
+         else{
           endTime.setHours(endTime.getHours() + Number(Hour));
+         }
+        
           if (Hour === ''){
         
               Alert.alert("Error", "Hour wasn't inputted. Your current game was not extended.");
           }
           else {
             await updateDoc(doc(db, "coordinates", currentUser.uid),{
-              hour: Hour,
+              hour: Hour + currHour,
               expiresAt: endTime,
             });
             Alert.alert('Success', 'Added more time your current event');
