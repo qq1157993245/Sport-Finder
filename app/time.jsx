@@ -28,17 +28,16 @@ const addTime = () => {
         const docRef = doc(db, 'coordinates', currentUser.uid);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-          // const currHour = docSnap.data().hour;
-          // console.log("Time - ", currHour)
-          
-          // const h = parseInt(Number(Hour) + Number(currHour))
+          const endTime = docSnap.data().expiresAt.toDate();
+          endTime.setHours(endTime.getHours() + Number(Hour));
           if (Hour === ''){
         
               Alert.alert("Error", "Hour wasn't inputted. Your current game was not extended.");
           }
           else {
             await updateDoc(doc(db, "coordinates", currentUser.uid),{
-              hour: Hour
+              hour: Hour,
+              expiresAt: endTime,
             });
             Alert.alert('Success', 'Added more time your current event');
           }
