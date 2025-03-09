@@ -113,9 +113,9 @@ const MapScreen = () => {
         showsMyLocationButton={true}
       >
 
-        {markers.map((marker) => (
+        {markers.map((marker, index) => (
           <Marker
-            key={marker.id}
+            key={index}
             coordinate={{
               latitude: marker.latitude,
               longitude: marker.longitude,
