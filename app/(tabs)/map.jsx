@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
 
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
 import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
-import {db} from '../(auth)/config/firebaseConfig';
+import {auth, db} from '../(auth)/config/firebaseConfig';
 import icons from '../../constants/icons.js'
 import * as Location from 'expo-location';
 
@@ -55,7 +55,7 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers})
+          fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers})
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -65,6 +65,7 @@ const MapScreen = () => {
     }, []);
 
     const handleJoinGame = async (marker) => {
+      console.log("onPress Clicked")
       try {
         const currentUser = auth.currentUser;
         const userId = currentUser.uid;
@@ -99,6 +100,9 @@ const MapScreen = () => {
     
           // Update Firestore: Remove user from the game
           await updateDoc(userRef, { isInGame: false, gameId: null });
+          await updateDoc(userRef, {
+            currentPlayers : currentPlayers - 1
+          });
     
           Alert.alert("Quit Game", "You have left the game.");
         }
@@ -158,23 +162,27 @@ const MapScreen = () => {
                 <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>
                 <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
-                <TouchableOpacity
-                  style={[styles.joinButton, joinedMarkerIds.has(marker.id) && styles.disabledButton]}
+                <View style={{ flex: 1, minHeight: 50 }} />
+                <CalloutSubview
                   onPress={() => handleJoinGame(marker)}
+                  style={styles.joinButton}
                 >
-                  <Text style={styles.joinButtonText}>Join Game</Text>
-                </TouchableOpacity>
+                  <Text style={{ color: "blue", textDecorationLine: "underline" }}>
+                    Join Game
+                  </Text>
+                </CalloutSubview>
 
-                <TouchableOpacity
+
+                <CalloutSubview
+                  onPress={() => handleQuitGame(marker)}
                   style={[
                   styles.quitButton,
-                  !joinedGames.includes(marker.id) && styles.disabledButton // Disable styling
+                  !joinedGames.includes(marker.id) && styles.disabledButton,
                   ]}
-                  onPress={() => handleQuitGame(marker)}
                   disabled={!joinedGames.includes(marker.id)}
                 >
                   <Text style={styles.quitButtonText}>Quit Game</Text>
-                </TouchableOpacity>
+                </CalloutSubview>
               </View>
             </Callout>
           </Marker>
@@ -208,7 +216,7 @@ const MapScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: { flex: 1 },
   map: { flex: 1 },
   hitmarker: {
     position: 'absolute',
@@ -243,6 +251,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     alignItems: 'center',
+    flexDirection: 'column', // Stack elements vertically
+    justifyContent: 'flex-start', // Ensures text stays at the top
+    minHeight: 220, // Force a taller container so buttons don’t overlap text
   },
   calloutTitle: {
     fontSize: 16,
@@ -253,33 +264,35 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   joinButton: {
-    marginTop: 10,
+    marginTop: 20, // Move Join button lower
     paddingVertical: 8,
     paddingHorizontal: 15,
     backgroundColor: '#2196F3',
     borderRadius: 5,
     alignItems: 'center',
+    width: '100%', // Ensure buttons span full width
   },
   joinButtonText: {
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   quitButton: {
-    marginTop: 10,
+    marginTop: 10, // Move Quit button lower, add more space from Join button
     paddingVertical: 8,
     paddingHorizontal: 15,
     backgroundColor: 'red',
     borderRadius: 5,
     alignItems: 'center',
+    width: '100%', // Full width
   },
-  
   quitButtonText: {
     color: 'white',
     fontSize: 14,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
-  
   disabledButton: {
     backgroundColor: 'gray',
     opacity: 0.5,

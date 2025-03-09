@@ -140,11 +140,6 @@ const Create = () => {
           handlePress={handleCreateGame}
           containerStyles="bg-gray-500 text-white"
         />
-        <CustomButton
-          title="Leave Game"
-          handlePress={handleLeaveGame}
-          containerStyles="bg-red-500 text-white mt-4"
-        />
       </View>
     </SafeAreaView>
   );
