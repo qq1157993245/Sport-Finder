@@ -80,12 +80,13 @@ const MapScreen = () => {
     };
     const timeString = date.toLocaleTimeString('en-US', options);
     
-    const ampm = timeString.slice(-2);
-    
-    const hours = date.getHours().toString().padStart(2);
+    // const ampm = timeString.slice(-2);
+    let hours = date.getHours();
+    // const hours = date.getHours().toString().padStart(2);
     const minutes = date.getMinutes().toString().padStart(2, '0');
-
-  
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
     return `${hours}:${minutes} ${ampm}`;
   };
 

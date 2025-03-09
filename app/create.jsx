@@ -15,7 +15,7 @@ const Create = () => {
   const [skillLevel, setSkillLevel] = useState('');
   const [sportType, setSportType] = useState('');
   const [hour, setHour] = useState('');
-  const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
+ 
   const [errorMessage, setErrorMessage] = useState('');
 
   const router = useRouter();
@@ -37,7 +37,27 @@ const Create = () => {
     { label: 'Pickleball', value: 'Pickleball' }
   ];
 
-  // const hours = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
+
+  const hours = [
+    { label: '1 hour', value: 1 },
+    { label: '1 hour 30 minutes', value: 1.5 },
+    { label: '2 hour', value: 2 },
+    { label: '2 hour 30 minutes', value: 2.5 },
+    { label: '3 hour', value: 3 },
+    { label: '3 hour 30 minutes', value: 3.5},
+    { label: '4 hour', value: 4 },
+    { label: '4 hour 30 minutes', value: 4.5},
+    { label: '5 hour', value: 5},
+    
+  ];
+
+
+  
+  const hour_whole = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
+
+  function isFloat(number) {
+    return Number(number) === number && number % 1 !== 0;
+  }
 
   const handleCreateGame = async () => {
     if (!numPlayers || !skillLevel || !sportType || !hour) {
@@ -52,7 +72,16 @@ const Create = () => {
        
       const tCreated = new Date();
       const expires = new Date();
-      expires.setHours(expires.getHours() + Number(hour));
+      if (isFloat(hour)) {
+         const num =  Math.floor(hour);
+         expires.setHours(expires.getHours() + num);
+         expires.setMinutes(expires.getMinutes() + 30);
+      }
+      else{
+        expires.setHours(expires.getHours() + Number(hour));
+      }
+      
+
       await setDoc(coordinateRef, {
         latitude,
         longitude,
