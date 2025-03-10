@@ -15,9 +15,7 @@ const MapScreen = () => {
   const router = useRouter();
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
-  const [joinedGames, setJoinedGames] = useState([]);
   const [markers, setMarkers] = useState([]);
-  const [joinedMarkerIds, setJoinedMarkerIds] = useState(new Set());  // Track joined marker IDs
 
   useEffect(() => {
       // Get the user's current location
@@ -64,54 +62,6 @@ const MapScreen = () => {
       // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
     }, []);
 
-    const handleJoinGame = async (marker) => {
-      console.log("onPress Clicked")
-      try {
-        const currentUser = auth.currentUser;
-        const userId = currentUser.uid;
-        const userRef = doc(db, "coordinates", userId);
-    
-        if (!joinedGames.includes(marker.id)) {
-          setJoinedGames([...joinedGames, marker.id]);
-    
-          // Update Firestore: Mark user as in the game
-          await setDoc(userRef, { isInGame: true, gameId: marker.id }, { merge: true });
-          await updateDoc(userRef, {
-            currentPlayers : currentPlayers + 1
-          });
-    
-          Alert.alert("Joined Game", "You have successfully joined the game!");
-        }
-      } catch (error) {
-        console.error("Error joining game:", error);
-        Alert.alert("Error", "Failed to join game. Please try again.");
-      }
-    };
-    
-    
-    const handleQuitGame = async (marker) => {
-      try {
-        const currentUser = auth.currentUser;
-        const userId = currentUser.uid;
-        const userRef = doc(db, "users", userId);
-    
-        if (joinedGames.includes(marker.id)) {
-          setJoinedGames(joinedGames.filter(id => id !== marker.id));
-    
-          // Update Firestore: Remove user from the game
-          await updateDoc(userRef, { isInGame: false, gameId: null });
-          await updateDoc(userRef, {
-            currentPlayers : currentPlayers - 1
-          });
-    
-          Alert.alert("Quit Game", "You have left the game.");
-        }
-      } catch (error) {
-        console.error("Error quitting game:", error);
-        Alert.alert("Error", "Failed to leave game. Please try again.");
-      }
-    };
-
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
     setRegion(newRegion);
@@ -129,6 +79,10 @@ const MapScreen = () => {
     });
   };
 
+  const goToGameDetails = (marker) => {
+    router.push({ pathname: '/gameDetails', params: { gameId: marker.id } });
+  };
+
   const handleGetCurrentLocation = () =>{
     setRegion(initialRegion);
   }
@@ -143,51 +97,19 @@ const MapScreen = () => {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
-
         {markers.map((marker) => (
-          <Marker
-            key={marker.id}
-            coordinate={{
-              latitude: marker.latitude,
-              longitude: marker.longitude,
-            }}
-            title={marker.title}
-            description={marker.description}
-          
-          >
-            {/* Popup when clicking marker */}
-            <Callout>
+          <Marker key={marker.id} coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}>
+            <Callout onPress={() => goToGameDetails(marker)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
                 <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>
-                <Text style={styles.calloutDescription}>Game Duration: {marker.gameDuration} Hours</Text>
+                <Text style={styles.calloutDescription}>Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
-                <View style={{ flex: 1, minHeight: 50 }} />
-                <CalloutSubview
-                  onPress={() => handleJoinGame(marker)}
-                  style={styles.joinButton}
-                >
-                  <Text style={{ color: "blue", textDecorationLine: "underline" }}>
-                    Join Game
-                  </Text>
-                </CalloutSubview>
-
-
-                <CalloutSubview
-                  onPress={() => handleQuitGame(marker)}
-                  style={[
-                  styles.quitButton,
-                  !joinedGames.includes(marker.id) && styles.disabledButton,
-                  ]}
-                  disabled={!joinedGames.includes(marker.id)}
-                >
-                  <Text style={styles.quitButtonText}>Quit Game</Text>
-                </CalloutSubview>
+                <Text style={[styles.calloutDescription, styles.calloutCentered]}>Click on Callout to Join or Leave Game</Text>
               </View>
             </Callout>
           </Marker>
         ))}
-
       </MapView>
 
       {/* hitmarker to choose location */}
@@ -243,7 +165,7 @@ const styles = StyleSheet.create({
     width: 43,
     height: 43,
     backgroundColor: '#F3F1F1',
-    borderRadius: '50%',
+    borderRadius: 50,
   },
   callout: {
     width: 200,
@@ -251,9 +173,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
     alignItems: 'center',
-    flexDirection: 'column', // Stack elements vertically
-    justifyContent: 'flex-start', // Ensures text stays at the top
-    minHeight: 220, // Force a taller container so buttons don’t overlap text
   },
   calloutTitle: {
     fontSize: 16,
@@ -263,40 +182,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 5,
   },
-  joinButton: {
-    marginTop: 20, // Move Join button lower
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    backgroundColor: '#2196F3',
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '100%', // Ensure buttons span full width
-  },
-  joinButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
+  calloutCentered: {
     textAlign: 'center',
   },
-  quitButton: {
-    marginTop: 10, // Move Quit button lower, add more space from Join button
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    backgroundColor: 'red',
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '100%', // Full width
-  },
-  quitButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  disabledButton: {
-    backgroundColor: 'gray',
-    opacity: 0.5,
-  }
 });
 
 export default MapScreen;
