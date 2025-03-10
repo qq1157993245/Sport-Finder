@@ -41,8 +41,8 @@ const GameDetailsScreen = () => {
   
   return (
     <View style={styles.container}>
-      <TouchableOpacity onPress={()=>router.back()}>
-                  <Ionicons name="close" size={30} color="white" />
+      <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
+          <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text style={styles.title}>Game Details</Text>
       <Text style={styles.detail}>Sport: {sport}</Text>
@@ -66,16 +66,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    backgroundColor: 'black',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: 'white'
   },
   detail: {
     fontSize: 18,
     marginBottom: 10,
+    color: 'white'
   },
   joinButton: {
     marginTop: 20,
@@ -95,6 +97,12 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    zIndex: 10,
   },
 });
 
