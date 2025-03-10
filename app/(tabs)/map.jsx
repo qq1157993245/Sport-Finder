@@ -6,7 +6,7 @@ import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
-import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
+import { collection, doc, onSnapshot, deleteDoc} from "firebase/firestore";
 import {auth, db} from '../(auth)/config/firebaseConfig';
 import icons from '../../constants/icons.js'
 import * as Location from 'expo-location';
@@ -54,6 +54,9 @@ const MapScreen = () => {
           //   description: data.description,
           // });
           fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers})
+          if (data.currentPlayers === 0) {
+            deleteGame(doc.id);
+          }
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -61,6 +64,16 @@ const MapScreen = () => {
 
       // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
     }, []);
+  
+  const deleteGame = async (gameId) => {
+    try {
+      await deleteDoc(doc(db, 'coordinates', gameId)); // Delete the game from Firestore
+      console.log(`Game ${gameId} deleted due to no players.`);
+    } catch (error) {
+      console.error("Error deleting game:", error);
+      Alert.alert("Error", "Failed to delete game.");
+    }
+  };
 
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
@@ -128,12 +141,6 @@ const MapScreen = () => {
           containerStyles="text-3xl w-16 h-16 bg-white-500 text-white rounded-full flex items-center justify-center"
         />
       </View>
-
-      {/* refresh button */}
-      <CustomButton
-        title="↻"
-        handlePress={() => {/* add refresh function here */}}
-        containerStyles="text-2xl mb-8 w-10 h-6 bg-white-500 text-white rounded-full flex items-center justify-center absolute bottom-5 right-5"      />
     </View>
   );
 };

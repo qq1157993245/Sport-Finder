@@ -9,6 +9,7 @@ const GameDetailsScreen = () => {
   const router = useRouter();
   const {id} = useLocalSearchParams();
   const [gameDetails, setGameDetails] = useState({});
+  const [userInGame, setUserInGame] = useState(false); // Track if the user is in a game
 
   useEffect(() => {
     const fetchGameDetails = async () => {
@@ -28,17 +29,46 @@ const GameDetailsScreen = () => {
         setLoading(false);
       }
     };
+    const checkUserInGame = async () => {
+      try {
+        const userRef = doc(db, "coordinates", auth.currentUser.uid); // Fetch current user from 'users' collection
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          setUserInGame(userDoc.data().isInGame || false); // Check if user is already in a game
+        }
+      } catch (error) {
+        console.error("Error checking user's game status:", error);
+      }
+    };
 
     fetchGameDetails();
+    checkUserInGame();
   }, [id]);
 
   const handleJoinGame = async () => {
+    if (userInGame) {
+      Alert.alert("You're already in a game!", "You can only join one game at a time.");
+      return;
+    }
+
     try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-      
       const gameRef = doc(db, "coordinates", id);
-      await updateDoc(gameRef, { currentPlayers: Number(currentPlayers) + 1 });
+      const docSnap = await getDoc(gameRef);
+      const gameData = docSnap.data();
+      
+      if (gameData.currentPlayers >= gameData.numPlayers) {
+        Alert.alert("Game is full", "There are no available spots in this game.");
+        return;
+      }
+
+      // Update the number of players in the game
+      await updateDoc(gameRef, { currentPlayers: gameData.currentPlayers + 1 });
+
+      // Update the user's `isInGame` status to true
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, { isInGame: true });
+
+      setUserInGame(true); // Update the state to reflect user is in a game
       Alert.alert("Success", "You have joined the game!");
       router.back();
     } catch (error) {
@@ -48,12 +78,24 @@ const GameDetailsScreen = () => {
   };
   
   const handleLeaveGame = async () => {
+    if (!userInGame) {
+      Alert.alert("You're not in a game!", "You cannot leave a game if you're not currently in one.");
+      return;
+    }
+
     try {
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-      
       const gameRef = doc(db, "coordinates", id);
-      await updateDoc(gameRef, { currentPlayers: Math.max(0, Number(currentPlayers) - 1) });
+      const docSnap = await getDoc(gameRef);
+      const gameData = docSnap.data();
+      
+      // Update the number of players in the game
+      await updateDoc(gameRef, { currentPlayers: Math.max(0, gameData.currentPlayers - 1) });
+
+      // Update the user's `isInGame` status to false
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      await updateDoc(userRef, { isInGame: false });
+
+      setUserInGame(false); // Update the state to reflect user is no longer in a game
       Alert.alert("Success", "You have left the game!");
       router.back();
     } catch (error) {
