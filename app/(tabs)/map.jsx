@@ -79,8 +79,9 @@ const MapScreen = () => {
     });
   };
 
-  const goToGameDetails = (marker) => {
-    router.push({ pathname: '/gameDetails', params: { gameId: marker.id } });
+  const goToGameDetails = (id) => {
+    console.log({id})
+    router.push({ pathname: '/gameDetails', params: { id } });
   };
 
   const handleGetCurrentLocation = () =>{
@@ -99,7 +100,7 @@ const MapScreen = () => {
       >
         {markers.map((marker) => (
           <Marker key={marker.id} coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}>
-            <Callout onPress={() => goToGameDetails(marker)}>
+            <Callout onPress={() => goToGameDetails(marker.id)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
                 <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>

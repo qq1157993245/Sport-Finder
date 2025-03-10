@@ -58,7 +58,8 @@ const Create = () => {
         timeCreated: new Date(),
         hour,
         currentPlayers: 1,
-        isInGame: true
+        isInGame: true,
+        id: userId
       });
 
       router.push('/map');

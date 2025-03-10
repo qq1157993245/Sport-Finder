@@ -7,17 +7,17 @@ import { Ionicons } from '@expo/vector-icons';
 
 const GameDetailsScreen = () => {
   const router = useRouter();
-  const { id, currentPlayers} = useLocalSearchParams();
+  const {id} = useLocalSearchParams();
   const [gameDetails, setGameDetails] = useState({});
 
   useEffect(() => {
     const fetchGameDetails = async () => {
       try {
+        console.log({id});
         const gameRef = doc(db, "coordinates", id);
         const docSnap = await getDoc(gameRef);
-        
         if (docSnap.exists()) {
-          setGameDetails(docSnap.data());  // This sets the state with the Firebase data
+          setGameDetails(docSnap.data());
         } else {
           Alert.alert("Error", "Game not found.");
         }
