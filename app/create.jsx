@@ -6,7 +6,7 @@ import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import Dropdownmenu from '../components/dropdownmenu';
 import { db, auth } from './(auth)/config/firebaseConfig';
-import { collection, setDoc, doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, setDoc, doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
 import { Ionicons } from '@expo/vector-icons';
 
 const Create = () => {
@@ -48,6 +48,13 @@ const Create = () => {
       const coordinateRef = doc(coordCollection, userId);
       const userRef = doc(db, "users", userId);
 
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        setErrorMessage("User data not found.");
+        return;
+      }
+      const username = userSnap.data().username;
+
       // Create game data
       await setDoc(coordinateRef, {
         latitude,
@@ -59,7 +66,8 @@ const Create = () => {
         hour,
         currentPlayers: 1,
         isInGame: true,
-        id: userId
+        id: userId,
+        players: [username]
       });
 
       router.push('/map');

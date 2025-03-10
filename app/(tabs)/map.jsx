@@ -53,7 +53,7 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers})
+          fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, currentPlayers: doc.data().currentPlayers, players: data.players || []})
           if (data.currentPlayers === 0) {
             deleteGame(doc.id);
           }

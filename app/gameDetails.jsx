@@ -55,22 +55,32 @@ const GameDetailsScreen = () => {
       const gameRef = doc(db, "coordinates", id);
       const docSnap = await getDoc(gameRef);
       const gameData = docSnap.data();
-      
+
       if (gameData.currentPlayers >= gameData.numPlayers) {
         Alert.alert("Game is full", "There are no available spots in this game.");
         return;
       }
 
-      // Update the number of players in the game
-      await updateDoc(gameRef, { currentPlayers: gameData.currentPlayers + 1 });
-
-      // Update the user's `isInGame` status to true
       const userRef = doc(db, "users", auth.currentUser.uid);
-      await updateDoc(userRef, { isInGame: true });
+      const userDoc = await getDoc(userRef);
+      const username = userDoc.data().username;
 
-      setUserInGame(true); // Update the state to reflect user is in a game
-      Alert.alert("Success", "You have joined the game!");
-      router.back();
+      // Add the user to the players array if they aren't already in the game
+      if (!gameData.players.includes(username)) {
+        await updateDoc(gameRef, {
+          currentPlayers: gameData.currentPlayers + 1,
+          players: [...gameData.players, username], // Add user UID to the players array
+        });
+
+        // Update the user's `isInGame` status to true
+        await updateDoc(userRef, { isInGame: true });
+
+        setUserInGame(true); // Update the state to reflect user is in a game
+        Alert.alert("Success", "You have joined the game!");
+        router.back();
+      } else {
+        Alert.alert("You're already in this game.");
+      }
     } catch (error) {
       console.error("Error joining game:", error);
       Alert.alert("Error", "Failed to join game. Please try again.");
@@ -87,12 +97,23 @@ const GameDetailsScreen = () => {
       const gameRef = doc(db, "coordinates", id);
       const docSnap = await getDoc(gameRef);
       const gameData = docSnap.data();
-      
-      // Update the number of players in the game
-      await updateDoc(gameRef, { currentPlayers: Math.max(0, gameData.currentPlayers - 1) });
+
+      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userDoc = await getDoc(userRef);
+      const username = userDoc.data().username;
+
+      // Check if the user is in the players array
+      if (!gameData.players.includes(username)) {
+        Alert.alert("You're not in this game!");
+        return;
+      }
+      // Remove the user from the players array and update the currentPlayers count
+      await updateDoc(gameRef, {
+        currentPlayers: Math.max(0, gameData.currentPlayers - 1),
+        players: gameData.players.filter(player => player !== username), // Remove user from the players array
+      });
 
       // Update the user's `isInGame` status to false
-      const userRef = doc(db, "users", auth.currentUser.uid);
       await updateDoc(userRef, { isInGame: false });
 
       setUserInGame(false); // Update the state to reflect user is no longer in a game
