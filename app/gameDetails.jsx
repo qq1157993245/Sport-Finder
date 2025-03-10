@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from './(auth)/config/firebaseConfig';
 import { Ionicons } from '@expo/vector-icons';
 
 const GameDetailsScreen = () => {
   const router = useRouter();
-  const { id, sport, playersCount, currentPlayers, gameDuration, skillLevel } = useLocalSearchParams();
-  
+  const { id, currentPlayers} = useLocalSearchParams();
+  const [gameDetails, setGameDetails] = useState({});
+
+  useEffect(() => {
+    const fetchGameDetails = async () => {
+      try {
+        const gameRef = doc(db, "coordinates", id);
+        const docSnap = await getDoc(gameRef);
+        
+        if (docSnap.exists()) {
+          setGameDetails(docSnap.data());  // This sets the state with the Firebase data
+        } else {
+          Alert.alert("Error", "Game not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching game details:", error);
+        Alert.alert("Error", "Failed to fetch game details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGameDetails();
+  }, [id]);
+
   const handleJoinGame = async () => {
     try {
       const currentUser = auth.currentUser;
@@ -45,10 +68,10 @@ const GameDetailsScreen = () => {
           <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text style={styles.title}>Game Details</Text>
-      <Text style={styles.detail}>Sport: {sport}</Text>
-      <Text style={styles.detail}>Players: {currentPlayers}/{playersCount}</Text>
-      <Text style={styles.detail}>Game Duration: {gameDuration} Hours</Text>
-      <Text style={styles.detail}>Skill Level: {skillLevel}</Text>
+      <Text style={styles.detail}>Sport: {gameDetails.sportType}</Text>
+      <Text style={styles.detail}>Players: {gameDetails.currentPlayers}/{gameDetails.numPlayers}</Text>
+      <Text style={styles.detail}>Game Duration: {gameDetails.hour} Hours</Text>
+      <Text style={styles.detail}>Skill Level: {gameDetails.skillLevel}</Text>
       
       <TouchableOpacity style={styles.joinButton} onPress={handleJoinGame}>
         <Text style={styles.buttonText}>Join Game</Text>
@@ -69,29 +92,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   title: {
-    fontSize: 24,
+    fontSize: 36,
     fontWeight: 'bold',
     marginBottom: 20,
     color: 'white'
   },
   detail: {
-    fontSize: 18,
+    fontSize: 26,
     marginBottom: 10,
     color: 'white'
   },
   joinButton: {
     marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     backgroundColor: '#2196F3',
     borderRadius: 5,
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   leaveButton: {
     marginTop: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     backgroundColor: 'red',
     borderRadius: 5,
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     color: 'white',
