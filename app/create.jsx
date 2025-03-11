@@ -65,10 +65,11 @@ const Create = () => {
         timeCreated: new Date(),
         hour,
         currentPlayers: 1,
-        isInGame: true,
         id: userId,
         players: [username]
       });
+
+      await updateDoc(userRef, {isInGame: true});
 
       router.push('/map');
     } catch (error) {

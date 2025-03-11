@@ -31,7 +31,7 @@ const GameDetailsScreen = () => {
     };
     const checkUserInGame = async () => {
       try {
-        const userRef = doc(db, "coordinates", auth.currentUser.uid); // Fetch current user from 'users' collection
+        const userRef = doc(db, "users", auth.currentUser.uid); // Fetch current user from 'users' collection
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           setUserInGame(userDoc.data().isInGame || false); // Check if user is already in a game

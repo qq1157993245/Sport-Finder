@@ -24,7 +24,9 @@ export const signUp = async (email, password, confirmPassword) => {
             email:email,
             username: '',
             age:'',
-            favoriteSport:''
+            favoriteSport:'',
+            isInGame: false
+
         }
         const userRef = doc(db, 'users', userCredential.user.uid);
 
