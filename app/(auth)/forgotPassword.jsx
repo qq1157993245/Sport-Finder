@@ -1,10 +1,10 @@
-import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import FormField from '../../components/formfield'
-import CustomButton from '../../components/custombutton'
-import { Link, router } from 'expo-router'
-import { resetPassword } from './signUpFuncs'
+import { View, Text, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import FormField from '../../components/formfield';
+import CustomButton from '../../components/custombutton';
+import { router } from 'expo-router';
+import { resetPassword } from './signUpFuncs';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -18,20 +18,20 @@ const ForgotPassword = () => {
     }
 
     try {
-        setIsSubmitting(true)
-        const response = await resetPassword(email)
-        if (response.success) {
-            setError('');
-        } else {
-            setError(response.message);
-        }
-      } catch (error) {
-        Alert.alert('Error', error.message)
-      } finally {
-        setEmail('');
-        setIsSubmitting(false);
+      setIsSubmitting(true);
+      const response = await resetPassword(email);
+      if (response.success) {
+        setError('');
+      } else {
+        setError(response.message);
       }
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setEmail('');
+      setIsSubmitting(false);
     }
+  };
 
   return (
     <SafeAreaView className="bg-black h-full">
@@ -42,7 +42,7 @@ const ForgotPassword = () => {
           </Text>
 
           <Text className="text-gray-300 text-md text-center mt-2">
-            Enter your email and we'll send you a reset link.
+            Enter your email and we will send you a reset link.
           </Text>
 
           <FormField
@@ -64,13 +64,13 @@ const ForgotPassword = () => {
 
           <View className="items-center mt-5">
             <TouchableOpacity onPress={() => router.back()}>
-                <Text className="text-blue-400 text-sm font-psemibold">Back to Sign In</Text>
+              <Text className="text-blue-400 text-sm font-psemibold">Back to Sign In</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default ForgotPassword
+export default ForgotPassword;

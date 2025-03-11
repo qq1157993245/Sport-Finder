@@ -1,17 +1,17 @@
-import { View, Text, Alert, Image, Platform } from 'react-native';
+import { View, Text, Alert, Platform } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-import { changePassword, deleteAccount, logOut, updateData, getData } from './profileFuncs';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { deleteAccount, logOut, getData } from './profileFuncs';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { UserContext } from '../context/userContext';
-import image from '../../constants/images';
-import Dialog from "react-native-dialog";
+import Dialog from 'react-native-dialog';
 
 const Profile = () => {
   const router = useRouter(); // Initialize router for navigation
-  const {username, setUsername, age, setAge, favoriteSport, setFavoriteSport} = useContext(UserContext);
+  const {username, setUsername, age, setAge,
+    favoriteSport, setFavoriteSport} = useContext(UserContext);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
 
@@ -29,7 +29,7 @@ const Profile = () => {
           {text: 'Cancel', style: 'cancel'},
           {text: 'Delete', onPress: async (inputPassword) => handleProcessDelete(inputPassword)},
         ],
-        'secure-text'
+        'secure-text',
       );
     } else { // For android
       setDialogVisible(true);
@@ -38,7 +38,7 @@ const Profile = () => {
 
   const handleProcessDelete = async (inputPassword) => {
     if (!inputPassword.trim()) {
-      Alert.alert("Error", "Password is required.");
+      Alert.alert('Error', 'Password is required.');
       return;
     }
 
@@ -47,20 +47,20 @@ const Profile = () => {
 
     const response = await deleteAccount(inputPassword);
     if (response.success) {
-      router.replace("/"); // Redirect to sign up page
+      router.replace('/'); // Redirect to sign up page
     } else {
       Alert.alert('Error', response.message);
     }
-  }
+  };
 
   const handleLogout = async () => {
     await logOut();
-    router.replace("/sign-in"); // Redirect to sign-in and prevent going back
+    router.replace('/sign-in'); // Redirect to sign-in and prevent going back
   };
 
   const handleEditProfile = () =>{
     router.push('/editProfile');
-  }
+  };
 
   useEffect(()=>{
     const fetchData = async ()=>{
@@ -81,14 +81,23 @@ const Profile = () => {
   return (
     <SafeAreaView className="bg-black h-full px-6">
       <KeyboardAwareScrollView showsVerticalScrollIndicator = {false} >
-      <Text className="text-white text-3xl font-semibold text-center mt-8">Profile</Text>
+        <Text className="text-white text-3xl font-semibold text-center mt-8">Profile</Text>
 
 
-      {/* Profile Fields using FormField Component */}
+        {/* Profile Fields using FormField Component */}
         <View className="mt-6 space-y-6 bg-gray-900">
-          {username && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{username}</Text>}
-          {age && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{`${age} years old`}</Text>}
-          {favoriteSport && <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">{`I like ${favoriteSport}`}</Text>}
+          {username &&
+           <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">
+             {username}
+           </Text>}
+          {age &&
+           <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">
+             {`${age} years old`}
+           </Text>}
+          {favoriteSport &&
+           <Text className="text-gray-200 text-3xl font-psemibold mt-6 text-center">
+             {`I like ${favoriteSport}`}
+           </Text>}
           <CustomButton
             title="Edit Profile"
             handlePress={handleEditProfile}
@@ -135,7 +144,7 @@ const Profile = () => {
                 setPassword('');
               }} />
             <Dialog.Button label="Delete" color="red" onPress={()=>handleProcessDelete(password)} />
-         </Dialog.Container>
+          </Dialog.Container>
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>

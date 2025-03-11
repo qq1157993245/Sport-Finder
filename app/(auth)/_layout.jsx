@@ -1,4 +1,4 @@
-import { View, Text, StatusBar } from 'react-native'
+import { StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 
 const AuthLayout = () => {
@@ -9,39 +9,39 @@ const AuthLayout = () => {
           name="sign-in"
           options={{
             headerShown: false,
-            gestureEnabled: false
+            gestureEnabled: false,
           }}
         />
         <Stack.Screen
           name="forgotPassword"
           options={{
-            headerShown: false
+            headerShown: false,
           }}
         />
         <Stack.Screen
           name="preferences"
           options={{
-            headerShown: false
+            headerShown: false,
           }}
         />
         <Stack.Screen
           name="editProfile"
           options={{
-            headerShown: false
+            headerShown: false,
           }}
         />
         <Stack.Screen
           name="updatePassword"
           options={{
-            headerShown: false
+            headerShown: false,
           }}
         />
       </Stack>
 
       <StatusBar backgroundColor ='#161622'
-      style="light" />
+        style="light" />
     </>
-  )
-}
+  );
+};
 
-export default AuthLayout
+export default AuthLayout;

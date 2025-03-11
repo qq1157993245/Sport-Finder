@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
-import DropDownPicker from 'react-native-dropdown-picker'
+import { Text, View } from 'react-native';
+import React, { useState } from 'react';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 const Dropdownmenu = ({items, value, setValue, placeholder, title, ...props}) => {
-    const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <View className='mt-8'>
@@ -17,25 +17,25 @@ const Dropdownmenu = ({items, value, setValue, placeholder, title, ...props}) =>
         setValue={setValue}
         placeholder={placeholder}
         style={{
-            backgroundColor:'black',
-            borderColor: 'grey',
-            height: 60,
+          backgroundColor:'black',
+          borderColor: 'grey',
+          height: 60,
         }}
         textStyle={{
-            fontSize: 20,
-            color:'white',
+          fontSize: 20,
+          color:'white',
         }}
         dropDownContainerStyle={{
-            backgroundColor: 'black',
-            borderColor: 'grey',
-            maxHeight:250,
+          backgroundColor: 'black',
+          borderColor: 'grey',
+          maxHeight:250,
         }}
         arrowIconStyle={{
-            tintColor:'white',
+          tintColor:'white',
         }}
       />
     </View>
-  )
-}
+  );
+};
 
-export default Dropdownmenu
+export default Dropdownmenu;

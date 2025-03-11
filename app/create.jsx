@@ -3,10 +3,9 @@ import React, { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../components/custombutton';
-import FormField from '../components/formfield';
 import Dropdownmenu from '../components/dropdownmenu';
 import { db, auth } from './(auth)/config/firebaseConfig';
-import { collection, setDoc, doc } from "firebase/firestore";
+import { collection, setDoc, doc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 
 const Create = () => {
@@ -23,7 +22,7 @@ const Create = () => {
   const skillLevels = [
     { label: 'Beginner', value: 'Beginner' },
     { label: 'Intermediate', value: 'Intermediate' },
-    { label: 'Advanced', value: 'Advanced' }
+    { label: 'Advanced', value: 'Advanced' },
   ];
 
   const sportTypes = [
@@ -34,7 +33,7 @@ const Create = () => {
     { label: 'Handball', value: 'Handball' },
     { label: 'Baseball', value: 'Baseball' },
     { label: 'Football', value: 'Football' },
-    { label: 'Pickleball', value: 'Pickleball' }
+    { label: 'Pickleball', value: 'Pickleball' },
   ];
 
 
@@ -53,7 +52,7 @@ const Create = () => {
 
 
   
-  const hour_whole = Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }))
+  Array.from({ length: 5 }, (_, i) => ({ label: `${i+1}`, value: i+1 }));
 
   function isFloat(number) {
     return Number(number) === number && number % 1 !== 0;
@@ -61,7 +60,7 @@ const Create = () => {
 
   const handleCreateGame = async () => {
     if (!numPlayers || !skillLevel || !sportType || !hour) {
-      setErrorMessage("All fields are required.");
+      setErrorMessage('All fields are required.');
       return;
     }
 
@@ -73,9 +72,9 @@ const Create = () => {
       const tCreated = new Date();
       const expires = new Date();
       if (isFloat(hour)) {
-         const num =  Math.floor(hour);
-         expires.setHours(expires.getHours() + num);
-         expires.setMinutes(expires.getMinutes() + 30);
+        const num =  Math.floor(hour);
+        expires.setHours(expires.getHours() + num);
+        expires.setMinutes(expires.getMinutes() + 30);
       }
       else{
         expires.setHours(expires.getHours() + Number(hour));
@@ -90,13 +89,13 @@ const Create = () => {
         sportType,
         timeCreated: tCreated,
         hour,
-        expiresAt: expires
+        expiresAt: expires,
       });
 
       router.push('/map');
     } catch (error) {
       console.error('Game creation failed:', error.message);
-      setErrorMessage("Failed to create game. Please try again.");
+      setErrorMessage('Failed to create game. Please try again.');
     }
   };
 
@@ -116,13 +115,13 @@ const Create = () => {
       ) : null}
 
       <View className="mt-10 space-y-6">
-      <Dropdownmenu
-        title="Number of Players"
-        items={Array.from({ length: 20 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
-        value={numPlayers}
-        setValue={setNumPlayers}
-        placeholder="Select number of players"
-      />
+        <Dropdownmenu
+          title="Number of Players"
+          items={Array.from({ length: 20 }, (_, i) => ({ label: `${i + 1}`, value: i + 1 }))}
+          value={numPlayers}
+          setValue={setNumPlayers}
+          placeholder="Select number of players"
+        />
         <Dropdownmenu
           title="Skill Level"
           items={skillLevels}
