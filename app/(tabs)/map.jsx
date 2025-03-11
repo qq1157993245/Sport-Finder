@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
-import MapView, { Marker, Callout } from 'react-native-maps';
+import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
 
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
 import coordinates from './coordinates.json';
-import { collection, addDoc, setDoc, doc, onSnapshot} from "firebase/firestore";
-import {db} from '../(auth)/config/firebaseConfig';
+import { collection, doc, onSnapshot, deleteDoc} from "firebase/firestore";
+import {auth, db} from '../(auth)/config/firebaseConfig';
 import icons from '../../constants/icons.js'
 import * as Location from 'expo-location';
 
@@ -15,7 +15,6 @@ const MapScreen = () => {
   const router = useRouter();
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
-
   const [markers, setMarkers] = useState([]);
 
   useEffect(() => {
@@ -55,7 +54,10 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, expires: doc.data().expiresAt})
+          fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, expires: doc.data().expiresAt, currentPlayers: doc.data().currentPlayers, players: data.players || []})
+          if (data.currentPlayers === 0) {
+            deleteGame(doc.id);
+          }
         });
         console.log(fetchedCoords)
         setMarkers(fetchedCoords);
@@ -63,6 +65,16 @@ const MapScreen = () => {
 
       // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
     }, []);
+  
+  const deleteGame = async (gameId) => {
+    try {
+      await deleteDoc(doc(db, 'coordinates', gameId)); // Delete the game from Firestore
+      console.log(`Game ${gameId} deleted due to no players.`);
+    } catch (error) {
+      console.error("Error deleting game:", error);
+      Alert.alert("Error", "Failed to delete game.");
+    }
+  };
 
   // Capture the coordinates of the center of the map
   const handleRegionChangeComplete = (newRegion) => {
@@ -98,6 +110,11 @@ const MapScreen = () => {
     });
   };
 
+  const goToGameDetails = (id) => {
+    console.log({id})
+    router.push({ pathname: '/gameDetails', params: { id } });
+  };
+
   const handleGetCurrentLocation = () =>{
     setRegion(initialRegion);
   }
@@ -125,22 +142,20 @@ const MapScreen = () => {
 
           >
             {/* Popup when clicking marker */}
-            <Callout>
+            <Callout onPress={() => goToGameDetails(marker.id)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
                 <Text style={styles.calloutDescription}>Players: {marker.playersCount}/{marker.playersCount}</Text>
-                <Text style={styles.calloutDescription}>
-                  Game Duration: {marker.gameDuration} {marker.gameDuration === 1 ? "hour" : "hours"}
-                </Text>
+                <Text style={styles.calloutDescription}>Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
                 <Text style={styles.calloutDescription}>
                   Games Ends At: {extractTime(marker.expires.toDate())}
                 </Text>
+                <Text style={[styles.calloutDescription, styles.calloutCentered]}>Click on Callout to Join or Leave Game</Text>
               </View>
             </Callout>
           </Marker>
         ))}
-
       </MapView>
 
       {/* hitmarker to choose location */}
@@ -159,13 +174,13 @@ const MapScreen = () => {
         />
       </View>
 
-      {/* refresh button */}
+      
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: { flex: 1 },
   map: { flex: 1 },
   hitmarker: {
     position: 'absolute',
@@ -192,7 +207,7 @@ const styles = StyleSheet.create({
     width: 43,
     height: 43,
     backgroundColor: '#F3F1F1',
-    borderRadius: '50%',
+    borderRadius: 50,
   },
   callout: {
     width: 200,
@@ -208,6 +223,9 @@ const styles = StyleSheet.create({
   calloutDescription: {
     fontSize: 14,
     marginTop: 5,
+  },
+  calloutCentered: {
+    textAlign: 'center',
   },
 });
 

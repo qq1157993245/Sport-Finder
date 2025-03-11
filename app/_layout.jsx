@@ -36,17 +36,12 @@ const RootLayout = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <UserProvider>
-        <SafeAreaProvider>
-          <Stack screenOptions={{ gestureEnabled: false }}>
-            <Stack.Screen
-              name="create"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="time"
-              options={{ headerShown: false }}
-            />
+        <UserProvider>
+          <SafeAreaProvider>
+          <Stack>
+            <Stack.Screen name="create" options={{ headerShown: false }} />
+            <Stack.Screen name="time" options={{ headerShown: false }} />
+            <Stack.Screen name="gameDetails" options={{ headerShown: false }} />
             <Stack.Screen
               name="index"
               options={{
