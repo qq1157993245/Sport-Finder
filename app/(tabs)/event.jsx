@@ -39,29 +39,41 @@ const Event = () => {
 
     const handleEndGame = async () => {
       try {
-         const coordCollection = collection(db, 'coordinates');
-         const coordinateRef = doc(coordCollection, currentUser.uid);
-         const coordSnap = await getDoc(coordinateRef);
-
-         if(coordSnap.exists()) {
-           await deleteDoc(coordinateRef);
-           console.log("Marker deleted")
-           Alert.alert("Success", "You deleted your current event. ");
-
-           router.push('/map');
-         }
-         else {
-            // throw new Error("You have not created an event")
-            Alert.alert("You have not created an event. Please create one first.");
-            router.push('/map');
-         }
-
+        const coordCollection = collection(db, 'coordinates');
+        const coordinateRef = doc(coordCollection, auth.currentUser.uid);
+        const coordSnap = await getDoc(coordinateRef);
+    
+        if (!coordSnap.exists()) {
+          Alert.alert("You have not created an event. Please create one first.");
+          router.push('/map');
+          return;
+        }
+    
+        const gameData = coordSnap.data();
+        const players = gameData.players || [];
+        const updatePromises = players.map(async (userId) => {
+          const userRef = doc(db, 'users', userId);
+          const userSnap = await getDoc(userRef);
+    
+          if (userSnap.exists()) {
+            await updateDoc(userRef, { isInGame: false });
+          }
+        });
+    
+        await Promise.all(updatePromises);
+    
+        // Now delete the event from coordinates
+        await deleteDoc(coordinateRef);
+        console.log("Game event deleted successfully.");
+        Alert.alert("Success", "You have ended the game.");
+    
+        router.push('/map');
+      } catch (error) {
+        console.error("Error ending game:", error);
+        Alert.alert("Error", "Failed to end game.");
       }
-      catch (error) {
-        console.error("Error deleting document:", error);
-        throw error; // Re-throw the error so the calling function can handle it.
-      }
-    }
+    };
+
     const handleSave = async () => {
       try {
         const coordCollection = collection(db, 'coordinates');

@@ -91,7 +91,6 @@ const Create = () => {
         setErrorMessage("User data not found.");
         return;
       }
-      const username = userSnap.data().username;
 
       // Create game data
       await setDoc(coordinateRef, {
@@ -105,7 +104,7 @@ const Create = () => {
         expiresAt: expires,
         currentPlayers: 1,
         id: userId,
-        players: [username]
+        players: [userId]
       });
 
       await updateDoc(userRef, {isInGame: true});

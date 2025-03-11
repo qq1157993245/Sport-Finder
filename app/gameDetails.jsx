@@ -62,14 +62,13 @@ const GameDetailsScreen = () => {
       }
 
       const userRef = doc(db, "users", auth.currentUser.uid);
-      const userDoc = await getDoc(userRef);
-      const username = userDoc.data().username;
+      const userID = auth.currentUser.uid;
 
       // Add the user to the players array if they aren't already in the game
-      if (!gameData.players.includes(username)) {
+      if (!gameData.players.includes(userID)) {
         await updateDoc(gameRef, {
           currentPlayers: gameData.currentPlayers + 1,
-          players: [...gameData.players, username], // Add user UID to the players array
+          players: [...gameData.players, userID], // Add user UID to the players array
         });
 
         // Update the user's `isInGame` status to true
@@ -99,18 +98,17 @@ const GameDetailsScreen = () => {
       const gameData = docSnap.data();
 
       const userRef = doc(db, "users", auth.currentUser.uid);
-      const userDoc = await getDoc(userRef);
-      const username = userDoc.data().username;
+      const userId = auth.currentUser.uid;
 
       // Check if the user is in the players array
-      if (!gameData.players.includes(username)) {
+      if (!gameData.players.includes(userId)) {
         Alert.alert("You're not in this game!");
         return;
       }
       // Remove the user from the players array and update the currentPlayers count
       await updateDoc(gameRef, {
         currentPlayers: Math.max(0, gameData.currentPlayers - 1),
-        players: gameData.players.filter(player => player !== username), // Remove user from the players array
+        players: gameData.players.filter(player => player !== userId), // Remove user from the players array
       });
 
       // Update the user's `isInGame` status to false
