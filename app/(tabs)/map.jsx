@@ -145,7 +145,7 @@ const MapScreen = () => {
             <Callout onPress={() => goToGameDetails(marker.id)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
-                <Text style={styles.calloutDescription}>Players: {marker.playersCount}/{marker.playersCount}</Text>
+                <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>
                 <Text style={styles.calloutDescription}>Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
                 <Text style={styles.calloutDescription}>
