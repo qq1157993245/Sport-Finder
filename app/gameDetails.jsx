@@ -15,29 +15,28 @@ const GameDetailsScreen = () => {
     const fetchGameDetails = async () => {
       try {
         console.log({id});
-        const gameRef = doc(db, "coordinates", id);
+        const gameRef = doc(db, 'coordinates', id);
         const docSnap = await getDoc(gameRef);
         if (docSnap.exists()) {
           setGameDetails(docSnap.data());
         } else {
-          Alert.alert("Error", "Game not found.");
+          Alert.alert('Error', 'Game not found.');
         }
       } catch (error) {
-        console.error("Error fetching game details:", error);
-        Alert.alert("Error", "Failed to fetch game details.");
-      } finally {
-        setLoading(false);
+        console.error('Error fetching game details:', error);
+        Alert.alert('Error', 'Failed to fetch game details.');
       }
     };
     const checkUserInGame = async () => {
       try {
-        const userRef = doc(db, "users", auth.currentUser.uid); // Fetch current user from 'users' collection
+        const userRef = doc(
+          db, 'users', auth.currentUser.uid); // Fetch current user from 'users' collection
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           setUserInGame(userDoc.data().isInGame || false); // Check if user is already in a game
         }
       } catch (error) {
-        console.error("Error checking user's game status:", error);
+        console.error('Error checking user\'s game status:', error);
       }
     };
 
@@ -47,21 +46,21 @@ const GameDetailsScreen = () => {
 
   const handleJoinGame = async () => {
     if (userInGame) {
-      Alert.alert("You're already in a game!", "You can only join one game at a time.");
+      Alert.alert('You\'re already in a game!', 'You can only join one game at a time.');
       return;
     }
 
     try {
-      const gameRef = doc(db, "coordinates", id);
+      const gameRef = doc(db, 'coordinates', id);
       const docSnap = await getDoc(gameRef);
       const gameData = docSnap.data();
 
       if (gameData.currentPlayers >= gameData.numPlayers) {
-        Alert.alert("Game is full", "There are no available spots in this game.");
+        Alert.alert('Game is full', 'There are no available spots in this game.');
         return;
       }
 
-      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userRef = doc(db, 'users', auth.currentUser.uid);
       const userID = auth.currentUser.uid;
 
       // Add the user to the players array if they aren't already in the game
@@ -75,62 +74,66 @@ const GameDetailsScreen = () => {
         await updateDoc(userRef, { isInGame: true });
 
         setUserInGame(true); // Update the state to reflect user is in a game
-        Alert.alert("Success", "You have joined the game!");
+        Alert.alert('Success', 'You have joined the game!');
         router.back();
       } else {
-        Alert.alert("You're already in this game.");
+        Alert.alert('You\'re already in this game.');
       }
     } catch (error) {
-      console.error("Error joining game:", error);
-      Alert.alert("Error", "Failed to join game. Please try again.");
+      console.error('Error joining game:', error);
+      Alert.alert('Error', 'Failed to join game. Please try again.');
     }
   };
   
   const handleLeaveGame = async () => {
     if (!userInGame) {
-      Alert.alert("You're not in a game!", "You cannot leave a game if you're not currently in one.");
+      Alert.alert('You\'re not in a game!',
+        'You cannot leave a game if you\'re not currently in one.');
       return;
     }
 
     try {
-      const gameRef = doc(db, "coordinates", id);
+      const gameRef = doc(db, 'coordinates', id);
       const docSnap = await getDoc(gameRef);
       const gameData = docSnap.data();
 
-      const userRef = doc(db, "users", auth.currentUser.uid);
+      const userRef = doc(db, 'users', auth.currentUser.uid);
       const userId = auth.currentUser.uid;
 
       // Check if the user is in the players array
       if (!gameData.players.includes(userId)) {
-        Alert.alert("You're not in this game!");
+        Alert.alert('You\'re not in this game!');
         return;
       }
       // Remove the user from the players array and update the currentPlayers count
       await updateDoc(gameRef, {
         currentPlayers: Math.max(0, gameData.currentPlayers - 1),
-        players: gameData.players.filter(player => player !== userId), // Remove user from the players array
+        players: gameData.players.filter(
+          (player) => player !== userId), // Remove user from the players array
       });
 
       // Update the user's `isInGame` status to false
       await updateDoc(userRef, { isInGame: false });
 
       setUserInGame(false); // Update the state to reflect user is no longer in a game
-      Alert.alert("Success", "You have left the game!");
+      Alert.alert('Success', 'You have left the game!');
       router.back();
     } catch (error) {
-      console.error("Error leaving game:", error);
-      Alert.alert("Error", "Failed to leave game. Please try again.");
+      console.error('Error leaving game:', error);
+      Alert.alert('Error', 'Failed to leave game. Please try again.');
     }
   };
   
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
-          <Ionicons name="close" size={30} color="white" />
+        <Ionicons name="close" size={30} color="white" />
       </TouchableOpacity>
       <Text style={styles.title}>Game Details</Text>
       <Text style={styles.detail}>Sport: {gameDetails.sportType}</Text>
-      <Text style={styles.detail}>Players: {gameDetails.currentPlayers}/{gameDetails.numPlayers}</Text>
+      <Text style={styles.detail}>
+        Players: {gameDetails.currentPlayers}/{gameDetails.numPlayers}
+      </Text>
       <Text style={styles.detail}>Game Duration: {gameDetails.hour} Hours</Text>
       <Text style={styles.detail}>Skill Level: {gameDetails.skillLevel}</Text>
       
@@ -156,12 +159,12 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: 'white'
+    color: 'white',
   },
   detail: {
     fontSize: 26,
     marginBottom: 10,
-    color: 'white'
+    color: 'white',
   },
   joinButton: {
     marginTop: 20,
