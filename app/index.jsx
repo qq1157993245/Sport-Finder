@@ -1,20 +1,20 @@
-import { useState, useContext, useEffect } from "react";
-import { Link, router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
+import { useState, useContext, useEffect } from 'react';
+import { Link, router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text } from 'react-native';
 import CustomButton from '../components/custombutton';
 import FormField from '../components/formfield';
 import {signUp} from './(auth)/signUpFuncs';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 // import { AuthContext } from "./(auth)/config/firebaseConfig";
 import { Redirect } from 'expo-router';
-import { UserContext } from "./context/userContext";
+import { UserContext } from './context/userContext';
 
 
 const SignUp = () => {
 
   const { currentUser, pending} = useContext(UserContext);
-  const [isLoggedIn , setisLoggedIn] = useState(false)
+  const [isLoggedIn , setisLoggedIn] = useState(false);
 
   useEffect(() => {
     console.log('CHECKING USER ' + currentUser);
@@ -26,12 +26,12 @@ const SignUp = () => {
   }, [pending, currentUser]);
 
   async function handleSignUp() {
-      const response = await signUp(email, password, confirmPassword);
-      if (response.success) {
-        router.push('/preferences');
-      }else{
-        setError(response.message);
-      }
+    const response = await signUp(email, password, confirmPassword);
+    if (response.success) {
+      router.push('/preferences');
+    }else{
+      setError(response.message);
+    }
   }
 
   const [email, setEmail] = useState('');
@@ -47,10 +47,12 @@ const SignUp = () => {
     <SafeAreaView className="bg-black h-full">
       <KeyboardAwareScrollView>
         <View className="w-full flex justify-center h-full px-4 my-6">
-          <Text className="text-center text-4xl justify-center font-semibold text-white mt-10 font-psemibold">
+          <Text className={'text-center text-4xl justify-center ' + 
+            'font-semibold text-white mt-10 font-psemibold'}>
             SportsFinder
           </Text>
-          <Text className="text-left text-2xl justify-center font-semibold text-white mt-10 font-psemibold">
+          <Text className={'text-left text-2xl justify-center ' +
+             'font-semibold text-white mt-10 font-psemibold'}>
             Sign Up
           </Text>
 

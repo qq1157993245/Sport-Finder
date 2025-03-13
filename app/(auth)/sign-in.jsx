@@ -1,13 +1,12 @@
-import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
 
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { images } from '../../constants';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import FormField from '../../components/formfield';
 import CustomButton from '../../components/custombutton';
-import { Link, router } from 'expo-router'
+import { Link, router } from 'expo-router';
 import { loginAuth } from './loginFuncs';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const SignIn = () => {
 
@@ -81,6 +80,6 @@ const SignIn = () => {
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
-  )
-}
-export default SignIn
+  );
+};
+export default SignIn;
