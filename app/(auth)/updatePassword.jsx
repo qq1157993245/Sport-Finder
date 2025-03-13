@@ -1,38 +1,38 @@
-import { View, Text, ScrollView, Image, TouchableOpacity, Alert } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import FormField from '../../components/formfield'
-import CustomButton from '../../components/custombutton'
-import { Link, router } from 'expo-router'
-import { resetPassword } from './signUpFuncs'
-import { Ionicons } from '@expo/vector-icons'
+import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import FormField from '../../components/formfield';
+import CustomButton from '../../components/custombutton';
+import { router } from 'expo-router';
+import { resetPassword } from './signUpFuncs';
+import { Ionicons } from '@expo/vector-icons';
 
 const UpdatePassword = () => {
   const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const handleResetPassword = async () => {
     if (!email) {
-        setError('Please enter your email');
-        return;
+      setError('Please enter your email');
+      return;
     }
 
     try {
-        setIsSubmitting(true)
-        const response = await resetPassword(email)
-        if (response.success) {
-            setError('');
-        } else {
-            setError(response.message);
-        }
-      } catch (error) {
-        Alert.alert('Error', error.message)
-      } finally {
-        setEmail('');
-        setIsSubmitting(false);
+      setIsSubmitting(true);
+      const response = await resetPassword(email);
+      if (response.success) {
+        setError('');
+      } else {
+        setError(response.message);
       }
+    } catch (error) {
+      Alert.alert('Error', error.message);
+    } finally {
+      setEmail('');
+      setIsSubmitting(false);
     }
+  };
 
   return (
     <SafeAreaView className="bg-black h-full">
@@ -74,13 +74,13 @@ const UpdatePassword = () => {
 
           <View className="items-center mt-5">
             <TouchableOpacity onPress={() => router.replace('/sign-in')}>
-                <Text className="text-blue-400 text-sm font-psemibold">Back to Sign In</Text>
+              <Text className="text-blue-400 text-sm font-psemibold">Back to Sign In</Text>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default UpdatePassword
+export default UpdatePassword;

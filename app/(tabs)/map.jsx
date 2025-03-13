@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 import { StyleSheet, View, Text, Dimensions, TouchableOpacity, Image, Alert } from 'react-native';
-import MapView, { Marker, Callout, CalloutSubview } from 'react-native-maps';
+import MapView, { Marker, Callout} from 'react-native-maps';
 
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-import coordinates from './coordinates.json';
-import { collection, doc, onSnapshot, deleteDoc} from "firebase/firestore";
-import {auth, db} from '../(auth)/config/firebaseConfig';
-import icons from '../../constants/icons.js'
+import { collection, doc, onSnapshot, deleteDoc} from 'firebase/firestore';
+import {db} from '../(auth)/config/firebaseConfig';
+import icons from '../../constants/icons.js';
 import * as Location from 'expo-location';
 
 const MapScreen = () => {
@@ -18,31 +17,33 @@ const MapScreen = () => {
   const [markers, setMarkers] = useState([]);
 
   useEffect(() => {
-      // Get the user's current location
-      (async () => {
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permission to access location was denied');
-        }
+    // Get the user's current location
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission to access location was denied');
+      }
 
-        let location = await Location.getCurrentPositionAsync({});
-        setInitialRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        });
-        setRegion({
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-          latitudeDelta: 0.02,
-          longitudeDelta: 0.02,
-        });
-      })();
-      // Fetch markers from Firestore and set up a listener for real-time updates
-      const coordinatesCollection = collection(db, 'coordinates'); // 'markers' is your collection name
+      const location = await Location.getCurrentPositionAsync({});
+      setInitialRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      });
+      setRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02,
+      });
+    })();
+    // Fetch markers from Firestore and set up a listener for real-time updates
+    const coordinatesCollection = collection(
+      db, 'coordinates'); // 'markers' is your collection name
 
-      const unsubscribe = onSnapshot(coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
+    onSnapshot(
+      coordinatesCollection, (querySnapshot) => { // Use onSnapshot for updates
         const fetchedCoords = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
@@ -54,25 +55,34 @@ const MapScreen = () => {
           //   title: data.title,
           //   description: data.description,
           // });
-          fetchedCoords.push({id: doc.data().id, latitude: doc.data().latitude, longitude: doc.data().longitude, sport: doc.data().sportType, playersCount: doc.data().numPlayers, gameDuration: doc.data().hour, skillLevel: doc.data().skillLevel, expires: doc.data().expiresAt, currentPlayers: doc.data().currentPlayers, players: data.players || []})
+          fetchedCoords.push({id: doc.data().id, 
+            latitude: doc.data().latitude,
+            longitude: doc.data().longitude,
+            sport: doc.data().sportType, 
+            playersCount: doc.data().numPlayers, 
+            gameDuration: doc.data().hour, 
+            skillLevel: doc.data().skillLevel,
+            expires: doc.data().expiresAt, 
+            currentPlayers: doc.data().currentPlayers,
+            players: data.players || []});
           if (data.currentPlayers === 0) {
             deleteGame(doc.id);
           }
         });
-        console.log(fetchedCoords)
+        console.log(fetchedCoords);
         setMarkers(fetchedCoords);
       });
 
-      // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
-    }, []);
+    // return () => unsubscribe(); // Unsubscribe from the listener when the component unmounts
+  }, []);
   
   const deleteGame = async (gameId) => {
     try {
       await deleteDoc(doc(db, 'coordinates', gameId)); // Delete the game from Firestore
       console.log(`Game ${gameId} deleted due to no players.`);
     } catch (error) {
-      console.error("Error deleting game:", error);
-      Alert.alert("Error", "Failed to delete game.");
+      console.error('Error deleting game:', error);
+      Alert.alert('Error', 'Failed to delete game.');
     }
   };
 
@@ -84,7 +94,7 @@ const MapScreen = () => {
 
   const extractTime = (date) => {
     if (!(date instanceof Date) || isNaN(date)) {
-      Alert.alert("Not an date object", "Please input a date");
+      Alert.alert('Not an date object', 'Please input a date');
     }
     
   
@@ -101,23 +111,23 @@ const MapScreen = () => {
   // Function to navigate to Create screen with the coordinates
   const goToCreateScreen = () => {
     if (!region) {
-      Alert.alert("Location not available", "Please wait for your location to be set.");
+      Alert.alert('Location not available', 'Please wait for your location to be set.');
       return;
     }
     router.push({
-      pathname: "/create",
+      pathname: '/create',
       params: { latitude: region.latitude, longitude: region.longitude }, // Corrected to query
     });
   };
 
   const goToGameDetails = (id) => {
-    console.log({id})
+    console.log({id});
     router.push({ pathname: '/gameDetails', params: { id } });
   };
 
   const handleGetCurrentLocation = () =>{
     setRegion(initialRegion);
-  }
+  };
 
   return (
     <View style={styles.container}>
@@ -145,13 +155,17 @@ const MapScreen = () => {
             <Callout onPress={() => goToGameDetails(marker.id)}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>Sport: {marker.sport}</Text>
-                <Text style={styles.calloutDescription}>Players: {marker.currentPlayers}/{marker.playersCount}</Text>
+                <Text style={styles.calloutDescription}>
+                  Players: {marker.currentPlayers}/{marker.playersCount}
+                </Text>
                 <Text style={styles.calloutDescription}>Duration: {marker.gameDuration} Hours</Text>
                 <Text style={styles.calloutDescription}>Skill Level: {marker.skillLevel}</Text>
                 <Text style={styles.calloutDescription}>
                   Games Ends At: {extractTime(marker.expires.toDate())}
                 </Text>
-                <Text style={[styles.calloutDescription, styles.calloutCentered]}>Click on Callout to Join or Leave Game</Text>
+                <Text style={[styles.calloutDescription, styles.calloutCentered]}>
+                  Click on Callout to Join or Leave Game
+                </Text>
               </View>
             </Callout>
           </Marker>
@@ -170,7 +184,8 @@ const MapScreen = () => {
         <CustomButton
           title="+"
           handlePress={goToCreateScreen}
-          containerStyles="text-3xl w-16 h-16 bg-white-500 text-white rounded-full flex items-center justify-center"
+          containerStyles={'text-3xl w-16 h-16 bg-white-500 ' + 
+            'text-white rounded-full flex items-center justify-center'}
         />
       </View>
 

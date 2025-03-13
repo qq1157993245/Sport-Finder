@@ -1,9 +1,9 @@
-import profile from "../assets/icons/profile.png";
-import eyeHide from "../assets/icons/eye-hide.png";
-import eye from "../assets/icons/eye.png";
-import currentLocation from "../assets/icons/currentLocation.png"
-import map from "../assets/icons/map.png"
-import sport from "../assets/icons/sport.png"
+import profile from '../assets/icons/profile.png';
+import eyeHide from '../assets/icons/eye-hide.png';
+import eye from '../assets/icons/eye.png';
+import currentLocation from '../assets/icons/currentLocation.png';
+import map from '../assets/icons/map.png';
+import sport from '../assets/icons/sport.png';
 
 
 export default {
@@ -12,5 +12,5 @@ export default {
   eye,
   currentLocation,
   map,
-  sport
+  sport,
 };

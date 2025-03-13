@@ -11,7 +11,9 @@ const TabIcon = ({ icon, color, name, focused }) => {
         style={{ tintColor: color, width: 24, height: 24, marginTop: 22 }}
       />
       <View style={{ width: 70, alignItems: 'center' }}>
-        <Text className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs`} style={{ color: color }}>
+        <Text 
+          className={`${focused ? 'font-psemibold' : 'font-pregular'} text-xs`} 
+          style={{ color: color }}>
           {name}
         </Text>
       </View>

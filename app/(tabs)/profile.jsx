@@ -3,15 +3,16 @@ import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import CustomButton from '../../components/custombutton';
-import { changePassword, deleteAccount, logOut, updateData, getData } from './profileFuncs';
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { deleteAccount, logOut, getData } from './profileFuncs';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { UserContext } from '../context/userContext';
-import Dialog from "react-native-dialog";
+import Dialog from 'react-native-dialog';
 import { Ionicons } from '@expo/vector-icons';
 
 const Profile = () => {
   const router = useRouter();
-  const { username, setUsername, age, setAge, favoriteSport, setFavoriteSport } = useContext(UserContext);
+  const { username, setUsername, age, setAge, favoriteSport,
+    setFavoriteSport } = useContext(UserContext);
   const [dialogVisible, setDialogVisible] = useState(false);
   const [password, setPassword] = useState('');
 
@@ -42,7 +43,7 @@ const Profile = () => {
           { text: 'Cancel', style: 'cancel' },
           { text: 'Delete', onPress: async (inputPassword) => handleProcessDelete(inputPassword) },
         ],
-        'secure-text'
+        'secure-text',
       );
     } else {
       setDialogVisible(true);
@@ -51,7 +52,7 @@ const Profile = () => {
 
   const handleProcessDelete = async (inputPassword) => {
     if (!inputPassword.trim()) {
-      Alert.alert("Error", "Password is required.");
+      Alert.alert('Error', 'Password is required.');
       return;
     }
 
@@ -60,7 +61,7 @@ const Profile = () => {
 
     const response = await deleteAccount(inputPassword);
     if (response.success) {
-      router.replace("/");
+      router.replace('/');
     } else {
       Alert.alert('Error', response.message);
     }
@@ -74,18 +75,20 @@ const Profile = () => {
         {/* Profile Card */}
         <View className="bg-gray-900 mt-6 rounded-2xl p-6 items-center shadow-lg">
           {/* Profile Info */}
-          <Text className="text-white text-3xl font-semibold mt-4">{username || "Username"}</Text>
+          <Text className="text-white text-3xl font-semibold mt-4">{username || 'Username'}</Text>
 
           {/* Info Section */}
           <View className="mt-4 space-y-3">
             <View className="flex-row items-center space-x-2">
               <Ionicons name="calendar" size={22} color="white" />
-              <Text className="text-gray-300 text-lg">{age ? `${age} years old` : "Age"}</Text>
+              <Text className="text-gray-300 text-lg">{age ? `${age} years old` : 'Age'}</Text>
             </View>
 
             <View className="flex-row items-center space-x-2">
               <Ionicons name="football" size={22} color="white" />
-              <Text className="text-gray-300 text-lg">{favoriteSport ? `I like ${favoriteSport}` : "Favorite Sport"}</Text>
+              <Text className="text-gray-300 text-lg">
+                {favoriteSport ? `I like ${favoriteSport}` : 'Favorite Sport'}
+              </Text>
             </View>
           </View>
 
@@ -108,7 +111,7 @@ const Profile = () => {
             title="Logout"
             handlePress={async () => {
               await logOut();
-              router.replace("/sign-in");
+              router.replace('/sign-in');
             }}
             containerStyles="bg-gray-500 text-white mb-4"
           />
