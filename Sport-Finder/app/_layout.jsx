@@ -63,6 +63,10 @@ const RootLayout = () => {
               name="(tabs)"
               options={{ headerShown: false }}
             />
+            <Stack.Screen
+              name="(sportDetails)"
+              options={{ headerShown: false }}
+            />
           </Stack>
         </SafeAreaProvider>
       </UserProvider>

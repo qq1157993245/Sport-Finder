@@ -12,47 +12,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: 'AIzaSyCfsElSve4AExvEjRz3ew3u2r5lRMiO4Eo',
-  authDomain: 'sportsfinder-25b5f.firebaseapp.com',
-  projectId: 'sportsfinder-25b5f',
-  storageBucket: 'sportsfinder-25b5f.firebasestorage.app',
-  messagingSenderId: '619560730482',
-  appId: '1:619560730482:web:48b334337c0078191227eb',
-  measurementId: 'G-N4ZGBBXZ6F',
+  apiKey: 'AIzaSyCmvTdXnH03VP5OVYmksxzYGye5yYlwDmE',
+  authDomain: 'sportsfinder-8275b.firebaseapp.com',
+  projectId: 'sportsfinder-8275b',
+  storageBucket: 'sportsfinder-8275b.firebasestorage.app',
+  messagingSenderId: '732223071182',
+  appId: '1:732223071182:web:cf51fdb2246870c278419f',
+  measurementId: 'G-YV6Z5C1WNZ',
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 const auth = initializeAuth(app, { persistence: getReactNativePersistence(AsyncStorage) });
-
-// const AuthContext = React.createContext();
-
-// const AuthProvider = ({ children }) => {
-//   const [currentUser, setCurrentUser] = useState(null);
-//   const [pending, setPending] = useState(true);
-
-//   useEffect(() => {
-//     onAuthStateChanged(auth, (user) => {
-//       setCurrentUser(user)
-//       setPending(false)
-//     });
-//   }, []);
-
-//   if(pending){
-//     return <>Loading...</>
-//   }
-
-//   return (
-//     <AuthContext.Provider
-//       value={{
-//         currentUser
-//       }}
-//     >
-//       {children}
-//     </AuthContext.Provider>
-//   );
-// };
 
 //Intialize database
 const db = getFirestore(app);

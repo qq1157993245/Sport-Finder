@@ -34,7 +34,6 @@ export default [
       'prefer-arrow-callback': ['error'],
 
       // Misc
-      'no-magic-numbers': ['warn'],
       'no-debugger': ['error'],
       'no-empty': ['error'],
 

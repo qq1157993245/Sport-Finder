@@ -6,9 +6,11 @@ const CustomButton = ({
   containerStyles,
   textStyles,
   isLoading,
+  ...props
 }) => {
   return (
     <TouchableOpacity
+      {...props}
       onPress={handlePress}
       activeOpacity={0.7}
       className={'bg-white rounded-xl min-h-[62px] flex flex-row ' + 
