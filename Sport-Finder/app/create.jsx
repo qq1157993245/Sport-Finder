@@ -9,6 +9,8 @@ import { ScrollView } from 'react-native';
 import NavigateButton from '../components/navigateButton';
 import icons from '../constants/icons.js';
 import { UserContext } from './context/userContext.jsx';
+import { doc, setDoc } from 'firebase/firestore';
+import { auth, db } from './(auth)/config/firebaseConfig.js';
 
 const Create = () => {
 
@@ -25,13 +27,39 @@ const Create = () => {
     if (!(numofPlayers && skillLevel && sportType && hour)) {
       setError('All fields are required.');
     } else {
-      setNumofPlayers('');
-      setSkillLevel('');
-      setSportType('');
-      setHour('');
-      setAddress('');
-      setError('');
-      router.push('/map');
+      const gameLocation = {};
+      const API_KEY = 'AIzaSyBCpIybveZ2ArS7vNo4p1Tz769tudpibHA';
+      const url = 'https://maps.googleapis.com/maps/api/geocode/json?' + 
+      `address=${encodeURIComponent(address)}&key=${API_KEY}`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const location = data.results[0].geometry.location;
+
+        gameLocation.latitude = location.lat;
+        gameLocation.longitude = location.lng;
+        gameLocation.numofPlayers = numofPlayers;
+        gameLocation.skillLevel = skillLevel;
+        gameLocation.sportType = sportType;
+        gameLocation.hour = hour;
+        gameLocation.address = address;
+
+        const currentUser = auth.currentUser;
+        const gameRef = doc(db, 'game', currentUser.uid);
+        await setDoc(gameRef, gameLocation);
+
+        setNumofPlayers('');
+        setSkillLevel('');
+        setSportType('');
+        setHour('');
+        setAddress('');
+        setError('');
+        router.push('/map');
+
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 

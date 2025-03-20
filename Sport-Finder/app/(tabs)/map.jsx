@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 
 import { Alert, Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import { View } from 'react-native';
 import * as Location from 'expo-location';
 import icons from '../../constants/icons.js';
 import { useRouter } from 'expo-router';
+import { db } from '../(auth)/config/firebaseConfig.js';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 const MapScreen = () => {
 
@@ -13,10 +15,19 @@ const MapScreen = () => {
 
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
+  const [games, setGames] = useState(null);
 
   function handleClickCreateIcon () {
     router.push('/create');
   }
+
+  async function handleGetCurrentLocation () {
+    setRegion(initialRegion);
+  }
+
+  const handleRegionChangeComplete = (newRegion) => {
+    setRegion(newRegion);
+  };
 
   useEffect(() => {
     // Get the user's current location
@@ -33,24 +44,51 @@ const MapScreen = () => {
         latitudeDelta: 0.02,
         longitudeDelta: 0.02,
       });
-      setRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      });
     })();
+
+    const collectionRef = collection(db, 'game');
+    const unsubscribe = onSnapshot(collectionRef, (querySnapshot)=>{
+      const documents = querySnapshot.docs.map((doc)=>(
+        {
+          latitude: doc.data().latitude,
+          longitude: doc.data().longitude,
+          numofPlayers: doc.data().numofPlayers,
+          skillLevel: doc.data().skillLevel,
+          sportType: doc.data().sportType,
+          hour: doc.data().hour,
+          address: doc.data().address,
+        }
+      ));
+      setGames(documents);
+    });
+
+    // Clean up function: avoid memory leak
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
     <View style={styles.container}>
       <MapView
+        key={games && games.length}
         style={styles.map}
         initialRegion={initialRegion}
         region={region}
+        onRegionChangeComplete={handleRegionChangeComplete}
         showsUserLocation={true}
       >
-        <TouchableOpacity style={styles.currentLocationButton}>
+        {games && games.map((game, index)=>(
+          <Marker
+            key={index}
+            coordinate={{
+              latitude: game.latitude,
+              longitude: game.longitude,
+            }
+            }
+          />
+        ))}
+        <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
           <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>
         </TouchableOpacity>
         <TouchableOpacity style={styles.createButton} onPress={handleClickCreateIcon}>

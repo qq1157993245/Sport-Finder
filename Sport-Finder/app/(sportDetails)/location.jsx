@@ -1,6 +1,6 @@
 import { Alert, Image, SafeAreaView, StyleSheet, TouchableOpacity} from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import CustomButton from '../../components/custombutton';
