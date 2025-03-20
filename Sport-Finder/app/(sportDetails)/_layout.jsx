@@ -5,7 +5,22 @@ const SportDetailsLayout = () => {
   return (
     <Stack>
       <Stack.Screen 
-        name='NumofPlayers'
+        name='numofPlayers'
+        options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='skillLevel'
+        options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='sportType'
+        options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='hours'
+        options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='address'
+        options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='location'
         options={{headerShown: false}}/>
     </Stack>
   );

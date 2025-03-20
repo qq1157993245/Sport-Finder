@@ -1,5 +1,5 @@
-import { View, TouchableOpacity} from 'react-native';
-import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, Image, StyleSheet} from 'react-native';
+import React, { useContext, useState} from 'react';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import CustomButton from '../components/custombutton';
@@ -8,60 +8,41 @@ import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native';
 import NavigateButton from '../components/navigateButton';
 import icons from '../constants/icons.js';
+import { UserContext } from './context/userContext.jsx';
 
 const Create = () => {
 
   const router = useRouter();
 
-  const [numPlayers, setNumPlayers] = useState('');
-  const [skillLevel, setSkillLevel] = useState('');
-  const [sportType, setSportType] = useState('');
-  const [hour, setHour] = useState('');
+  const {numofPlayers, setNumofPlayers, skillLevel, setSkillLevel,
+    sportType, setSportType, hour, setHour, address, setAddress} = useContext(UserContext);
 
-  const skillLevels = [
-    { label: 'Beginner', value: 'Beginner' },
-    { label: 'Intermediate', value: 'Intermediate' },
-    { label: 'Advanced', value: 'Advanced' },
-  ];
-
-  const sportTypes = [
-    { label: 'Basketball', value: 'Basketball' },
-    { label: 'Soccer', value: 'Soccer' },
-    { label: 'Tennis', value: 'Tennis' },
-    { label: 'Volleyball', value: 'Volleyball' },
-    { label: 'Handball', value: 'Handball' },
-    { label: 'Baseball', value: 'Baseball' },
-    { label: 'Football', value: 'Football' },
-    { label: 'Pickleball', value: 'Pickleball' },
-  ];
-
-
-  const hours = [
-    { label: '1 hour', value: 1 },
-    { label: '1 hour 30 minutes', value: 1.5 },
-    { label: '2 hour', value: 2 },
-    { label: '2 hour 30 minutes', value: 2.5 },
-    { label: '3 hour', value: 3 },
-    { label: '3 hour 30 minutes', value: 3.5},
-    { label: '4 hour', value: 4 },
-    { label: '4 hour 30 minutes', value: 4.5},
-    { label: '5 hour', value: 5},
-    { label: '6 hour', value: 6},
-    { label: '6 hour', value: 7},
-    { label: '6 hour', value: 8},
-    { label: '6 hour', value: 9},
-    { label: '6 hour', value: 10},
-    { label: '6 hour', value: 11},
-  ];
+  const [error, setError] = useState('');
 
 
   // Function to create game and set isInGame to true
   const handleCreateGame = async () => {
-    router.push('/map');
+    if (!(numofPlayers && skillLevel && sportType && hour)) {
+      setError('All fields are required.');
+    } else {
+      setNumofPlayers('');
+      setSkillLevel('');
+      setSportType('');
+      setHour('');
+      setAddress('');
+      setError('');
+      router.push('/map');
+    }
   };
 
   // Function to leave game and set isInGame to false
   const handleLeaveGame = async () => {
+    setNumofPlayers('');
+    setSkillLevel('');
+    setSportType('');
+    setHour('');
+    setAddress('');
+    setError('');
     router.back();
   };
 
@@ -75,25 +56,40 @@ const Create = () => {
       {/* ScrollView - Ensures Vertical Scrolling */}
       <ScrollView
         className='flex-1'
-        showsVerticalScrollIndicator={true}
+        showsVerticalScrollIndicator={false}
       >
         {/* Map Section */}
-        <View className="w-full h-60 rounded-lg overflow-hidden mt-10">
+        <View className="w-full h-24 rounded-lg overflow-hidden mt-10 justify-center items-center">
           <MapView className="w-full h-full" />
+          <TouchableOpacity style={styles.pinButton} onPress={()=>router.push('/location')}>
+            <Image source={icons.map} style={styles.pinIcon}/>
+            <Text>Edit Pin</Text>
+          </TouchableOpacity>
         </View>
 
+        {error && <Text style={{color: 'red'}}>{error}</Text>}
 
         <View className="mt-10 space-y-6">
           <NavigateButton 
-            text={'Number of Players'} 
+            text={numofPlayers ? `Players: ${numofPlayers}` : 'Number of Players'} 
             icon={icons.right_arrow} 
-            onPress={()=>{
-              router.push('/NumofPlayers');
-            }}/>
+            onPress={()=>router.push('/numofPlayers')}/>
           <NavigateButton 
-            text={'Skill Level'} 
+            text={skillLevel ? skillLevel : 'Skill Level'} 
             icon={icons.right_arrow}
-            onPress={()=>(router.push('/SkillLevel'))}/>
+            onPress={()=>(router.push('/skillLevel'))}/>
+          <NavigateButton 
+            text={sportType ? sportType : 'Sport Type'} 
+            icon={icons.right_arrow}
+            onPress={()=>(router.push('/sportType'))}/>
+          <NavigateButton 
+            text={hour ? hour : 'Hours'} 
+            icon={icons.right_arrow}
+            onPress={()=>(router.push('/hours'))}/>
+          <NavigateButton 
+            text={address ? address : 'Address'}
+            icon={icons.right_arrow}
+            onPress={()=>(router.push('/address'))}/>
         </View>
 
         {/* Create Button */}
@@ -108,5 +104,22 @@ const Create = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  pinButton: {
+    flexDirection: 'row',
+    position: 'absolute',
+    backgroundColor: 'gray',
+    height: '25%',
+    width: '30%',
+    borderRadius: '10%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pinIcon: {
+    height: 20,
+    width: 20,
+  },
+});
 
 export default Create;

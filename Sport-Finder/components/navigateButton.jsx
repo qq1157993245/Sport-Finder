@@ -8,7 +8,9 @@ const NavigateButton = ({text, icon, onPress, ...props}) => {
       onPress={onPress}
       className='h-16 bg-black flex-row items-center justify-between border-b-white border-b-2'
     >
-      <Text className='text-white text-2xl'>{text}</Text>
+      <Text className='text-white text-2xl flex-1' numberOfLines={1}>
+        {text}
+      </Text>
       <Image source={icon} style={styles.rightArrowIcon}/>
     </TouchableOpacity>
   );
