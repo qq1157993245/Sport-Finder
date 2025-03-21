@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
-import { Alert, Dimensions, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity} from 'react-native';
+import MapView, { Callout, Marker } from 'react-native-maps';
 import { View } from 'react-native';
 import * as Location from 'expo-location';
 import icons from '../../constants/icons.js';
 import { useRouter } from 'expo-router';
 import { db } from '../(auth)/config/firebaseConfig.js';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { UserContext } from '../context/userContext.jsx';
 
 const MapScreen = () => {
 
@@ -16,6 +17,8 @@ const MapScreen = () => {
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
   const [games, setGames] = useState(null);
+
+  const {setGameId} = useContext(UserContext);
 
   function handleClickCreateIcon () {
     router.push('/create');
@@ -28,6 +31,11 @@ const MapScreen = () => {
   const handleRegionChangeComplete = (newRegion) => {
     setRegion(newRegion);
   };
+
+  function handleCalloutPress (id) {
+    setGameId(id);
+    router.push('/groupChat');
+  }
 
   useEffect(() => {
     // Get the user's current location
@@ -46,10 +54,11 @@ const MapScreen = () => {
       });
     })();
 
-    const collectionRef = collection(db, 'game');
-    const unsubscribe = onSnapshot(collectionRef, (querySnapshot)=>{
-      const documents = querySnapshot.docs.map((doc)=>(
+    const collectionRef = collection(db, 'games');
+    const unsubscribe = onSnapshot(collectionRef, (collectionSnapshot)=>{
+      const documents = collectionSnapshot.docs.map((doc)=>(
         {
+          id: doc.data().id,
           latitude: doc.data().latitude,
           longitude: doc.data().longitude,
           numofPlayers: doc.data().numofPlayers,
@@ -86,7 +95,20 @@ const MapScreen = () => {
               longitude: game.longitude,
             }
             }
-          />
+          >
+            <Callout
+              onPress={()=>handleCalloutPress(game.id)}
+            >
+              <View>
+                <Text className='absolute right-6'>{'>>'}</Text>
+                <Text>{`Players: ${game.numofPlayers}`}</Text>
+                <Text>{`Sport Type: ${game.sportType}`}</Text>
+                <Text>{`Skill Level: ${game.skillLevel}`}</Text>
+                <Text>{`Address: ${game.address}`}</Text>
+                <Text>{`Hour: ${game.hour}`}</Text>
+              </View>
+            </Callout>
+          </Marker>
         ))}
         <TouchableOpacity style={styles.currentLocationButton} onPress={handleGetCurrentLocation}>
           <Image source={icons.currentLocation} style={styles.currentLocationIcon}/>

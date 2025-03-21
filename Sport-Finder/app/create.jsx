@@ -22,11 +22,11 @@ const Create = () => {
   const [error, setError] = useState('');
 
 
-  // Function to create game and set isInGame to true
   const handleCreateGame = async () => {
     if (!(numofPlayers && skillLevel && sportType && hour)) {
       setError('All fields are required.');
     } else {
+      // Get the address's latitude and longitude
       const gameLocation = {};
       const API_KEY = 'AIzaSyBCpIybveZ2ArS7vNo4p1Tz769tudpibHA';
       const url = 'https://maps.googleapis.com/maps/api/geocode/json?' + 
@@ -37,6 +37,10 @@ const Create = () => {
         const data = await response.json();
         const location = data.results[0].geometry.location;
 
+        const currentUser = auth.currentUser;
+
+        // Store game information
+        gameLocation.id  =currentUser.uid;
         gameLocation.latitude = location.lat;
         gameLocation.longitude = location.lng;
         gameLocation.numofPlayers = numofPlayers;
@@ -45,9 +49,20 @@ const Create = () => {
         gameLocation.hour = hour;
         gameLocation.address = address;
 
-        const currentUser = auth.currentUser;
-        const gameRef = doc(db, 'game', currentUser.uid);
+        const gameRef = doc(db, 'games', currentUser.uid);
         await setDoc(gameRef, gameLocation);
+
+        // Store group chat information
+        const groupChat = {
+          host: {
+            id: currentUser.uid,
+            messages: [],
+          },
+          guests:[],
+        };
+
+        const groupChatRef = doc(db, 'groupChats', currentUser.uid);
+        await setDoc(groupChatRef, groupChat);
 
         setNumofPlayers('');
         setSkillLevel('');

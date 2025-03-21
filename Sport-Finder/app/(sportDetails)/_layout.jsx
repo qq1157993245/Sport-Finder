@@ -22,6 +22,9 @@ const SportDetailsLayout = () => {
       <Stack.Screen 
         name='location'
         options={{headerShown: false}}/>
+      <Stack.Screen 
+        name='groupChat'
+        options={{headerShown: false}}/>
     </Stack>
   );
 };

@@ -59,16 +59,16 @@ const TabsLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="event"
+        name="contacts"
         options={{
-          title: 'Event',
+          title: 'Contacts',
           headerShown: false,
           gestureEnabled: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
               icon={icons.sport}
               color={color}
-              name="Event"
+              name="Contacts"
               focused={focused}
             />
           ),

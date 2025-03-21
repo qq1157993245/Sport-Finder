@@ -19,6 +19,7 @@ export default function UserProvider({ children }) {
   const [sportType, setSportType] = useState('');
   const [hour, setHour] = useState('');
   const [address, setAddress] = useState('');
+  const [gameId, setGameId] = useState('');
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -34,7 +35,7 @@ export default function UserProvider({ children }) {
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
       setFavoriteSport, currentUser, numofPlayers, setNumofPlayers, skillLevel, setSkillLevel,
-      sportType, setSportType, hour, setHour, address, setAddress}}>
+      sportType, setSportType, hour, setHour, address, setAddress, gameId, setGameId}}>
       {children}
     </UserContext.Provider>
   );
