@@ -100,7 +100,7 @@ const MapScreen = () => {
               onPress={()=>handleCalloutPress(game.id)}
             >
               <View>
-                <Text className='absolute right-6'>{'>>'}</Text>
+                <Text className='absolute right-1/4'>{'>>'}</Text>
                 <Text>{`Players: ${game.numofPlayers}`}</Text>
                 <Text>{`Sport Type: ${game.sportType}`}</Text>
                 <Text>{`Skill Level: ${game.skillLevel}`}</Text>

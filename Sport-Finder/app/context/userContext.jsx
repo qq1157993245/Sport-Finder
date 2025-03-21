@@ -14,10 +14,6 @@ export default function UserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [pending, setPending] = useState(true);
 
-  const [numofPlayers, setNumofPlayers] = useState('');
-  const [skillLevel, setSkillLevel] = useState('');
-  const [sportType, setSportType] = useState('');
-  const [hour, setHour] = useState('');
   const [address, setAddress] = useState('');
   const [gameId, setGameId] = useState('');
 
@@ -34,8 +30,7 @@ export default function UserProvider({ children }) {
   
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
-      setFavoriteSport, currentUser, numofPlayers, setNumofPlayers, skillLevel, setSkillLevel,
-      sportType, setSportType, hour, setHour, address, setAddress, gameId, setGameId}}>
+      setFavoriteSport, currentUser, address, setAddress, gameId, setGameId}}>
       {children}
     </UserContext.Provider>
   );

@@ -9,7 +9,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import 'react-native-get-random-values';
 import { UserContext } from '../context/userContext';
 
-const Address = () => {
+const SearchAddress = () => {
 
   const {address, setAddress} = useContext(UserContext);
 
@@ -69,4 +69,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Address;
+export default SearchAddress;

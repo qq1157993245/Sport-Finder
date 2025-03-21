@@ -6,24 +6,60 @@ import CustomButton from '../components/custombutton';
 import { Ionicons } from '@expo/vector-icons';
 import MapView from 'react-native-maps';
 import { ScrollView } from 'react-native';
-import NavigateButton from '../components/navigateButton';
+// import NavigateButton from '../components/navigateButton';
 import icons from '../constants/icons.js';
 import { UserContext } from './context/userContext.jsx';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from './(auth)/config/firebaseConfig.js';
+import Dropdownlist from '../components/dropdownlist.jsx';
+import NavigateButton from '../components/navigateButton.jsx';
 
 const Create = () => {
 
   const router = useRouter();
 
-  const {numofPlayers, setNumofPlayers, skillLevel, setSkillLevel,
-    sportType, setSportType, hour, setHour, address, setAddress} = useContext(UserContext);
+  const {address, setAddress} = useContext(UserContext);
+
+  const [numofPlayers, setNumofPlayers] = useState('');
+  const [skillLevel, setSkillLevel] = useState('');
+  const [sportType, setSportType] = useState('');
+  const [hour, setHour] = useState('');
 
   const [error, setError] = useState('');
 
+  const playersCount = Array.from({ length: 20 },
+    (_, i) => ({ title: `${i + 1}`, value: i + 1 }));
+
+  const skillLevels = [
+    { title: 'Beginner', value: 'Beginner' },
+    { title: 'Intermediate', value: 'Intermediate' },
+    { title: 'Advanced', value: 'Advanced' },
+  ];
+  const sportTypes = [
+    { title: 'Basketball', value: 'Basketball' },
+    { title: 'Soccer', value: 'Soccer' },
+    { title: 'Tennis', value: 'Tennis' },
+    { title: 'Volleyball', value: 'Volleyball' },
+    { title: 'Handball', value: 'Handball' },
+    { title: 'Baseball', value: 'Baseball' },
+    { title: 'Football', value: 'Football' },
+    { title: 'Pickleball', value: 'Pickleball' },
+  ];
+  const hours = [
+    { title: '1 hour', value: 1 },
+    { title: '1 hour 30 minutes', value: 1.5 },
+    { title: '2 hour', value: 2 },
+    { title: '2 hour 30 minutes', value: 2.5 },
+    { title: '3 hour', value: 3 },
+    { title: '3 hour 30 minutes', value: 3.5},
+    { title: '4 hour', value: 4 },
+    { title: '4 hour 30 minutes', value: 4.5},
+    { title: '5 hour', value: 5},
+  ];
+
 
   const handleCreateGame = async () => {
-    if (!(numofPlayers && skillLevel && sportType && hour)) {
+    if (!(numofPlayers && skillLevel && sportType && hour && address)) {
       setError('All fields are required.');
     } else {
       // Get the address's latitude and longitude
@@ -106,33 +142,37 @@ const Create = () => {
           <MapView className="w-full h-full" />
           <TouchableOpacity style={styles.pinButton} onPress={()=>router.push('/location')}>
             <Image source={icons.map} style={styles.pinIcon}/>
-            <Text>Edit Pin</Text>
+            <Text>Adjust Pin</Text>
           </TouchableOpacity>
         </View>
 
         {error && <Text style={{color: 'red'}}>{error}</Text>}
 
-        <View className="mt-10 space-y-6">
-          <NavigateButton 
-            text={numofPlayers ? `Players: ${numofPlayers}` : 'Number of Players'} 
-            icon={icons.right_arrow} 
-            onPress={()=>router.push('/numofPlayers')}/>
-          <NavigateButton 
-            text={skillLevel ? skillLevel : 'Skill Level'} 
-            icon={icons.right_arrow}
-            onPress={()=>(router.push('/skillLevel'))}/>
-          <NavigateButton 
-            text={sportType ? sportType : 'Sport Type'} 
-            icon={icons.right_arrow}
-            onPress={()=>(router.push('/sportType'))}/>
-          <NavigateButton 
-            text={hour ? hour : 'Hours'} 
-            icon={icons.right_arrow}
-            onPress={()=>(router.push('/hours'))}/>
+        <View>
+          <Dropdownlist
+            items={playersCount}
+            title={'Select number of players'}
+            onSelect={setNumofPlayers}
+          />
+          <Dropdownlist
+            items={skillLevels}
+            title={'Select skill level'}
+            onSelect={setSkillLevel}
+          />
+          <Dropdownlist
+            items={sportTypes}
+            title={'Select sport type'}
+            onSelect={setSportType}
+          />
+          <Dropdownlist
+            items={hours}
+            title={'Select hour'}
+            onSelect={setHour}
+          />
           <NavigateButton 
             text={address ? address : 'Address'}
             icon={icons.right_arrow}
-            onPress={()=>(router.push('/address'))}/>
+            onPress={()=>(router.push('/searchAddress'))}/>
         </View>
 
         {/* Create Button */}

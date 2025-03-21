@@ -10,6 +10,7 @@ const Dropdownmenu = ({items, value, setValue, placeholder, title, ...props}) =>
       <Text className="text-base text-gray-100 font-pmedium mb-1">{title}</Text>
       <DropDownPicker
         {...props}
+        listMode='SCROLLVIEW'
         items={items}
         open={open}
         setOpen={setOpen}
