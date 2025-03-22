@@ -89,16 +89,8 @@ const Create = () => {
         await setDoc(gameRef, gameLocation);
 
         // Store group chat information
-        const groupChat = {
-          host: {
-            id: currentUser.uid,
-            messages: [],
-          },
-          guests:[],
-        };
-
         const groupChatRef = doc(db, 'groupChats', currentUser.uid);
-        await setDoc(groupChatRef, groupChat);
+        await setDoc(groupChatRef, {users: []});
 
         setNumofPlayers('');
         setSkillLevel('');

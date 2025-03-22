@@ -1,109 +1,80 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
-import SelectDropdown from 'react-native-select-dropdown';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, { useRef } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+} from 'react-native';
 
-const Contacts = () => {
-  const emojisWithIcons = [
-    {title: 'happy', icon: 'emoticon-happy-outline'},
-    {title: 'cool', icon: 'emoticon-cool-outline'},
-    {title: 'lol', icon: 'emoticon-lol-outline'},
-    {title: 'sad', icon: 'emoticon-sad-outline'},
-    {title: 'cry', icon: 'emoticon-cry-outline'},
-    {title: 'angry', icon: 'emoticon-angry-outline'},
-    {title: 'confused', icon: 'emoticon-confused-outline'},
-    {title: 'excited', icon: 'emoticon-excited-outline'},
-    {title: 'kiss', icon: 'emoticon-kiss-outline'},
-    {title: 'devil', icon: 'emoticon-devil-outline'},
-    {title: 'dead', icon: 'emoticon-dead-outline'},
-    {title: 'wink', icon: 'emoticon-wink-outline'},
-    {title: 'sick', icon: 'emoticon-sick-outline'},
-    {title: 'frown', icon: 'emoticon-frown-outline'},
-  ];
+const App = () => {
+
+  const scrollRef = useRef();
   return (
-    <View style={{ flex: 1, justifyContent: 'center', padding: 20 }}>
-      <SelectDropdown
-        data={emojisWithIcons}
-        onSelect={(selectedItem, index) => {
-          console.log(selectedItem, index);
-        }}
-        renderButton={(selectedItem, isOpened) => {
-          return (
-            <View style={styles.dropdownButtonStyle}>
-              {selectedItem && (
-                <Icon name={selectedItem.icon} style={styles.dropdownButtonIconStyle} />
-              )}
-              <Text style={styles.dropdownButtonTxtStyle}>
-                {(selectedItem && selectedItem.title) || 'Select your mood'}
-              </Text>
-              <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} 
-                style={styles.dropdownButtonArrowStyle} />
-            </View>
-          );
-        }}
-        renderItem={(item, index, isSelected) => {
-          return (
-            <View 
-              style={{...styles.dropdownItemStyle, 
-                ...(isSelected && {backgroundColor: '#D2D9DF'})}}>
-              <Icon name={item.icon} style={styles.dropdownItemIconStyle} />
-              <Text style={styles.dropdownItemTxtStyle}>{item.title}</Text>
-            </View>
-          );
-        }}
-        showsVerticalScrollIndicator={false}
-        dropdownStyle={styles.dropdownMenuStyle}
-      />
-    </View>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+
+      >
+        {/* Scrollable messages */}
+        <ScrollView
+          ref={scrollRef}
+          // contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          {Array.from({ length: 80 }).map((_, i) => (
+            <Text key={i} style={styles.message}>Hello!!!!!!!!!!!!!!!!!!!!</Text>
+          ))}
+        </ScrollView>
+
+        {/* Fixed input at bottom */}
+        <View style={styles.inputBar}>
+          <TextInput 
+            onFocus={()=>{
+              if (scrollRef.current) {
+                scrollRef.current.scrollToEnd({animated: false});
+              }
+            }}
+            placeholder="Enter text..." 
+            style={styles.input} />
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  dropdownButtonStyle: {
-    width: 200,
-    height: 50,
-    backgroundColor: '#E9ECEF',
-    borderRadius: 12,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-  },
-  dropdownButtonTxtStyle: {
+  safeArea: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#151E26',
+    backgroundColor: '#fff',
   },
-  dropdownButtonArrowStyle: {
-    fontSize: 28,
-  },
-  dropdownButtonIconStyle: {
-    fontSize: 28,
-    marginRight: 8,
-  },
-  dropdownMenuStyle: {
-    backgroundColor: '#E9ECEF',
-    borderRadius: 8,
-  },
-  dropdownItemStyle: {
-    width: '100%',
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  dropdownItemTxtStyle: {
+  container: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '500',
-    color: '#151E26',
   },
-  dropdownItemIconStyle: {
-    fontSize: 28,
-    marginRight: 8,
+  scrollContent: {
+    paddingBottom: 80, // enough space for keyboard + input bar
+  },
+  message: {
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  inputBar: {
+    borderTopWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: '#f9f9f9',
+  },
+  input: {
+    height: 40,
+    borderRadius: 6,
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    backgroundColor: '#fff',
   },
 });
 
-export default Contacts;
+export default App;
