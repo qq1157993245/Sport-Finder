@@ -13,8 +13,9 @@ const GroupChat = () => {
 
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState(null);
+  const [isHost, setIsHost] = useState(false);
 
-  const {gameId} = useContext(UserContext);
+  const {gameId, isInGame, setIsInGame} = useContext(UserContext);
 
   const scrollRef = useRef(null);
 
@@ -41,10 +42,52 @@ const GroupChat = () => {
     setInputMessage('');
   }
 
+  async function handleJoinAndLeave() {
+    const currentUser = auth.currentUser;
+    const userRef = doc(db, 'users', currentUser.uid);
+    const gameRef = doc(db, 'games', gameId);
+    const gameResponse = await getDoc(gameRef);
+    const gameData = gameResponse.data();
+
+    if (isInGame) {
+      await updateDoc(userRef, {isInGame: false});
+      await updateDoc(gameRef, {joinedPlayers: gameData.joinedPlayers - 1});
+      setIsInGame(false);
+    } else {
+      if (currentUser.uid !== gameId) {
+        const newGuestsIds = gameData.guestsIds.push(currentUser.uid);
+        await updateDoc(gameRef, {
+          guestsIds: newGuestsIds,
+        });
+      }
+      await updateDoc(userRef, {isInGame: true});
+      await updateDoc(gameRef, {joinedPlayers: gameData.joinedPlayers + 1});
+      setIsInGame(true);
+    }
+  }
+
+  async function handleEndGame () {
+
+  }
+
   useEffect(()=>{
     const getData = async () =>{
-      const docRef = doc(db, 'groupChats', gameId);
-      const unsubscribe = onSnapshot(docRef, (docSnapShot)=>{
+      // Reference to users
+      const currentUser = auth.currentUser;
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userResponse = await getDoc(userRef);
+      const data = userResponse.data();
+      setIsInGame(data.isInGame);
+
+      if (currentUser.uid === gameId) {
+        setIsHost(true);
+      } else {
+        setIsHost(false);
+      }
+
+      // Reference to groupChats
+      const groupChatRef = doc(db, 'groupChats', gameId);
+      const unsubscribe = onSnapshot(groupChatRef, (docSnapShot)=>{
         setUsers(docSnapShot.data().users);
       });
 
@@ -63,9 +106,30 @@ const GroupChat = () => {
         className='flex-1 bg-black'
       >
 
-        <TouchableOpacity>
-          <Ionicons name="arrow-back" size={30} color="white" onPress={()=>router.back()}/>
-        </TouchableOpacity>
+        <View className='flex-row justify-between'>
+          <TouchableOpacity>
+            <Ionicons name="arrow-back" size={45} color="white" onPress={()=>router.back()}/>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleEndGame}
+            className={'border-2 border-white rounded-xl ' +
+             'justify-center items-center w-24 bg-purple-600'}>
+            {isHost && <Text className='text-white'>End Game</Text>}
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            onPress={handleJoinAndLeave}
+            className={'border-2 border-white rounded-xl ' +  
+              `${isInGame ? 'bg-red-600 ' : 'bg-green-600 '}` + 
+            'justify-center items-center w-24'}>
+            <Text className='text-white text-lg'>{isInGame ? 'Leave' : 'Join'}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={()=>router.push('/groupChatDetails')}>
+            <Image source={icons.ellipsis}/>
+          </TouchableOpacity>
+        </View>
 
         <ScrollView
           ref={scrollRef}

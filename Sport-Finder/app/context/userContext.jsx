@@ -17,6 +17,8 @@ export default function UserProvider({ children }) {
   const [address, setAddress] = useState('');
   const [gameId, setGameId] = useState('');
 
+  const [isInGame, setIsInGame] = useState(null);
+
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
@@ -30,7 +32,8 @@ export default function UserProvider({ children }) {
   
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
-      setFavoriteSport, currentUser, address, setAddress, gameId, setGameId}}>
+      setFavoriteSport, currentUser, address, setAddress, gameId, setGameId, 
+      isInGame, setIsInGame}}>
       {children}
     </UserContext.Provider>
   );

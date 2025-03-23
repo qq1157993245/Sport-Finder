@@ -9,7 +9,7 @@ import { ScrollView } from 'react-native';
 // import NavigateButton from '../components/navigateButton';
 import icons from '../constants/icons.js';
 import { UserContext } from './context/userContext.jsx';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './(auth)/config/firebaseConfig.js';
 import Dropdownlist from '../components/dropdownlist.jsx';
 import NavigateButton from '../components/navigateButton.jsx';
@@ -28,7 +28,7 @@ const Create = () => {
   const [error, setError] = useState('');
 
   const playersCount = Array.from({ length: 20 },
-    (_, i) => ({ title: `${i + 1}`, value: i + 1 }));
+    (_, i) => ({ title: i + 1, value: i + 1 }));
 
   const skillLevels = [
     { title: 'Beginner', value: 'Beginner' },
@@ -75,10 +75,16 @@ const Create = () => {
 
         const currentUser = auth.currentUser;
 
+        // Change inGame status
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {isInGame: true});
+
         // Store game information
-        gameLocation.id  =currentUser.uid;
+        gameLocation.hostId  =currentUser.uid;
+        gameLocation.guestsIds = [];
         gameLocation.latitude = location.lat;
         gameLocation.longitude = location.lng;
+        gameLocation.joinedPlayers = 1;
         gameLocation.numofPlayers = numofPlayers;
         gameLocation.skillLevel = skillLevel;
         gameLocation.sportType = sportType;

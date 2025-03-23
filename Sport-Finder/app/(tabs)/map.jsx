@@ -6,8 +6,8 @@ import { View } from 'react-native';
 import * as Location from 'expo-location';
 import icons from '../../constants/icons.js';
 import { useRouter } from 'expo-router';
-import { db } from '../(auth)/config/firebaseConfig.js';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { auth, db } from '../(auth)/config/firebaseConfig.js';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { UserContext } from '../context/userContext.jsx';
 
 const MapScreen = () => {
@@ -20,8 +20,17 @@ const MapScreen = () => {
 
   const {setGameId} = useContext(UserContext);
 
-  function handleClickCreateIcon () {
-    router.push('/create');
+  async function handleClickCreateIcon () {
+    const currentUser = auth.currentUser;
+    const userRef = doc(db, 'users', currentUser.uid);
+    const response = await getDoc(userRef);
+    const data = response.data();
+
+    if (data.isInGame) {
+      Alert.alert('You are already in a game.');
+    } else {
+      router.push('/create');
+    }
   }
 
   async function handleGetCurrentLocation () {
@@ -58,9 +67,11 @@ const MapScreen = () => {
     const unsubscribe = onSnapshot(collectionRef, (collectionSnapshot)=>{
       const documents = collectionSnapshot.docs.map((doc)=>(
         {
-          id: doc.data().id,
+          hostId: doc.data().hostId,
+          guestsIds: doc.data().guestsIds,
           latitude: doc.data().latitude,
           longitude: doc.data().longitude,
+          joinedPlayers: doc.data().joinedPlayers,
           numofPlayers: doc.data().numofPlayers,
           skillLevel: doc.data().skillLevel,
           sportType: doc.data().sportType,
@@ -97,11 +108,10 @@ const MapScreen = () => {
             }
           >
             <Callout
-              onPress={()=>handleCalloutPress(game.id)}
+              onPress={()=>handleCalloutPress(game.hostId)}
             >
               <View>
-                <Text className='absolute right-1/4'>{'>>'}</Text>
-                <Text>{`Players: ${game.numofPlayers}`}</Text>
+                <Text>{`Players: ${game.joinedPlayers}/${game.numofPlayers}`}</Text>
                 <Text>{`Sport Type: ${game.sportType}`}</Text>
                 <Text>{`Skill Level: ${game.skillLevel}`}</Text>
                 <Text>{`Address: ${game.address}`}</Text>
