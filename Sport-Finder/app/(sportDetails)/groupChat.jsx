@@ -1,4 +1,4 @@
-import { Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text,
+import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text,
   TextInput, TouchableOpacity } from 'react-native';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { View } from 'react-native';
 import icons from '../../constants/icons.js';
 import { UserContext } from '../context/userContext.jsx';
-import { doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { arrayRemove, deleteDoc, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../(auth)/config/firebaseConfig.js';
 
 const GroupChat = () => {
@@ -14,6 +14,8 @@ const GroupChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState(null);
   const [isHost, setIsHost] = useState(false);
+  const [isEnded, setIsEnded] = useState(false);
+  const [join, setJoin] = useState(false);
 
   const {gameId, isInGame, setIsInGame} = useContext(UserContext);
 
@@ -46,58 +48,137 @@ const GroupChat = () => {
     const currentUser = auth.currentUser;
     const userRef = doc(db, 'users', currentUser.uid);
     const gameRef = doc(db, 'games', gameId);
+    const groupChatRef = doc(db, 'groupChats', currentUser.uid);
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
 
-    if (isInGame) {
-      await updateDoc(userRef, {isInGame: false});
-      await updateDoc(gameRef, {joinedPlayers: gameData.joinedPlayers - 1});
-      setIsInGame(false);
-    } else {
-      if (currentUser.uid !== gameId) {
-        const newGuestsIds = gameData.guestsIds.push(currentUser.uid);
-        await updateDoc(gameRef, {
-          guestsIds: newGuestsIds,
-        });
+    if (isHost) {
+      if (gameData.joinedPlayers <= 1) {
+        await updateDoc(userRef, {isInGame: false});
+        await deleteDoc(groupChatRef);
+        await deleteDoc(gameRef);
+        setIsInGame(false);
+        router.back();
+      } else {
+        Alert.alert('You are the owner of this group. ' +
+             'Please transfer ownership to another member before leaving.');
       }
+    } else if (!isHost && isInGame) {
+      if (join) {
+        Alert.alert('You are in a game already.');
+      } else {
+        await updateDoc(userRef, {isInGame: false});
+        await updateDoc(gameRef, {
+          guestsIds: arrayRemove(currentUser.uid),
+          joinedPlayers: gameData.joinedPlayers - 1,
+        });
+        setIsInGame(false);
+        setJoin(true);
+      }
+    } else if (!isHost && !isInGame) {
+      const newGuestsIds = [...gameData.guestsIds, currentUser.uid];
       await updateDoc(userRef, {isInGame: true});
-      await updateDoc(gameRef, {joinedPlayers: gameData.joinedPlayers + 1});
+      await updateDoc(gameRef, {
+        guestsIds: newGuestsIds,
+        joinedPlayers: gameData.joinedPlayers + 1,
+      });
       setIsInGame(true);
+      setJoin(false);
     }
   }
 
   async function handleEndGame () {
+    const confirmed = await new Promise ((resolve) =>{
+      Alert.alert('End Game', 'Are you sure you want to end the game?', [
+        {text: 'Yes', onPress: ()=>resolve(true)},
+        {text: 'Cancel', onPress: ()=>resolve(false)},
+      ]);
+    });
 
+    if (!confirmed) return;
+
+    try {
+      const currentUser = auth.currentUser;
+      const userRef = doc(db, 'users', currentUser.uid);
+      const gameRef = doc(db, 'games', gameId);
+      const groupChatRef = doc(db, 'groupChats', gameId);
+      const gameResponse = await getDoc(gameRef);
+      const gameData = gameResponse.data();
+  
+      await updateDoc(userRef, {
+        isInGame: false,
+      });
+      for (let i = 0; i < gameData.guestsIds.length; i++) {
+        const guestRef = doc(db, 'users', gameData.guestsIds[i]);
+        await updateDoc(guestRef, {
+          isInGame: false,
+        });
+      }
+      await deleteDoc(groupChatRef);
+      await deleteDoc(gameRef);
+      
+      setIsInGame(false);
+      setIsEnded(true);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   useEffect(()=>{
+    let unsubscribe;
+
     const getData = async () =>{
       // Reference to users
       const currentUser = auth.currentUser;
       const userRef = doc(db, 'users', currentUser.uid);
       const userResponse = await getDoc(userRef);
-      const data = userResponse.data();
-      setIsInGame(data.isInGame);
+      const userData = userResponse.data();
+      setIsInGame(userData.isInGame);
 
       if (currentUser.uid === gameId) {
+        setJoin(false);
         setIsHost(true);
       } else {
+        if (!isHost && isInGame) {
+          setJoin(false);
+        } else if (!isHost && !isInGame) {
+          setJoin(true);
+        }
         setIsHost(false);
       }
 
       // Reference to groupChats
       const groupChatRef = doc(db, 'groupChats', gameId);
-      const unsubscribe = onSnapshot(groupChatRef, (docSnapShot)=>{
-        setUsers(docSnapShot.data().users);
+      unsubscribe = onSnapshot(groupChatRef, (docSnapShot)=>{
+        if (docSnapShot.exists()) {
+          setUsers(docSnapShot.data().users);
+        } else {
+          if (!isEnded) return;
+
+          Alert.alert(
+            'Game Ended',
+            'The game has ended.',
+            [
+              {
+                text: 'OK',
+                onPress: () => {
+                  unsubscribe();
+                  router.replace('/map');
+                },
+              },
+            ],
+          );
+          setUsers(null);
+        }
       });
 
       // Clean up function: avoid memory leak
-      return () => {
-        unsubscribe();
-      };
     };
     getData();
-  }, []);
+    return () => {
+      unsubscribe();
+    };
+  }, [gameId, isEnded]);
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
@@ -111,24 +192,27 @@ const GroupChat = () => {
             <Ionicons name="arrow-back" size={45} color="white" onPress={()=>router.back()}/>
           </TouchableOpacity>
 
+          {isHost && 
           <TouchableOpacity 
             onPress={handleEndGame}
             className={'border-2 border-white rounded-xl ' +
-             'justify-center items-center w-24 bg-purple-600'}>
-            {isHost && <Text className='text-white'>End Game</Text>}
-          </TouchableOpacity>
+           'justify-center items-center w-24 bg-purple-600'}>
+            <Text className='text-white'>End Game</Text>
+          </TouchableOpacity>}
 
           <TouchableOpacity 
             onPress={handleJoinAndLeave}
             className={'border-2 border-white rounded-xl ' +  
-              `${isInGame ? 'bg-red-600 ' : 'bg-green-600 '}` + 
+              `${join ? 'bg-green-600 ' : 'bg-red-600 '}` + 
             'justify-center items-center w-24'}>
-            <Text className='text-white text-lg'>{isInGame ? 'Leave' : 'Join'}</Text>
+            <Text className='text-white text-lg'>{join ? 'Join' : 'Leave'}</Text>
           </TouchableOpacity>
 
+          {isHost && 
           <TouchableOpacity onPress={()=>router.push('/groupChatDetails')}>
             <Image source={icons.ellipsis}/>
-          </TouchableOpacity>
+          </TouchableOpacity>}
+          
         </View>
 
         <ScrollView

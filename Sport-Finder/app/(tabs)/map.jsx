@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import icons from '../../constants/icons.js';
 import { useRouter } from 'expo-router';
 import { auth, db } from '../(auth)/config/firebaseConfig.js';
-import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { UserContext } from '../context/userContext.jsx';
 
 const MapScreen = () => {
@@ -18,7 +18,7 @@ const MapScreen = () => {
   const [region, setRegion] = useState(null);
   const [games, setGames] = useState(null);
 
-  const {setGameId} = useContext(UserContext);
+  const {gameId, setGameId} = useContext(UserContext);
 
   async function handleClickCreateIcon () {
     const currentUser = auth.currentUser;
@@ -33,8 +33,12 @@ const MapScreen = () => {
     }
   }
 
-  async function handleGetCurrentLocation () {
+  function handleGetCurrentLocation () {
     setRegion(initialRegion);
+  }
+
+  function handleClickRefreshIcon () {
+    handleGetAllGames();
   }
 
   const handleRegionChangeComplete = (newRegion) => {
@@ -46,6 +50,27 @@ const MapScreen = () => {
     router.push('/groupChat');
   }
 
+  // Get all the games
+  async function handleGetAllGames () {
+    const gamesRef = collection(db, 'games');
+    const snapshot = await getDocs(gamesRef);
+    const documents = snapshot.docs.map((doc)=>(
+      {
+        hostId: doc.data().hostId,
+        guestsIds: doc.data().guestsIds,
+        latitude: doc.data().latitude,
+        longitude: doc.data().longitude,
+        joinedPlayers: doc.data().joinedPlayers,
+        numofPlayers: doc.data().numofPlayers,
+        skillLevel: doc.data().skillLevel,
+        sportType: doc.data().sportType,
+        hour: doc.data().hour,
+        address: doc.data().address,
+      }
+    ));
+    setGames(documents);
+  }
+
   useEffect(() => {
     // Get the user's current location
     (async () => {
@@ -53,7 +78,7 @@ const MapScreen = () => {
       if (status !== 'granted') {
         Alert.alert('Permission to access location was denied');
       }
-
+       
       const location = await Location.getCurrentPositionAsync({});
       setInitialRegion({
         latitude: location.coords.latitude,
@@ -63,30 +88,8 @@ const MapScreen = () => {
       });
     })();
 
-    const collectionRef = collection(db, 'games');
-    const unsubscribe = onSnapshot(collectionRef, (collectionSnapshot)=>{
-      const documents = collectionSnapshot.docs.map((doc)=>(
-        {
-          hostId: doc.data().hostId,
-          guestsIds: doc.data().guestsIds,
-          latitude: doc.data().latitude,
-          longitude: doc.data().longitude,
-          joinedPlayers: doc.data().joinedPlayers,
-          numofPlayers: doc.data().numofPlayers,
-          skillLevel: doc.data().skillLevel,
-          sportType: doc.data().sportType,
-          hour: doc.data().hour,
-          address: doc.data().address,
-        }
-      ));
-      setGames(documents);
-    });
-
-    // Clean up function: avoid memory leak
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+    handleGetAllGames();
+  }, [gameId]);
 
   return (
     <View style={styles.container}>
@@ -126,6 +129,9 @@ const MapScreen = () => {
         <TouchableOpacity style={styles.createButton} onPress={handleClickCreateIcon}>
           <Image source={icons.create} style={styles.createIcon}/>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.refreshButton} onPress={handleClickRefreshIcon}>
+          <Image source={icons.refresh} style={styles.refreshIcon}/>
+        </TouchableOpacity>
       </MapView>
     </View>
   );
@@ -156,6 +162,17 @@ const styles = StyleSheet.create({
     right: Dimensions.get('window').width * 0.015,
   },
   createIcon: {
+    width: 43,
+    height: 43,
+    backgroundColor: '#F3F1F1',
+    borderRadius: 50,
+  },
+  refreshButton: {
+    position: 'absolute',
+    top: Dimensions.get('window').height * 0.28,
+    right: Dimensions.get('window').width * 0.015,
+  },
+  refreshIcon: {
     width: 43,
     height: 43,
     backgroundColor: '#F3F1F1',

@@ -20,12 +20,12 @@ export const signUp = async (email, password, confirmPassword) => {
 
     //todo add more fields
     const userProfile = {
+      id: userCredential.user.uid,
       email:email,
       username: '',
       age:'',
       favoriteSport:'',
       isInGame: false,
-
     };
     const userRef = doc(db, 'users', userCredential.user.uid);
 
