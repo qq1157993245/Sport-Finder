@@ -9,7 +9,7 @@ import { ScrollView } from 'react-native';
 // import NavigateButton from '../components/navigateButton';
 import icons from '../constants/icons.js';
 import { UserContext } from './context/userContext.jsx';
-import { doc, setDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from './(auth)/config/firebaseConfig.js';
 import Dropdownlist from '../components/dropdownlist.jsx';
 import NavigateButton from '../components/navigateButton.jsx';
@@ -18,7 +18,7 @@ const Create = () => {
 
   const router = useRouter();
 
-  const {address, setAddress} = useContext(UserContext);
+  const {address, setAddress, setJoinedGameId} = useContext(UserContext);
 
   const [numofPlayers, setNumofPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
@@ -75,10 +75,6 @@ const Create = () => {
 
         const currentUser = auth.currentUser;
 
-        // Change inGame status
-        const userRef = doc(db, 'users', currentUser.uid);
-        await updateDoc(userRef, {isInGame: true});
-
         // Store game information
         gameLocation.hostId  =currentUser.uid;
         gameLocation.guestsIds = [];
@@ -91,12 +87,23 @@ const Create = () => {
         gameLocation.hour = hour;
         gameLocation.address = address;
 
-        const gameRef = doc(db, 'games', currentUser.uid);
-        await setDoc(gameRef, gameLocation);
+        const gameCollectionRef = collection(db, 'games');
+        const gameRef = await addDoc(gameCollectionRef, gameLocation);
+        // const gameRef = doc(db, 'games', currentUser.uid);
+        // await setDoc(gameRef, gameLocation);
 
         // Store group chat information
-        const groupChatRef = doc(db, 'groupChats', currentUser.uid);
+        const groupChatRef = doc(db, 'groupChats', gameRef.id);
         await setDoc(groupChatRef, {users: []});
+
+        // Change inGame status
+        const userRef = doc(db, 'users', currentUser.uid);
+        await updateDoc(userRef, {
+          isInGame: true,
+          joinedGameId: gameRef.id,
+        });
+
+        setJoinedGameId(gameRef.id);
 
         setNumofPlayers('');
         setSkillLevel('');

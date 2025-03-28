@@ -4,49 +4,35 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { UserContext } from '../context/userContext';
 import { auth, db } from '../(auth)/config/firebaseConfig';
-import { arrayRemove, arrayUnion, deleteDoc, doc, getDoc, setDoc,
-  updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
 import CustomButton from '../../components/custombutton';
 
 const GroupChatDetails = () => {
   const [users, setUsers] = useState([]);
   const [selectedId, setSelectedId] = useState('');
 
-  const {gameId, setGameId} = useContext(UserContext);
+  const {gameId} = useContext(UserContext);
 
   async function handleConfirmSelect () {
     const currentUser = auth.currentUser;
 
     if (currentUser.uid === selectedId) return;
 
-    // Get the old game's info
-    const oldGameRef = doc(db, 'games', currentUser.uid);
-    const oldGameResponse = await getDoc(oldGameRef);
-    const oldGameData = oldGameResponse.data();
-
-    // Get the old group chat's info
-    const oldGroupChatRef = doc(db, 'groupChats', currentUser.uid);
-    const oldGroupChatResponse = await getDoc(oldGroupChatRef);
-    const oldGroupChatData = oldGroupChatResponse.data();
-
-    // Transfer the ownership to the selected user
-    const newGameRef = doc(db, 'games', selectedId);
-    const newGroupChatRef = doc(db, 'groupChats', selectedId);
-
-    await deleteDoc(oldGameRef);
-    await deleteDoc(oldGroupChatRef);
-
-    await setDoc(newGameRef, oldGameData);
-    await setDoc(newGroupChatRef, oldGroupChatData);
-    await updateDoc(newGameRef, {
+    // Update game's info
+    const gameRef = doc(db, 'games', gameId);
+    await updateDoc(gameRef, {
       hostId: selectedId,
       guestsIds: arrayRemove(selectedId),
     });
-    await updateDoc(newGameRef, {
+    await updateDoc(gameRef, {
       guestsIds: arrayUnion(currentUser.uid),
     });
 
-    setGameId(selectedId);
+    // Update groupChat's info
+    const groupChatRef = doc(db, 'groupChats', gameId);
+    await updateDoc(groupChatRef, {
+      lastUpdatedDate: Date.now(), // dummy value
+    });
 
     router.back();
   }
@@ -55,12 +41,13 @@ const GroupChatDetails = () => {
     const setData = async () =>{
       const members = [];
 
+      const currentUser = auth.currentUser;
       const gameRef = doc(db, 'games', gameId);
       const gameResponse = await getDoc(gameRef);
       const gameData = gameResponse.data();
 
       // Get the host's info using hostId
-      const hostRef = doc(db, 'users', gameData.hostId);
+      const hostRef = doc(db, 'users', currentUser.uid);
       const hostResponse = await getDoc(hostRef);
       const hostData = hostResponse.data();
       members.push(hostData);

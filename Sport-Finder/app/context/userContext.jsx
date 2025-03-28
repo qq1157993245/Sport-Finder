@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react';
 import {onAuthStateChanged} from 'firebase/auth';
-import { auth } from '../(auth)/config/firebaseConfig';
+import { auth} from '../(auth)/config/firebaseConfig';
 import {Text} from 'react-native';
 
 export const UserContext = createContext();
@@ -16,6 +16,7 @@ export default function UserProvider({ children }) {
 
   const [address, setAddress] = useState('');
   const [gameId, setGameId] = useState('');
+  const [joinedGameId, setJoinedGameId] = useState('');
 
   const [isInGame, setIsInGame] = useState(null);
 
@@ -24,7 +25,7 @@ export default function UserProvider({ children }) {
       setCurrentUser(user);
       setPending(false);
     });
-  }, []);
+  }, [gameId]);
 
   if(pending){
     return <Text>Loading...</Text>;
@@ -33,7 +34,7 @@ export default function UserProvider({ children }) {
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
       setFavoriteSport, currentUser, address, setAddress, gameId, setGameId, 
-      isInGame, setIsInGame}}>
+      isInGame, setIsInGame, joinedGameId, setJoinedGameId}}>
       {children}
     </UserContext.Provider>
   );

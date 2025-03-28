@@ -14,10 +14,9 @@ const GroupChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState(null);
   const [isHost, setIsHost] = useState(false);
-  const [isEnded, setIsEnded] = useState(false);
   const [join, setJoin] = useState(false);
 
-  const {gameId, isInGame, setIsInGame} = useContext(UserContext);
+  const {gameId, setGameId, isInGame, setIsInGame, setJoinedGameId} = useContext(UserContext);
 
   const scrollRef = useRef(null);
 
@@ -48,16 +47,21 @@ const GroupChat = () => {
     const currentUser = auth.currentUser;
     const userRef = doc(db, 'users', currentUser.uid);
     const gameRef = doc(db, 'games', gameId);
-    const groupChatRef = doc(db, 'groupChats', currentUser.uid);
+    const groupChatRef = doc(db, 'groupChats', gameId);
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
 
     if (isHost) {
       if (gameData.joinedPlayers <= 1) {
-        await updateDoc(userRef, {isInGame: false});
+        await updateDoc(userRef, {
+          isInGame: false,
+          joinedGameId: '',
+        });
         await deleteDoc(groupChatRef);
         await deleteDoc(gameRef);
         setIsInGame(false);
+        setJoinedGameId('');
+        setGameId('');
         router.back();
       } else {
         Alert.alert('You are the owner of this group. ' +
@@ -67,23 +71,35 @@ const GroupChat = () => {
       if (join) {
         Alert.alert('You are in a game already.');
       } else {
-        await updateDoc(userRef, {isInGame: false});
+        await updateDoc(userRef, {
+          isInGame: false,
+          joinedGameId: '',
+        });
         await updateDoc(gameRef, {
           guestsIds: arrayRemove(currentUser.uid),
           joinedPlayers: gameData.joinedPlayers - 1,
         });
+        setJoinedGameId('');
         setIsInGame(false);
         setJoin(true);
       }
     } else if (!isHost && !isInGame) {
-      const newGuestsIds = [...gameData.guestsIds, currentUser.uid];
-      await updateDoc(userRef, {isInGame: true});
-      await updateDoc(gameRef, {
-        guestsIds: newGuestsIds,
-        joinedPlayers: gameData.joinedPlayers + 1,
-      });
-      setIsInGame(true);
-      setJoin(false);
+      if (gameData.joinedPlayers === gameData.numofPlayers) {
+        Alert.alert('This game is full already.');
+      } else {
+        const newGuestsIds = [...gameData.guestsIds, currentUser.uid];
+        await updateDoc(userRef, {
+          isInGame: true,
+          joinedGameId: gameId,
+        });
+        await updateDoc(gameRef, {
+          guestsIds: newGuestsIds,
+          joinedPlayers: gameData.joinedPlayers + 1,
+        });
+        setJoinedGameId(gameId);
+        setIsInGame(true);
+        setJoin(false);
+      }
     }
   }
 
@@ -107,25 +123,30 @@ const GroupChat = () => {
   
       await updateDoc(userRef, {
         isInGame: false,
+        joinedGameId: '',
       });
       for (let i = 0; i < gameData.guestsIds.length; i++) {
         const guestRef = doc(db, 'users', gameData.guestsIds[i]);
         await updateDoc(guestRef, {
           isInGame: false,
+          joinedGameId: '',
         });
       }
       await deleteDoc(groupChatRef);
       await deleteDoc(gameRef);
       
+      setJoinedGameId('');
       setIsInGame(false);
-      setIsEnded(true);
+      setGameId('');
+      router.replace('/map');
     } catch (error) {
       console.log(error);
     }
   }
 
   useEffect(()=>{
-    let unsubscribe;
+    let unsubscribe1;
+    let unsubscribe2;
 
     const getData = async () =>{
       // Reference to users
@@ -135,26 +156,12 @@ const GroupChat = () => {
       const userData = userResponse.data();
       setIsInGame(userData.isInGame);
 
-      if (currentUser.uid === gameId) {
-        setJoin(false);
-        setIsHost(true);
-      } else {
-        if (!isHost && isInGame) {
-          setJoin(false);
-        } else if (!isHost && !isInGame) {
-          setJoin(true);
-        }
-        setIsHost(false);
-      }
-
       // Reference to groupChats
       const groupChatRef = doc(db, 'groupChats', gameId);
-      unsubscribe = onSnapshot(groupChatRef, (docSnapShot)=>{
+      unsubscribe1 = onSnapshot(groupChatRef, (docSnapShot)=>{
         if (docSnapShot.exists()) {
-          setUsers(docSnapShot.data().users);
+          setUsers([...docSnapShot.data().users]);
         } else {
-          if (!isEnded) return;
-
           Alert.alert(
             'Game Ended',
             'The game has ended.',
@@ -162,13 +169,34 @@ const GroupChat = () => {
               {
                 text: 'OK',
                 onPress: () => {
-                  unsubscribe();
+                  unsubscribe1();
+                  setGameId('');
                   router.replace('/map');
                 },
               },
             ],
           );
-          setUsers(null);
+        }
+      });
+
+      // Reference to games
+      const gameRef = doc(db, 'games', gameId);
+      unsubscribe2 = onSnapshot(gameRef, async (docSnapShot)=>{
+        if (docSnapShot.exists()) {
+
+          const gameResponse = await getDoc(gameRef);
+          const gameData = gameResponse.data();
+          if (currentUser.uid === gameData.hostId) {
+            setJoin(false);
+            setIsHost(true);
+          } else {
+            if (!isHost && userData.isInGame) {
+              setJoin(false);
+            } else if (!isHost && !userData.isInGame) {
+              setJoin(true);
+            }
+            setIsHost(false);
+          }
         }
       });
 
@@ -176,9 +204,15 @@ const GroupChat = () => {
     };
     getData();
     return () => {
-      unsubscribe();
+      if (unsubscribe1) {
+        unsubscribe1();
+      }
+      if (unsubscribe2) {
+        unsubscribe2();
+      }
+      setUsers(null);
     };
-  }, [gameId, isEnded]);
+  }, []);
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
@@ -189,7 +223,10 @@ const GroupChat = () => {
 
         <View className='flex-row justify-between'>
           <TouchableOpacity>
-            <Ionicons name="arrow-back" size={45} color="white" onPress={()=>router.back()}/>
+            <Ionicons name="arrow-back" size={45} color="white" onPress={()=>{
+              setGameId('');
+              router.back();
+            }}/>
           </TouchableOpacity>
 
           {isHost && 
