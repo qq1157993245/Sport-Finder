@@ -1,6 +1,6 @@
-import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text,
+import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text,
   TextInput, TouchableOpacity } from 'react-native';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { View } from 'react-native';
@@ -8,17 +8,23 @@ import icons from '../../constants/icons.js';
 import { UserContext } from '../context/userContext.jsx';
 import { arrayRemove, deleteDoc, doc, getDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../(auth)/config/firebaseConfig.js';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from '@gorhom/bottom-sheet';
 
 const GroupChat = () => {
 
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState(null);
+  const [user, setUser] = useState(null);
   const [isHost, setIsHost] = useState(false);
   const [join, setJoin] = useState(false);
 
   const {gameId, setGameId, isInGame, setIsInGame, setJoinedGameId} = useContext(UserContext);
 
   const scrollRef = useRef(null);
+
+  const bottomSheetRef = useRef(null);
+  const snapPoints = useMemo(() => ['60%'], []);
 
   async function handleSendMessage () {
     const currentUser = auth.currentUser;
@@ -144,6 +150,23 @@ const GroupChat = () => {
     }
   }
 
+  async function handleOpenSheet (userId) {
+    bottomSheetRef.current?.expand();
+
+    const userRef = doc(db, 'users', userId);
+    const userResponse = await getDoc(userRef);
+    const userData = userResponse.data();
+
+    const userInfo = {
+      age: userData.age,
+      name: userData.username,
+      favoriteSport: userData.favoriteSport,
+      isInGame: userData.isInGame,
+    };
+
+    setUser(userInfo);
+  }
+
   useEffect(()=>{
     let unsubscribe1;
     let unsubscribe2;
@@ -183,20 +206,21 @@ const GroupChat = () => {
       const gameRef = doc(db, 'games', gameId);
       unsubscribe2 = onSnapshot(gameRef, async (docSnapShot)=>{
         if (docSnapShot.exists()) {
-
           const gameResponse = await getDoc(gameRef);
           const gameData = gameResponse.data();
           if (currentUser.uid === gameData.hostId) {
             setJoin(false);
             setIsHost(true);
-          } else {
-            if (!isHost && userData.isInGame) {
-              setJoin(false);
-            } else if (!isHost && !userData.isInGame) {
-              setJoin(true);
-            }
+          } else if (currentUser.uid !== gameData.hostId && userData.isInGame &&
+             gameData.guestsIds.includes(currentUser.uid)) {
+            setJoin(false);
             setIsHost(false);
-          }
+          } else if ((currentUser.uid !== gameData.hostId && userData.isInGame &&
+             !gameData.guestsIds.includes(currentUser.uid)) ||
+           (currentUser.uid !== gameData.hostId && !userData.isInGame)){
+            setJoin(true); 
+            setIsHost(false);
+          } 
         }
       });
 
@@ -259,12 +283,13 @@ const GroupChat = () => {
               scrollRef.current.scrollToEnd({ animated: false });
             }
           }}
-          className='bg-white'
         >
           {users && users.map((user, index)=>(
             <View key={index} className='mb-4'>
-              <Text className='text-purple-800 font-bold text-xl'>{user.username}</Text>
-              <Text>{user.message}</Text>
+              <TouchableOpacity onPress={()=>handleOpenSheet(user.id)}>
+                <Text className='text-purple-800 font-bold text-xl'>{user.username}</Text>
+              </TouchableOpacity>
+              <Text className='text-white'>{user.message}</Text>
             </View>
           ))}
         </ScrollView>
@@ -284,11 +309,49 @@ const GroupChat = () => {
             <Image source={icons.send} className='w-12 h-12'/>
           </TouchableOpacity>
         </View>
+
+        <GestureHandlerRootView className='absolute h-full w-full'>
+          <BottomSheet
+            ref={bottomSheetRef}
+            snapPoints={snapPoints}
+            index={-1}
+            enablePanDownToClose={true}
+            backdropComponent={(props) => (
+              <BottomSheetBackdrop
+                {...props}
+                appearsOnIndex={0}
+                disappearsOnIndex={-1}
+                pressBehavior="close"
+                opacity={0.6}
+              />
+            )}
+          >
+            <BottomSheetView style={styles.sheetContent}>
+              {user &&
+               <View className='h-full w-full items-center'>
+                 <Text className='text-5xl mt-4'>{user.name}</Text>
+                 <Text className='text-2xl mt-4'>{`Age: ${user.age}`}</Text>
+                 <Text className='text-2xl mt-4'>{`Favorite sport: ${user.favoriteSport}`}</Text>
+                 <View className='flex-row mt-4'>
+                   <Ionicons name="ellipse" size={30} color={user.isInGame ? 'red' : 'green'}/>
+                   <Text className='text-2xl'>{user.isInGame ? 'Playing' : 'Idle'}</Text>
+                 </View>
+               </View>}
+            </BottomSheetView>
+          </BottomSheet>
+        </GestureHandlerRootView>
         
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
+const styles = StyleSheet.create({
+  sheetContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
 
 export default GroupChat;
