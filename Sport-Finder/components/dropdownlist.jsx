@@ -9,7 +9,7 @@ export default function Dropdownlist({items, title, onSelect, ...props}) {
       {...props}
       data={items}
       onSelect={(selectedItem) => {
-        onSelect(selectedItem.title);
+        onSelect(selectedItem.value);
       }}
       renderButton={(selectedItem, isOpened) => {
         return (

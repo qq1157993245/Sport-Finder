@@ -46,6 +46,7 @@ const Create = () => {
     { title: 'Pickleball', value: 'Pickleball' },
   ];
   const hours = [
+    { title: '0.003 hour', value: 0.003 },
     { title: '1 hour', value: 1 },
     { title: '1 hour 30 minutes', value: 1.5 },
     { title: '2 hour', value: 2 },
@@ -76,7 +77,7 @@ const Create = () => {
         const currentUser = auth.currentUser;
 
         // Store game information
-        gameLocation.hostId  =currentUser.uid;
+        gameLocation.hostId  = currentUser.uid;
         gameLocation.guestsIds = [];
         gameLocation.latitude = location.lat;
         gameLocation.longitude = location.lng;
@@ -84,13 +85,30 @@ const Create = () => {
         gameLocation.numofPlayers = numofPlayers;
         gameLocation.skillLevel = skillLevel;
         gameLocation.sportType = sportType;
-        gameLocation.hour = hour;
+        // gameLocation.hour = hour;
+        // gameLocation.startTime =  new Date().toISOString();
         gameLocation.address = address;
 
         const gameCollectionRef = collection(db, 'games');
         const gameRef = await addDoc(gameCollectionRef, gameLocation);
-        // const gameRef = doc(db, 'games', currentUser.uid);
-        // await setDoc(gameRef, gameLocation);
+        const addedGameRef = doc(db, 'games', gameRef.id);
+        await updateDoc(addedGameRef, {
+          id: gameRef.id,
+          // endTime: new Date(
+          //   new Date(gameLocation.startTime).getTime() + hour * 60 * 60 * 1000).toISOString(),
+          // timeLeft: hour * 60 * 60 * 1000,
+        });
+
+        // Store game time information
+        const now = new Date();
+        const gameTimeRef = doc(db, 'gamesTime', gameRef.id);
+        await setDoc(gameTimeRef, {
+          id: gameRef.id,
+          hour: hour,
+          startTime: now.toISOString(),
+          endTime: new Date(now.getTime() + hour * 60 * 60 * 1000).toISOString(),
+          timeLeft: hour * 60 * 60 * 1000,
+        });
 
         // Store group chat information
         const groupChatRef = doc(db, 'groupChats', gameRef.id);

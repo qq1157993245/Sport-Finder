@@ -56,6 +56,7 @@ const GroupChat = () => {
     const groupChatRef = doc(db, 'groupChats', gameId);
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
+    const gameTimeRef = doc(db, 'gamesTime', gameId);
 
     if (isHost) {
       if (gameData.joinedPlayers <= 1) {
@@ -65,6 +66,7 @@ const GroupChat = () => {
         });
         await deleteDoc(groupChatRef);
         await deleteDoc(gameRef);
+        await deleteDoc(gameTimeRef);
         setIsInGame(false);
         setJoinedGameId('');
         setGameId('');
@@ -126,6 +128,7 @@ const GroupChat = () => {
       const groupChatRef = doc(db, 'groupChats', gameId);
       const gameResponse = await getDoc(gameRef);
       const gameData = gameResponse.data();
+      const gameTimeRef = doc(db, 'gamesTime', gameId);
   
       await updateDoc(userRef, {
         isInGame: false,
@@ -140,6 +143,7 @@ const GroupChat = () => {
       }
       await deleteDoc(groupChatRef);
       await deleteDoc(gameRef);
+      await deleteDoc(gameTimeRef);
       
       setJoinedGameId('');
       setIsInGame(false);
@@ -184,22 +188,23 @@ const GroupChat = () => {
       unsubscribe1 = onSnapshot(groupChatRef, (docSnapShot)=>{
         if (docSnapShot.exists()) {
           setUsers([...docSnapShot.data().users]);
-        } else {
-          Alert.alert(
-            'Game Ended',
-            'The game has ended.',
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  unsubscribe1();
-                  setGameId('');
-                  router.replace('/map');
-                },
-              },
-            ],
-          );
-        }
+        } // else {
+        //   Alert.alert(
+        //     'Game Ended',
+        //     'The game has ended.',
+        //     [
+        //       {
+        //         text: 'OK',
+        //         onPress: () => {
+        //           unsubscribe1();
+        //           setGameId('');
+        //           setJoinedGameId('');
+        //           router.replace('/map');
+        //         },
+        //       },
+        //     ],
+        //   );
+        // }
       });
 
       // Reference to games
@@ -261,7 +266,7 @@ const GroupChat = () => {
             <Text className='text-white'>End Game</Text>
           </TouchableOpacity>}
 
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={handleJoinAndLeave}
             className={'border-2 border-white rounded-xl ' +  
               `${join ? 'bg-green-600 ' : 'bg-red-600 '}` + 
