@@ -32,6 +32,16 @@ const directMessage = () => {
     const userResponse = await getDoc(userRef);
     const userData = userResponse.data();
 
+    if (directMessageData.users.length === 0) {
+      const personRef = doc(db, 'users', personId);
+      await updateDoc(personRef, {
+        privateChats: arrayUnion({
+          directMessageId: DMId,
+          personId: currentUser.uid,
+        }),
+      });
+    }
+
     directMessageData.users.push({
       id: currentUser.uid,
       username: userData.username,
