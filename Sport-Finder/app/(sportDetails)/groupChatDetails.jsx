@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { UserContext } from '../context/userContext';
 import { auth, db } from '../(auth)/config/firebaseConfig';
-import { arrayRemove, arrayUnion, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, getDoc,
+  updateDoc } from 'firebase/firestore';
 import CustomButton from '../../components/custombutton';
 import { View } from 'react-native';
 import * as Haptics from 'expo-haptics';
@@ -16,7 +17,7 @@ const GroupChatDetails = () => {
   const [selectedId, setSelectedId] = useState('');
   const [user, setUser] = useState(null);
 
-  const {gameId} = useContext(UserContext);
+  const {gameId, isHost, setPersonId} = useContext(UserContext);
 
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['60%'], []);
@@ -50,17 +51,21 @@ const GroupChatDetails = () => {
     bottomSheetRef.current?.expand();
   }
 
+  async function handleDirectMessage (id) {
+    setPersonId(id);
+    router.push('/directMessage');
+  }
+
   useEffect(()=>{
     const setData = async () =>{
       const members = [];
 
-      const currentUser = auth.currentUser;
       const gameRef = doc(db, 'games', gameId);
       const gameResponse = await getDoc(gameRef);
       const gameData = gameResponse.data();
 
       // Get the host's info using hostId
-      const hostRef = doc(db, 'users', currentUser.uid);
+      const hostRef = doc(db, 'users', gameData.hostId);
       const hostResponse = await getDoc(hostRef);
       const hostData = hostResponse.data();
       members.push(hostData);
@@ -86,14 +91,14 @@ const GroupChatDetails = () => {
         <TouchableOpacity className='absolute left-0'>
           <Ionicons name="arrow-back" size={45} color="white" onPress={()=>router.back()}/>
         </TouchableOpacity>
-        <Text className='text-white text-3xl'>Switch Host</Text>
+        <Text className='text-white text-3xl'>{isHost ? 'Switch Host' : ''}</Text>
       </View>
 
       {users && users.map((user, index)=>(
         <TouchableOpacity 
           key={index} 
           className={'mt-10 border-2 border-purple-400 rounded-xl ' +
-            `${selectedId === user.id ? 'bg-red-500' : ''}`}
+            `${isHost && selectedId === user.id ? 'bg-red-500' : ''}`}
           onPress={()=>setSelectedId(user.id)}
           onLongPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -104,11 +109,12 @@ const GroupChatDetails = () => {
         </TouchableOpacity>
       ))}
 
+      {isHost && 
       <CustomButton
         handlePress={handleConfirmSelect}
         title={'Confirm'}
         containerStyles={'mt-20'}
-      />
+      />}
 
       <GestureHandlerRootView className='absolute h-full w-full'>
         <BottomSheet
@@ -136,6 +142,13 @@ const GroupChatDetails = () => {
                    <Ionicons name="ellipse" size={30} color={user.isInGame ? 'red' : 'green'}/>
                    <Text className='text-2xl'>{user.isInGame ? 'Playing' : 'Idle'}</Text>
                  </View>
+                 {user.id !== auth.currentUser.uid && 
+                 <TouchableOpacity 
+                   onPress={()=>handleDirectMessage(user.id)}
+                   className={'mt-10 rounded-full border border-white shadow-md ' + 
+                                 'bg-blue-500 p-4'}>
+                   <Text className='text-white text-2xl'>Direct Message</Text>
+                 </TouchableOpacity>}
                </View>}
           </BottomSheetView>
         </BottomSheet>

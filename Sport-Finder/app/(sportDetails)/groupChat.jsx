@@ -16,10 +16,10 @@ const GroupChat = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState(null);
   const [user, setUser] = useState(null);
-  const [isHost, setIsHost] = useState(false);
   const [join, setJoin] = useState(false);
 
-  const {gameId, setGameId, isInGame, setIsInGame, setJoinedGameId} = useContext(UserContext);
+  const {gameId, setGameId, isInGame, setIsInGame, setJoinedGameId, 
+    isHost, setIsHost} = useContext(UserContext);
 
   const scrollRef = useRef(null);
 
@@ -70,6 +70,7 @@ const GroupChat = () => {
         setIsInGame(false);
         setJoinedGameId('');
         setGameId('');
+        setIsHost(false);
         router.back();
       } else {
         Alert.alert('You are the owner of this group. ' +
@@ -148,6 +149,7 @@ const GroupChat = () => {
       setJoinedGameId('');
       setIsInGame(false);
       setGameId('');
+      setIsHost(false);
       router.replace('/map');
     } catch (error) {
       console.log(error);
@@ -274,10 +276,9 @@ const GroupChat = () => {
             <Text className='text-white text-lg'>{join ? 'Join' : 'Leave'}</Text>
           </TouchableOpacity>
 
-          {isHost && 
           <TouchableOpacity onPress={()=>router.push('/groupChatDetails')}>
             <Image source={icons.ellipsis}/>
-          </TouchableOpacity>}
+          </TouchableOpacity>
           
         </View>
 

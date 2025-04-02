@@ -20,6 +20,9 @@ export default function UserProvider({ children }) {
   const [joinedGameId, setJoinedGameId] = useState('');
 
   const [isInGame, setIsInGame] = useState(null);
+  const [isHost, setIsHost] = useState(false);
+
+  const [personId, setPersonId] = useState('');
 
   const unsubscribeExpireRef = useRef(null);
   const unsubscribeEndGameRef = useRef(null);
@@ -32,11 +35,10 @@ export default function UserProvider({ children }) {
     });
 
     const handleDeleteDoc = async (gameData, gameRef, gameTimeRef) =>{
-      const currentUser = auth.currentUser;
-      const userRef = doc(db, 'users', currentUser.uid);
+      const hostRef = doc(db, 'users', gameData.hostId);
       const groupChatRef = doc(db, 'groupChats', joinedGameId);
 
-      await updateDoc(userRef, {
+      await updateDoc(hostRef, {
         isInGame: false,
         joinedGameId: '',
       });
@@ -50,20 +52,25 @@ export default function UserProvider({ children }) {
       await deleteDoc(gameRef);
       await deleteDoc(gameTimeRef);
       await deleteDoc(groupChatRef);
-      Alert.alert(
-        'Game Expired',
-        'The game has expired.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setJoinedGameId('');
-              setGameId('');
-              router.replace('/map');
-            },
-          },
-        ],
-      );
+
+      setJoinedGameId('');
+      setGameId('');
+      router.replace('/map');
+
+      // Alert.alert(
+      //   'Game Expired',
+      //   'The game has expired.',
+      //   [
+      //     {
+      //       text: 'OK',
+      //       onPress: () => {
+      //         setJoinedGameId('');
+      //         setGameId('');
+      //         router.replace('/map');
+      //       },
+      //     },
+      //   ],
+      // );
     };
 
 
@@ -83,12 +90,13 @@ export default function UserProvider({ children }) {
             clearInterval(intervalRef.current);
             return;
           };
-
+          
+          const now = new Date();
           await updateDoc(gameTimeRef, {
             timeLeft: gameTimeData.hour * 60 * 60 * 1000 - 
-            (new Date().getTime() - new Date(gameTimeData.startTime).getTime()),
+            (now.getTime() - new Date(gameTimeData.startTime).getTime()),
           });
-          if (gameTimeData.timeLeft && gameTimeData.timeLeft < 0) {
+          if (now.getTime() > new Date(gameTimeData.endTime).getTime()) {
             clearInterval(intervalRef.current);
             handleDeleteDoc(gameData, gameRef, gameTimeRef);
             return;
@@ -146,7 +154,8 @@ export default function UserProvider({ children }) {
   return (
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
       setFavoriteSport, currentUser, address, setAddress, gameId, setGameId, 
-      isInGame, setIsInGame, joinedGameId, setJoinedGameId}}>
+      isInGame, setIsInGame, joinedGameId, setJoinedGameId, isHost, setIsHost,
+      personId, setPersonId}}>
       {children}
     </UserContext.Provider>
   );

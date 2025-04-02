@@ -10,7 +10,7 @@ export const removeExpiredGames = functions.pubsub
     const db = admin.firestore();
     const now = new Date();
 
-    const snapshot = await db.collection('games').get();
+    const snapshot = await db.collection('gamesTime').get();
 
     if (snapshot.empty) {
       console.log('No games found.');
@@ -22,13 +22,12 @@ export const removeExpiredGames = functions.pubsub
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const startTime = new Date(data.startTime);
+      const endTime = new Date(data.endTime);
       const hour = typeof data.hour === 'number' ? data.hour : null;
 
-      if (!startTime || hour == null) return;
+      if (!endTime || hour == null) return;
 
-      const expiresAt = new Date(startTime.getTime() + hour * 60 * 60 * 1000);
-      if (expiresAt < now) {
+      if (endTime.getTime() < now.getTime()) {
         batch.delete(doc.ref);
         deleteCount++;
       }

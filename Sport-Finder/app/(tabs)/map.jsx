@@ -84,7 +84,7 @@ const MapScreen = () => {
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
 
-    const gameTimeRef = doc(db, 'gamesTime', game.id);
+    const gameTimeRef = doc(db, 'gamesTime', joinedGameId);
     const gameTimeResponse = await getDoc(gameTimeRef);
     const gameTimeData = gameTimeResponse.data();
 
@@ -237,6 +237,14 @@ const MapScreen = () => {
                 <Text className='text-3xl mt-4'>{`Skill Level: ${game.skillLevel}`}</Text>
                 <Text className='text-3xl mt-4'>{`Address: ${game.address}`}</Text>
                 <Text className='text-3xl mt-4'>{`Hour: ${gameTime.hour}`}</Text>
+                <Text className='text-3xl mt-4'>
+                  {`Staring Time: ${new Date(gameTime.startTime).getHours()}:` + 
+                  `${new Date(gameTime.startTime).getMinutes()}`}
+                </Text>
+                <Text className='text-3xl mt-4'>
+                  {`Ending Time: ${new Date(gameTime.endTime).getHours()}:` +
+                   `${new Date(gameTime.endTime).getMinutes()}`}
+                </Text>
                 <TouchableOpacity 
                   onPress={()=>handleEnterGroupChat(game.id)}
                   className={'mt-10 rounded-full border border-white shadow-md ' + 
