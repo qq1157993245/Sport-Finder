@@ -1,47 +1,65 @@
-import React, { useRef } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
-  View,
   Text,
-  TextInput,
   StyleSheet,
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
+import { auth, db } from '../(auth)/config/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
+import { UserContext } from '../context/userContext';
+import { router } from 'expo-router';
 
 const App = () => {
+  const [contacts, setContacts] = useState(null);
 
-  const scrollRef = useRef();
+  const {personId, setPersonId} = useContext(UserContext);
+
+  function handleClickContact (id) {
+    setPersonId(id);
+    router.push('/directMessage');
+  }
+
+  useEffect(() =>{
+    const getData = async () =>{
+      const currentUser = auth.currentUser;
+      const userRef = doc(db, 'users', currentUser.uid);
+      const userResponse = await getDoc(userRef);
+      const userData = userResponse.data();
+      
+      const users = [];
+      for (let i = 0; i < userData.privateChats.length; i++) {
+        const personRef = doc(db, 'users', userData.privateChats[i].personId);
+        const personResponse = await getDoc(personRef);
+        const personData = personResponse.data();
+        users.push(personData);
+      }
+      setContacts(users);
+    };
+    
+    getData();
+  }, [personId]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-
       >
-        {/* Scrollable messages */}
-        <ScrollView
-          ref={scrollRef}
-          // contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          {Array.from({ length: 80 }).map((_, i) => (
-            <Text key={i} style={styles.message}>Hello!!!!!!!!!!!!!!!!!!!!</Text>
+        <ScrollView>
+          {contacts && contacts.map((contact, index)=>(
+            <TouchableOpacity
+              key={index} 
+              className='bg-black h-16 justify-center'
+              onPress={()=>handleClickContact(contact.id)}
+            >
+              <Text className='text-gray-100 text-3xl'>{contact.username}</Text>
+            </TouchableOpacity>
           ))}
         </ScrollView>
-
-        {/* Fixed input at bottom */}
-        <View style={styles.inputBar}>
-          <TextInput 
-            onFocus={()=>{
-              if (scrollRef.current) {
-                scrollRef.current.scrollToEnd({animated: false});
-              }
-            }}
-            placeholder="Enter text..." 
-            style={styles.input} />
-        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

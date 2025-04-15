@@ -3,10 +3,11 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { KeyboardAvoidingView } from 'react-native-web';
+import { KeyboardAvoidingView } from 'react-native';
 import { ScrollView, TextInput } from 'react-native-gesture-handler';
 import icons from '../../constants/icons.js';
-import { addDoc, arrayUnion, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, getDoc, onSnapshot,
+  updateDoc } from 'firebase/firestore';
 import { auth, db } from '../(auth)/config/firebaseConfig.js';
 import { UserContext } from '../context/userContext.jsx';
 
@@ -16,6 +17,7 @@ const directMessage = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [users, setUsers] = useState('');
   const [DMId, setDMId] = useState('');
+  const [person, setPerson] = useState('');
 
   const {personId} = useContext(UserContext);
 
@@ -53,20 +55,27 @@ const directMessage = () => {
   }
 
   useEffect(()=>{
+    let unsubscribe = null;
+
     const setData = async () =>{
+      const personRef = doc(db, 'users', personId);
+      const personResponse = await getDoc(personRef);
+      const personData = personResponse.data();
+      setPerson(personData);
+
       const currentUser = auth.currentUser;
-      const userRef = currentUser.uid;
+      const userRef = doc(db, 'users', currentUser.uid);
       const userResponse = await getDoc(userRef);
       const userData = userResponse.data();
 
       let directMessageId = null;
       for (let i = 0; i < userData.privateChats.length; i++) {
-        if (personId === userData.privateChats.personId) {
-          directMessageId = userData.privateChats.directMessageId;
+        if (personId === userData.privateChats[i].personId) {
+          directMessageId = userData.privateChats[i].directMessageId;
           break;
         }
       }
-
+      
       const directMessagesCollectionRef = collection(db, 'directMessages');
       if (!directMessageId) {
         const directMessageRef = await addDoc(directMessagesCollectionRef, {users: []});
@@ -80,13 +89,19 @@ const directMessage = () => {
       } else {
         setDMId(directMessageId);
         const directMessageRef = doc(db, 'directMessages', directMessageId);
-        const directMessageResponse = await getDoc(directMessageRef);
-        const directMessageData = directMessageResponse.data();
-        setUsers(directMessageData.users);
+        unsubscribe = onSnapshot(directMessageRef, (docSnapShot) =>{
+          if (docSnapShot.exists()) {
+            setUsers([...docSnapShot.data().users]);
+          }
+        });
       }
     };
 
     setData();
+    return () =>{
+      if (unsubscribe) unsubscribe();
+      setUsers(null);
+    };
   }, []);
 
   return (
@@ -96,14 +111,16 @@ const directMessage = () => {
         className='flex-1 bg-black'
       >
 
-        <View className='flex-row justify-between'>
-          <TouchableOpacity>
+        <View className='flex-row justify-center'>
+          <TouchableOpacity className='absolute left-0'>
             <Ionicons name="arrow-back" size={45} color="white" onPress={()=>{
               router.back();
             }}/>
           </TouchableOpacity>
 
-          
+          {person &&
+            <Text className='text-white text-3xl'>{person.username}</Text>
+          }
         </View>
 
         <ScrollView

@@ -9,6 +9,7 @@ import right_arrow from '../assets/icons/right-arrow.png';
 import send from '../assets/icons/send.png';
 import ellipsis from '../assets/icons/ellipsis.png';
 import refresh from '../assets/icons/refresh.png';
+import chat from '../assets/icons/chat.png';
 
 export default {
   profile,
@@ -22,4 +23,5 @@ export default {
   send,
   ellipsis,
   refresh,
+  chat,
 };

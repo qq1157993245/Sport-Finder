@@ -66,7 +66,7 @@ const TabsLayout = () => {
           gestureEnabled: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.sport}
+              icon={icons.chat}
               color={color}
               name="Contacts"
               focused={focused}
