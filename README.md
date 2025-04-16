@@ -13,7 +13,7 @@ Expo installed on your mobile (IOS or Android)
 
 ## Instructions:
 
-  1. Clone the repository to your local machine.
+  1. Clone the repository to your machine.
 
      Web URL: 
 
