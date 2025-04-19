@@ -49,7 +49,7 @@ Expo installed on your mobile (IOS or Android)
             EXPO_PUBLIC_API_KEY=your_api_key_here
             ```
 
-  4. In the `/SportFinder` folder and run:
+  4. In the `/SportFinder` folder, run:
 
          npm install
 
