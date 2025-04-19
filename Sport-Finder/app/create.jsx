@@ -65,9 +65,8 @@ const Create = () => {
     } else {
       // Get the address's latitude and longitude
       const gameLocation = {};
-      const API_KEY = 'AIzaSyBCpIybveZ2ArS7vNo4p1Tz769tudpibHA';
       const url = 'https://maps.googleapis.com/maps/api/geocode/json?' + 
-      `address=${encodeURIComponent(address)}&key=${API_KEY}`;
+      `address=${encodeURIComponent(address)}&key=${process.env.EXPO_PUBLIC_API_KEY}`;
 
       try {
         const response = await fetch(url);

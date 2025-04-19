@@ -41,7 +41,7 @@ const SearchAddress = () => {
             placeholder="Search for an address"
             fetchDetails={true}
             query={{
-              key: 'AIzaSyBCpIybveZ2ArS7vNo4p1Tz769tudpibHA',
+              key: process.env.EXPO_PUBLIC_API_KEY,
               language: 'en',
             }}
             styles={styles.searchAddress}

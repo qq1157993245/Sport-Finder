@@ -20,9 +20,8 @@ const SelectLocation = () => {
   }
 
   async function handleSave () {
-    const API_KEY = 'AIzaSyBCpIybveZ2ArS7vNo4p1Tz769tudpibHA';
     const url = 'https://maps.googleapis.com/maps/api/geocode/json?' + 
-    `latlng=${region.latitude},${region.longitude}&key=${API_KEY}`;
+    `latlng=${region.latitude},${region.longitude}&key=${process.env.EXPO_PUBLIC_API_KEY}`;
 
     try {
       const response = await fetch(url);
