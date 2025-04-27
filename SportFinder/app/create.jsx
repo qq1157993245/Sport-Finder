@@ -18,7 +18,8 @@ const Create = () => {
 
   const router = useRouter();
 
-  const {address, setAddress, setJoinedGameId} = useContext(UserContext);
+  const {address, setAddress, setJoinedGameId,
+    unknownLocation, setUnknownLocation} = useContext(UserContext);
 
   const [numofPlayers, setNumofPlayers] = useState('');
   const [skillLevel, setSkillLevel] = useState('');
@@ -71,11 +72,18 @@ const Create = () => {
       try {
         const response = await fetch(url);
         const data = await response.json();
-        const location = data.results[0].geometry.location;
+        let location;
+        if (unknownLocation) {
+          location = unknownLocation;
+        } else {
+          location = data.results[0].geometry.location;
+        }
 
         const currentUser = auth.currentUser;
 
         // Store game information
+        const now = new Date();
+
         gameLocation.hostId  = currentUser.uid;
         gameLocation.guestsIds = [];
         gameLocation.latitude = location.lat;
@@ -84,8 +92,9 @@ const Create = () => {
         gameLocation.numofPlayers = numofPlayers;
         gameLocation.skillLevel = skillLevel;
         gameLocation.sportType = sportType;
-        // gameLocation.hour = hour;
-        // gameLocation.startTime =  new Date().toISOString();
+        gameLocation.hour = hour;
+        gameLocation.startTime =  now.toISOString();
+        gameLocation.endTime= new Date(now.getTime() + hour * 60 * 60 * 1000).toISOString();
         gameLocation.address = address;
 
         const gameCollectionRef = collection(db, 'games');
@@ -96,17 +105,6 @@ const Create = () => {
           // endTime: new Date(
           //   new Date(gameLocation.startTime).getTime() + hour * 60 * 60 * 1000).toISOString(),
           // timeLeft: hour * 60 * 60 * 1000,
-        });
-
-        // Store game time information
-        const now = new Date();
-        const gameTimeRef = doc(db, 'gamesTime', gameRef.id);
-        await setDoc(gameTimeRef, {
-          id: gameRef.id,
-          hour: hour,
-          startTime: now.toISOString(),
-          endTime: new Date(now.getTime() + hour * 60 * 60 * 1000).toISOString(),
-          timeLeft: hour * 60 * 60 * 1000,
         });
 
         // Store group chat information
@@ -127,6 +125,7 @@ const Create = () => {
         setSportType('');
         setHour('');
         setAddress('');
+        setUnknownLocation('');
         setError('');
         router.push('/map');
 
@@ -143,6 +142,7 @@ const Create = () => {
     setSportType('');
     setHour('');
     setAddress('');
+    setUnknownLocation('');
     setError('');
     router.back();
   };

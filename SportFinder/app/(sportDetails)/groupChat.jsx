@@ -1,5 +1,5 @@
 import { Alert, Image, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, StyleSheet, Text,
-  TextInput, TouchableOpacity } from 'react-native';
+  TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -17,6 +17,7 @@ const GroupChat = () => {
   const [users, setUsers] = useState(null);
   const [user, setUser] = useState(null);
   const [join, setJoin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const {gameId, setGameId, isInGame, setIsInGame, setJoinedGameId, 
     isHost, setIsHost} = useContext(UserContext);
@@ -56,7 +57,6 @@ const GroupChat = () => {
     const groupChatRef = doc(db, 'groupChats', gameId);
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
-    const gameTimeRef = doc(db, 'gamesTime', gameId);
 
     if (isHost) {
       if (gameData.joinedPlayers <= 1) {
@@ -66,7 +66,6 @@ const GroupChat = () => {
         });
         await deleteDoc(groupChatRef);
         await deleteDoc(gameRef);
-        await deleteDoc(gameTimeRef);
         setIsInGame(false);
         setJoinedGameId('');
         setGameId('');
@@ -127,24 +126,22 @@ const GroupChat = () => {
       const userRef = doc(db, 'users', currentUser.uid);
       const gameRef = doc(db, 'games', gameId);
       const groupChatRef = doc(db, 'groupChats', gameId);
-      const gameResponse = await getDoc(gameRef);
-      const gameData = gameResponse.data();
-      const gameTimeRef = doc(db, 'gamesTime', gameId);
+      //const gameResponse = await getDoc(gameRef);
+      //const gameData = gameResponse.data();
   
       await updateDoc(userRef, {
         isInGame: false,
         joinedGameId: '',
       });
-      for (let i = 0; i < gameData.guestsIds.length; i++) {
-        const guestRef = doc(db, 'users', gameData.guestsIds[i]);
-        await updateDoc(guestRef, {
-          isInGame: false,
-          joinedGameId: '',
-        });
-      }
+      // for (let i = 0; i < gameData.guestsIds.length; i++) {
+      //   const guestRef = doc(db, 'users', gameData.guestsIds[i]);
+      //   await updateDoc(guestRef, {
+      //     isInGame: false,
+      //     joinedGameId: '',
+      //   });
+      // }
       await deleteDoc(groupChatRef);
       await deleteDoc(gameRef);
-      await deleteDoc(gameTimeRef);
       
       setJoinedGameId('');
       setIsInGame(false);
@@ -234,6 +231,7 @@ const GroupChat = () => {
       // Clean up function: avoid memory leak
     };
     getData();
+    setLoading(false);
     return () => {
       if (unsubscribe1) {
         unsubscribe1();
@@ -247,20 +245,21 @@ const GroupChat = () => {
 
   return (
     <SafeAreaView className='flex-1 bg-black'>
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className='flex-1 bg-black'
-      >
+      {loading ? <ActivityIndicator size="large" color="#FFFFFF" /> : 
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          className='flex-1 bg-black'
+        >
 
-        <View className='flex-row justify-between'>
-          <TouchableOpacity>
-            <Ionicons name="arrow-back" size={45} color="white" onPress={()=>{
-              setGameId('');
-              router.back();
-            }}/>
-          </TouchableOpacity>
+          <View className='flex-row justify-between'>
+            <TouchableOpacity>
+              <Ionicons name="arrow-back" size={45} color="white" onPress={()=>{
+                setGameId('');
+                router.back();
+              }}/>
+            </TouchableOpacity>
 
-          {isHost && 
+            {isHost && 
           <TouchableOpacity 
             onPress={handleEndGame}
             className={'border-2 border-white rounded-xl ' +
@@ -268,72 +267,72 @@ const GroupChat = () => {
             <Text className='text-white'>End Game</Text>
           </TouchableOpacity>}
 
-          <TouchableOpacity
-            onPress={handleJoinAndLeave}
-            className={'border-2 border-white rounded-xl ' +  
+            <TouchableOpacity
+              onPress={handleJoinAndLeave}
+              className={'border-2 border-white rounded-xl ' +  
               `${join ? 'bg-green-600 ' : 'bg-red-600 '}` + 
             'justify-center items-center w-24'}>
-            <Text className='text-white text-lg'>{join ? 'Join' : 'Leave'}</Text>
-          </TouchableOpacity>
+              <Text className='text-white text-lg'>{join ? 'Join' : 'Leave'}</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity onPress={()=>router.push('/groupChatDetails')}>
-            <Image source={icons.ellipsis}/>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={()=>router.push('/groupChatDetails')}>
+              <Image source={icons.ellipsis}/>
+            </TouchableOpacity>
           
-        </View>
+          </View>
 
-        <ScrollView
-          ref={scrollRef}
-          onContentSizeChange={()=>{
-            if (scrollRef.current) {
-              scrollRef.current.scrollToEnd({ animated: false });
-            }
-          }}
-        >
-          {users && users.map((user, index)=>(
-            <View key={index} className='mb-4'>
-              <TouchableOpacity onPress={()=>handleOpenSheet(user.id)}>
-                <Text className='text-purple-800 font-bold text-xl'>{user.username}</Text>
-              </TouchableOpacity>
-              <Text className='text-white'>{user.message}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      
-        <View className='flex-row w-full'>
-          <TextInput
+          <ScrollView
+            ref={scrollRef}
             onContentSizeChange={()=>{
               if (scrollRef.current) {
                 scrollRef.current.scrollToEnd({ animated: false });
               }
             }}
-            value={inputMessage}
-            onChangeText={(text)=>setInputMessage(text)}
-            className='border-2 border-white text-white rounded-md h-12 flex-1'
-          />
-          <TouchableOpacity onPress={handleSendMessage} disabled={inputMessage ? false : true}>
-            <Image source={icons.send} className='w-12 h-12'/>
-          </TouchableOpacity>
-        </View>
-
-        <GestureHandlerRootView className='absolute h-full w-full'>
-          <BottomSheet
-            ref={bottomSheetRef}
-            snapPoints={snapPoints}
-            index={-1}
-            enablePanDownToClose={true}
-            backdropComponent={(props) => (
-              <BottomSheetBackdrop
-                {...props}
-                appearsOnIndex={0}
-                disappearsOnIndex={-1}
-                pressBehavior="close"
-                opacity={0.6}
-              />
-            )}
           >
-            <BottomSheetView style={styles.sheetContent}>
-              {user &&
+            {users && users.map((user, index)=>(
+              <View key={index} className='mb-4'>
+                <TouchableOpacity onPress={()=>handleOpenSheet(user.id)}>
+                  <Text className='text-purple-800 font-bold text-xl'>{user.username}</Text>
+                </TouchableOpacity>
+                <Text className='text-white'>{user.message}</Text>
+              </View>
+            ))}
+          </ScrollView>
+      
+          <View className='flex-row w-full'>
+            <TextInput
+              onContentSizeChange={()=>{
+                if (scrollRef.current) {
+                  scrollRef.current.scrollToEnd({ animated: false });
+                }
+              }}
+              value={inputMessage}
+              onChangeText={(text)=>setInputMessage(text)}
+              className='border-2 border-white text-white rounded-md h-12 flex-1'
+            />
+            <TouchableOpacity onPress={handleSendMessage} disabled={inputMessage ? false : true}>
+              <Image source={icons.send} className='w-12 h-12'/>
+            </TouchableOpacity>
+          </View>
+
+          <GestureHandlerRootView className='absolute h-full w-full'>
+            <BottomSheet
+              ref={bottomSheetRef}
+              snapPoints={snapPoints}
+              index={-1}
+              enablePanDownToClose={true}
+              backdropComponent={(props) => (
+                <BottomSheetBackdrop
+                  {...props}
+                  appearsOnIndex={0}
+                  disappearsOnIndex={-1}
+                  pressBehavior="close"
+                  opacity={0.6}
+                />
+              )}
+            >
+              <BottomSheetView style={styles.sheetContent}>
+                {user &&
                <View className='h-full w-full items-center'>
                  <Text className='text-5xl mt-4'>{user.name}</Text>
                  <Text className='text-2xl mt-4'>{`Age: ${user.age}`}</Text>
@@ -343,11 +342,12 @@ const GroupChat = () => {
                    <Text className='text-2xl'>{user.isInGame ? 'Playing' : 'Idle'}</Text>
                  </View>
                </View>}
-            </BottomSheetView>
-          </BottomSheet>
-        </GestureHandlerRootView>
+              </BottomSheetView>
+            </BottomSheet>
+          </GestureHandlerRootView>
         
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      }
     </SafeAreaView>
   );
 };

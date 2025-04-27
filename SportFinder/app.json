@@ -2,6 +2,7 @@
   "expo": {
     "name": "SportsFinder",
     "slug": "sportsfinder",
+    "scheme": "sportsfinder",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,13 +10,17 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.1157993245.SportsFinder",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.1157993245.Sportsfinder"
     },
     "web": {
       "bundler": "metro",
@@ -25,6 +30,7 @@
     "plugins": [
       "expo-router",
       [
+        "@react-native-google-signin/google-signin",
         "expo-splash-screen",
         {
           "image": "./assets/images/splash-icon.png",

@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import { Alert, Dimensions, Image, StyleSheet, Text, TouchableOpacity} from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { View } from 'react-native';
 import * as Location from 'expo-location';
 import icons from '../../constants/icons.js';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { auth, db } from '../(auth)/config/firebaseConfig.js';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { UserContext } from '../context/userContext.jsx';
@@ -22,7 +22,6 @@ const MapScreen = () => {
   const [region, setRegion] = useState(null);
   const [games, setGames] = useState(null);
   const [game, setGame] = useState(null);
-  const [gameTime, setGameTime] = useState(null);
   // const [browsingGameId, setBrowsingGameId] = useState('');
 
   const {gameId, setGameId, joinedGameId, setJoinedGameId} = useContext(UserContext);
@@ -68,12 +67,8 @@ const MapScreen = () => {
 
   async function handleOpenSheet (game) {
     // setBrowsingGameId(game.id);
-    const gameTimeRef = doc(db, 'gamesTime', game.id);
-    const gameTimeResponse = await getDoc(gameTimeRef);
-    const gameTimeData = gameTimeResponse.data();
 
     setGame(game);
-    setGameTime(gameTimeData);
     setTimeout(()=>{
       bottomSheetRef.current?.snapToIndex(0);
     }, 100);
@@ -83,10 +78,6 @@ const MapScreen = () => {
     const gameRef = doc(db, 'games', joinedGameId);
     const gameResponse = await getDoc(gameRef);
     const gameData = gameResponse.data();
-
-    const gameTimeRef = doc(db, 'gamesTime', joinedGameId);
-    const gameTimeResponse = await getDoc(gameTimeRef);
-    const gameTimeData = gameTimeResponse.data();
 
     const newRegion = {
       latitude: gameData.latitude,
@@ -100,7 +91,6 @@ const MapScreen = () => {
     }
     // setBrowsingGameId(gameData.id);
     setGame(gameData);
-    setGameTime(gameTimeData);
     setTimeout(() => {
       const marker = markerRefs.current[joinedGameId];
       if (marker) marker.showCallout();
@@ -117,50 +107,96 @@ const MapScreen = () => {
 
     const gamesRef = collection(db, 'games');
     const snapshot = await getDocs(gamesRef);
-    const documents = snapshot.docs.map((doc)=>{
-      if (markerRefs.current[doc.id]) {
-        markerRefs.current[doc.id].hideCallout();
-      } 
-      return {
-        id: doc.id,
-        hostId: doc.data().hostId,
-        guestsIds: doc.data().guestsIds,
-        latitude: doc.data().latitude,
-        longitude: doc.data().longitude,
-        joinedPlayers: doc.data().joinedPlayers,
-        numofPlayers: doc.data().numofPlayers,
-        skillLevel: doc.data().skillLevel,
-        sportType: doc.data().sportType,
-        // hour: doc.data().hour,
-        // startTime: doc.data().startTime,
-        // endTime: doc.data().endTime,
-        // timeLeft: doc.data().timeLeft,
-        address: doc.data().address,
-      };
-    });
+    const documents = snapshot.docs
+      .filter((doc) => new Date(doc.data().endTime).getTime() > new Date().getTime())
+      .map((doc) => {
+        if (markerRefs.current[doc.id]) {
+          markerRefs.current[doc.id].hideCallout();
+        }
+        return {
+          id: doc.id,
+          hostId: doc.data().hostId,
+          guestsIds: doc.data().guestsIds,
+          latitude: doc.data().latitude,
+          longitude: doc.data().longitude,
+          joinedPlayers: doc.data().joinedPlayers,
+          numofPlayers: doc.data().numofPlayers,
+          skillLevel: doc.data().skillLevel,
+          sportType: doc.data().sportType,
+          hour: doc.data().hour,
+          startTime: doc.data().startTime,
+          endTime: doc.data().endTime,
+          address: doc.data().address,
+        };
+      });
     setJoinedGameId(userData.joinedGameId);
     setGames(documents);
   }
 
-  useEffect(() => {
-    // Get the user's current location
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
-      }
-       
-      const location = await Location.getCurrentPositionAsync({});
-      setInitialRegion({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-        latitudeDelta: 0.02,
-        longitudeDelta: 0.02,
-      });
-    })();
+  function handleConvertTime (date) {
+    const hour = new Date(date).getHours();
+    const minutes = new Date(date).getMinutes();
 
-    handleGetAllGames();
-  }, [gameId, joinedGameId]);
+    let time = '';
+
+    if (hour < 10) {
+      time += `0${hour}:`;
+    } else {
+      time += `${hour}:`;
+    }
+    if (minutes < 10) {
+      time += `0${minutes}`;
+    } else {
+      time += `${minutes}`;
+    }
+    if (hour < 12) {
+      time += 'AM';
+    } else {
+      time += 'PM';
+    }
+    return time;
+  }
+
+  useFocusEffect(
+    useCallback(()=>{
+      // Get the user's current location
+      (async () => {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('Permission to access location was denied');
+        }
+       
+        const location = await Location.getCurrentPositionAsync({});
+        setInitialRegion({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.02,
+          longitudeDelta: 0.02,
+        });
+      })();
+
+      handleGetAllGames();
+    }, [gameId, joinedGameId]));
+
+  // useEffect(() => {
+  //   // Get the user's current location
+  //   (async () => {
+  //     const { status } = await Location.requestForegroundPermissionsAsync();
+  //     if (status !== 'granted') {
+  //       Alert.alert('Permission to access location was denied');
+  //     }
+       
+  //     const location = await Location.getCurrentPositionAsync({});
+  //     setInitialRegion({
+  //       latitude: location.coords.latitude,
+  //       longitude: location.coords.longitude,
+  //       latitudeDelta: 0.02,
+  //       longitudeDelta: 0.02,
+  //     });
+  //   })();
+
+  //   handleGetAllGames();
+  // }, [gameId, joinedGameId]);
 
   return (
     <View style={styles.container}>
@@ -228,7 +264,7 @@ const MapScreen = () => {
           )}
         >
           <BottomSheetView>
-            {game && gameTime &&
+            {game &&
               <BottomSheetScrollView contentContainerStyle={styles.bottomScrollViewContainer}>
                 <Text className='text-3xl mt-4'>
                   {`Players: ${game.joinedPlayers}/${game.numofPlayers}`}
@@ -236,14 +272,12 @@ const MapScreen = () => {
                 <Text className='text-3xl mt-4'>{`Sport Type: ${game.sportType}`}</Text>
                 <Text className='text-3xl mt-4'>{`Skill Level: ${game.skillLevel}`}</Text>
                 <Text className='text-3xl mt-4'>{`Address: ${game.address}`}</Text>
-                <Text className='text-3xl mt-4'>{`Hour: ${gameTime.hour}`}</Text>
+                <Text className='text-3xl mt-4'>{`Hour: ${game.hour}`}</Text>
                 <Text className='text-3xl mt-4'>
-                  {`Staring Time: ${new Date(gameTime.startTime).getHours()}:` + 
-                  `${new Date(gameTime.startTime).getMinutes()}`}
+                  {`Staring Time:  ${handleConvertTime(game.startTime)}`}
                 </Text>
                 <Text className='text-3xl mt-4'>
-                  {`Ending Time: ${new Date(gameTime.endTime).getHours()}:` +
-                   `${new Date(gameTime.endTime).getMinutes()}`}
+                  {`Ending Time:  ${handleConvertTime(game.endTime)}`}
                 </Text>
                 <TouchableOpacity 
                   onPress={()=>handleEnterGroupChat(game.id)}

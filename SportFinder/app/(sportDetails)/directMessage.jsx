@@ -86,6 +86,12 @@ const directMessage = () => {
             personId: personId,
           }),
         });
+        await updateDoc(personRef, {
+          privateChats: arrayUnion({
+            directMessageId: directMessageRef.id,
+            personId: currentUser.uid,
+          }),
+        });
       } else {
         setDMId(directMessageId);
         const directMessageRef = doc(db, 'directMessages', directMessageId);

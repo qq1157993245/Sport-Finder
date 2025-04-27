@@ -12,7 +12,7 @@ const SelectLocation = () => {
   const [initialRegion, setInitialRegion] = useState(null);
   const [region, setRegion] = useState(null);
   
-  const {setAddress} = useContext(UserContext);
+  const {setAddress, setUnknownLocation} = useContext(UserContext);
 
 
   function handleRegionChangeComplete (newRegion) {
@@ -46,6 +46,10 @@ const SelectLocation = () => {
                   const newAddress = parts.join(', ');
                   setAddress(newAddress);
                 }
+                setUnknownLocation({
+                  lat: region.latitude,
+                  lng: region.longitude,
+                });
                 resolve(true);
               } },
               { text: 'Cancel'},

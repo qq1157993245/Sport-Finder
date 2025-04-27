@@ -9,9 +9,22 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 // import { AuthContext } from "./(auth)/config/firebaseConfig";
 import { Redirect } from 'expo-router';
 import { UserContext } from './context/userContext';
+import {googleAuth} from '../app/(auth)/loginFuncs';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { makeRedirectUri } from 'expo-auth-session';
 
+WebBrowser.maybeCompleteAuthSession();
+const redirectUri = makeRedirectUri({
+  useProxy: true,
+});
 
 const SignUp = () => {
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: '768186809270-bjf9c64b2bc1cbtk7lol6pfn49l5s2d0.apps.googleusercontent.com',
+    redirectUri,
+  });
+
 
   const { currentUser, pending} = useContext(UserContext);
   const [isLoggedIn , setisLoggedIn] = useState(false);
@@ -34,6 +47,27 @@ const SignUp = () => {
     }
   }
 
+  async function handleSignUpWithGoogle() {
+    const result = await promptAsync();
+    console.log(result);
+  
+    if (result.type === 'success') {
+      const idToken = result.params.id_token;
+      if (idToken) {
+        const response = await googleAuth(idToken);
+        if (response.success) {
+          console.log('Google signup success');
+        } else {
+          setError(response.message);
+        }
+      } else {
+        setError('No ID Token received');
+      }
+    } else {
+      setError('Google Sign In Cancelled');
+    }
+  }
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -46,9 +80,9 @@ const SignUp = () => {
   return (
     <SafeAreaView className="bg-black h-full">
       <KeyboardAwareScrollView>
-        <View className="w-full flex justify-center h-full px-4 my-6">
+        <View className="w-full flex justify-center h-full px-4 my-4">
           <Text className={'text-center text-4xl justify-center ' + 
-            'font-semibold text-white mt-10 font-psemibold'}>
+            'font-semibold text-white font-psemibold'}>
             SportsFinder
           </Text>
           <Text className={'text-left text-2xl justify-center ' + 
@@ -89,6 +123,13 @@ const SignUp = () => {
           <CustomButton
             title="Sign Up"
             handlePress={()=>handleSignUp()}
+            containerStyles="mt-7"
+            // isLoading={loading}
+          />
+
+          <CustomButton
+            title="Sign Up With Google"
+            handlePress={()=>handleSignUpWithGoogle()}
             containerStyles="mt-7"
             // isLoading={loading}
           />

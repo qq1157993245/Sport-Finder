@@ -16,6 +16,7 @@ export default function UserProvider({ children }) {
   const [pending, setPending] = useState(true);
 
   const [address, setAddress] = useState('');
+  const [unknownLocation, setUnknownLocation]=  useState('');
   const [gameId, setGameId] = useState('');
   const [joinedGameId, setJoinedGameId] = useState('');
 
@@ -34,23 +35,16 @@ export default function UserProvider({ children }) {
       setPending(false);
     });
 
-    const handleDeleteDoc = async (gameData, gameRef, gameTimeRef) =>{
-      const hostRef = doc(db, 'users', gameData.hostId);
+    const handleDeleteDoc = async (currentUser, gameRef) =>{
+      const userRef = doc(db, 'users', currentUser.uid);
+
       const groupChatRef = doc(db, 'groupChats', joinedGameId);
 
-      await updateDoc(hostRef, {
+      await updateDoc(userRef, {
         isInGame: false,
         joinedGameId: '',
       });
-      for (let i = 0; i < gameData.guestsIds.length; i++) {
-        const guestRef = doc(db, 'users', gameData.guestsIds[i]);
-        await updateDoc(guestRef, {
-          isInGame: false,
-          joinedGameId: '',
-        });
-      }
       await deleteDoc(gameRef);
-      await deleteDoc(gameTimeRef);
       await deleteDoc(groupChatRef);
 
       setJoinedGameId('');
@@ -73,32 +67,24 @@ export default function UserProvider({ children }) {
       // );
     };
 
-
     const handleExpire = async () =>{
       if (joinedGameId) {
         intervalRef.current = setInterval(async () => {
+          const currentUser = auth.currentUser;
           const gameRef = doc(db, 'games', joinedGameId);
           const gameResponse = await getDoc(gameRef);
           const gameData = gameResponse.data();  
 
-          const gameTimeRef = doc(db, 'gamesTime', joinedGameId);
-          const gameTimeResponse = await getDoc(gameTimeRef);
-          const gameTimeData = gameTimeResponse.data();
-
-          if (!gameTimeResponse.exists()) {
-            handleDeleteDoc(gameData, gameRef, gameTimeRef);
+          if (!gameResponse.exists()) {
+            handleDeleteDoc(currentUser, gameRef);
             clearInterval(intervalRef.current);
             return;
           };
           
           const now = new Date();
-          await updateDoc(gameTimeRef, {
-            timeLeft: gameTimeData.hour * 60 * 60 * 1000 - 
-            (now.getTime() - new Date(gameTimeData.startTime).getTime()),
-          });
-          if (now.getTime() > new Date(gameTimeData.endTime).getTime()) {
+          if (now.getTime() > new Date(gameData.endTime).getTime()) {
             clearInterval(intervalRef.current);
-            handleDeleteDoc(gameData, gameRef, gameTimeRef);
+            handleDeleteDoc(currentUser, gameRef);
             return;
           }
         }, 1000);
@@ -155,7 +141,7 @@ export default function UserProvider({ children }) {
     <UserContext.Provider value={{username, setUsername, age, setAge, favoriteSport, 
       setFavoriteSport, currentUser, address, setAddress, gameId, setGameId, 
       isInGame, setIsInGame, joinedGameId, setJoinedGameId, isHost, setIsHost,
-      personId, setPersonId}}>
+      personId, setPersonId, unknownLocation, setUnknownLocation}}>
       {children}
     </UserContext.Provider>
   );
