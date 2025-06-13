@@ -23,3 +23,8 @@ It also includes messaging features to make coordination and communication easie
 > If you accidentally tap it, simply close the app and Expo, then **reopen it by scanning the QR code again**.
 
 
+## 🎥 Demos
+
+- [View](./screenshots/interaction/pdf)
+
+
