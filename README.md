@@ -1,60 +1,25 @@
-# Sport Finder
+# 📱 Sport Finder
 
-**Sport Finder** is a mobile app built with **Expo** and **React Native** that allows users to create or join local sports games.  
-Users can also chat with others to coordinate and connect more easily.
+**Sport Finder** is a mobile app built with **Expo** and **React Native** that helps users create and join local sports games.  
+It also includes messaging features to make coordination and communication easier.
 
-## Prerequisite:
+## 🔑 Key Features
+- Create new games or join games created by others.
+- Chat with teammates in group chats.
+- Start one-on-one chats with other users.
 
-Node.js
+## 🚀 How to Try It
+1. Install the **Expo Go** app on your phone (available on iOS and Android).
+2. Open this link to get the QR code:
 
-npm
+   (https://expo.dev/preview/update?message=Updated&updateRuntimeVersion=1.0.0&createdAt=2025-06-13T09%3A05%3A00.395Z&slug=exp&projectId=94016a0f-7d89-4e9b-a669-c4de72009f63&group=279e5b6e-7b94-47ea-b731-5ce4efe11dfe)
+   
+3. Open the Expo Go app, then use a scanner to scan the QR code.
+4. Once scanned, the app will open — enjoy exploring it!
 
-Expo installed on your mobile (IOS or Android)
+> ⚠️ **Note**  
+> You may see a small **down arrow icon** near the bottom right, next to the "Profile" tab.  
+> This is **not part of the app** — it's part of **Expo Go’s preview interface**.  
+> If you accidentally tap it, simply close the app and Expo, then **reopen it by scanning the QR code again**.
 
-## Instructions:
 
-  1. Clone the repository to your machine.
-
-       Web URL:
-     
-             git clone https://github.com/qq1157993245/Sport-Finder.git
-
-       or SSH key:
-
-         git clone git@github.com:qq1157993245/Sport-Finder.git
-
-  3. Set up a map API KEY.
-     
-     1) Go to the [Google Cloud Console](https://console.cloud.google.com/).
-        
-     2) Create a new project (or use an existing one).
-    
-     3) Enable the following APIs:
-
-        - Maps SDK for Android
-
-        - Maps SDK for iOS
-
-        - Places API
-
-        - Geocoding API
-          
-      4) Go to the Credentials tab and create an API key.
-    
-      5) Restrict your key to only the APIs you enabled for better security (optional but recommended).
-    
-      6) Navigate to the `/SportFinder` folder and create a `.env` file with the following line:
-
-            ```env
-            EXPO_PUBLIC_API_KEY=your_api_key_here
-            ```
-
-  4. In the `/SportFinder` folder, run:
-
-         npm install
-
-  5. Run the command to start:
-
-         npx expo start
-
-  6. Open the Expo app on your mobile, and then scan the QR code shown in the terminal
