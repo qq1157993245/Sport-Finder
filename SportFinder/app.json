@@ -9,18 +9,29 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.1157993245.SportsFinder",
+      "bundleIdentifier": "com.1157993245.SportsFinder"
     },
     "android": {
-      "package": "com.1157993245.Sportsfinder"
+      "package": "com.run.Sportsfinder"
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "static"
     },
     "plugins": [],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "94016a0f-7d89-4e9b-a669-c4de72009f63"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/94016a0f-7d89-4e9b-a669-c4de72009f63"
     }
   }
 }

@@ -41,6 +41,8 @@ export default [
       'react/no-unescaped-entities': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+
+      'import/no-commonjs': 'off',
     },
   },
 ];

@@ -45,6 +45,9 @@ const SearchAddress = () => {
               language: 'en',
             }}
             styles={styles.searchAddress}
+            predefinedPlaces={[]}
+            textInputProps={{}}
+            minLength={0}
           />
         </View>
         {address && <Text style={{color: 'white', fontSize: 15}}>{address}</Text>}
