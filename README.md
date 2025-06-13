@@ -25,6 +25,6 @@ It also includes messaging features to make coordination and communication easie
 
 ## 🎥 Demos
 
-- [View](./screenshots/Interactions/pdf)
+- [View](./screenshots/interactions/pdf)
 
 
